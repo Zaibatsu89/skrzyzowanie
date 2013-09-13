@@ -1,6 +1,4 @@
 using System.Threading;
-using KruispuntGroep6.Communication.Client;
-using KruispuntGroep6.Communication.Server;
 using KruispuntGroep6.Simulator.Main;
 
 namespace KruispuntGroep6.Simulator
