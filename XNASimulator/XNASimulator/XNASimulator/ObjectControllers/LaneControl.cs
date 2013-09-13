@@ -124,75 +124,47 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
 
         private void LoadLane(Vector2 laneStartPosition, Lane lane)
         {
+            RotationEnum laneDirection = RotationEnum.North;
+            int laneSize = MainGame.LaneLengthHor;
+
             Tile laneSpawnTile;
             Tile laneStartTile = lists.Tiles[(int)laneStartPosition.X, (int)laneStartPosition.Y];
             lane.laneTiles.Add(laneStartTile);
 
-            //Add all tiles to the lane
-            if (lane.laneID.Contains("N"))
+            //Figure out the lane's direction
+            switch (lane.laneID[0])
             {
-                for (int i = 0; i < MainGame.LaneLengthVer - 1; i++)
-                {
-                    //Keep adding tiles to the north until you reach the lanelength
-                    lane.laneTiles.Add(lane.laneTiles[i].adjacentTiles[RotationEnum.North.ToString()]);
-
-                    //When the last tile has been added...
-                    if (lane.laneTiles.Count == MainGame.LaneLengthVer)
-                    {
-                        laneSpawnTile = lane.laneTiles[lane.laneTiles.Count - 1];
-                        laneSpawnTile.isSpawn = true;
-                        lane.spawnTile = laneSpawnTile;            
-                    }
-                }
-                
+                case 'N': 
+                    laneDirection = RotationEnum.North;
+                    laneSize = MainGame.LaneLengthVer;
+                    break;
+                case 'E': 
+                    laneDirection = RotationEnum.East;
+                    laneSize = MainGame.LaneLengthHor;
+                    break;
+                case 'S': 
+                    laneDirection = RotationEnum.South;
+                    laneSize = MainGame.LaneLengthVer;
+                    break;
+                case 'W': 
+                    laneDirection = RotationEnum.West;
+                    laneSize = MainGame.LaneLengthHor;
+                    break;
             }
-            else if (lane.laneID.Contains("E"))
-            {
-                for (int i = 0; i < MainGame.LaneLengthHor - 1; i++)
-                {
-                    lane.laneTiles.Add(lane.laneTiles[i].adjacentTiles[RotationEnum.East.ToString()]);
 
-                    if (lane.laneTiles.Count == MainGame.LaneLengthHor)
-                    {
-                        laneSpawnTile = lane.laneTiles[lane.laneTiles.Count - 1];
-                        laneSpawnTile.isSpawn = true;
-                        lane.spawnTile = laneSpawnTile;       
-                    }          
-                }
-                
-            }
-            else if (lane.laneID.Contains("W"))
+            //Build the lane
+            for (int i = 0; i < laneSize - 1; i++)
             {
-                
-                for (int i = 0; i < MainGame.LaneLengthHor - 1; i++)
-                {
-                    lane.laneTiles.Add(lane.laneTiles[i].adjacentTiles[RotationEnum.West.ToString()]);
+                //Keep adding tiles in the right direction until you reach the lanelength
+                lane.laneTiles.Add(lane.laneTiles[i].adjacentTiles[laneDirection.ToString()]);
 
-                    if (lane.laneTiles.Count == MainGame.LaneLengthHor)
-                    {
-                        laneSpawnTile = lane.laneTiles[lane.laneTiles.Count - 1];
-                        laneSpawnTile.isSpawn = true;
-                        lane.spawnTile = laneSpawnTile;       
-                    }
-                }
-                
-            }
-            else if (lane.laneID.Contains("S"))
-            {
-                for (int i = 0; i < MainGame.LaneLengthVer - 1; i++)
+                //When the last tile has been added...
+                if (lane.laneTiles.Count == laneSize)
                 {
-                    lane.laneTiles.Add(lane.laneTiles[i].adjacentTiles[RotationEnum.South.ToString()]);
-
-                    //When the last tile has been added...
-                    if (lane.laneTiles.Count == MainGame.LaneLengthVer)
-                    {
-                        //Set the last tile as the vehicle spawning tile
-                        laneSpawnTile = lane.laneTiles[lane.laneTiles.Count - 1];
-                        laneSpawnTile.isSpawn = true;
-                        lane.spawnTile = laneSpawnTile;       
-                    }
+                    laneSpawnTile = lane.laneTiles[lane.laneTiles.Count - 1];
+                    laneSpawnTile.isSpawn = true;
+                    lane.spawnTile = laneSpawnTile;
                 }
-                
             }
 
             //When done building, do tile assignments
@@ -209,7 +181,6 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
                         tile.Texture.Equals(Textures.CarSortLeft) ||
                         tile.Texture.Equals(Textures.CarSortRight) ||
                         tile.Texture.Equals(Textures.Buslane))
-                        //tile.Texture.Equals(Textures.Bikelane)) //TODO add bikelane detectionclose texture
                 {
                     //set the detection tiles
                     lane.detectionClose = tile;                   

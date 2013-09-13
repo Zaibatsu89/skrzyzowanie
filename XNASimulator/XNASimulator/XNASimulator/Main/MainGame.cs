@@ -29,7 +29,6 @@ namespace KruispuntGroep6.Simulator.Main
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
-
         //Static ints for crossroad size
         public static int TilesHor = 22; //Total horizontal tiles
         public static int TilesVer = 20; //Total vertical tiles

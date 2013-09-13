@@ -115,32 +115,11 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
         private void CheckNextTile(Vehicle vehicle)
         {
             Tile currentTile = lists.Tiles[(int)vehicle.occupyingtile.X,(int)vehicle.occupyingtile.Y];
-
-            switch (vehicle.rotation)
-            {
-                case RotationEnum.North:
-                    //check if there is a tile north of the one the vehicle is occupying
-                    this.CheckNextTile(currentTile, vehicle, RotationEnum.North);
-                    break;
-                case RotationEnum.East:
-                    this.CheckNextTile(currentTile, vehicle, RotationEnum.East);
-                    break;
-                case RotationEnum.South:
-                    this.CheckNextTile(currentTile, vehicle, RotationEnum.South);
-                    break;
-                case RotationEnum.West:
-                    this.CheckNextTile(currentTile, vehicle, RotationEnum.West);
-                    break;
-            }
-        }
-
-        private void CheckNextTile(Tile currentTile, Vehicle vehicle, RotationEnum direction)
-        {
             Tile nextTile;
 
-            if (currentTile.adjacentTiles.ContainsKey(direction.ToString()))
+            if (currentTile.adjacentTiles.ContainsKey(vehicle.rotation.ToString()))
             {
-                nextTile = currentTile.adjacentTiles[direction.ToString()];
+                nextTile = currentTile.adjacentTiles[vehicle.rotation.ToString()];
                 if (vehicle.collission.Intersects(nextTile.CollisionRectangle))
                 {
                     CheckTileOccupation(vehicle, nextTile);
