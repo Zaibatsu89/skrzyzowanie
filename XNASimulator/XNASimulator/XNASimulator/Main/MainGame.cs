@@ -6,12 +6,13 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using XNASimulator.Communication;
 
 namespace KruispuntGroep6.Simulator.Main
 {
     //TODO: 
     //Add listen class and parser class
-    //Pathfinding (First build regular lanes, then build path lanes using that info)
+    //Add remaining pathing lanes
     //Bus stoplights
     //Add 2-tile vehicle
     //Add tunnels
@@ -19,8 +20,8 @@ namespace KruispuntGroep6.Simulator.Main
 
     //Bugs:
     //Ghost cars that don't move appear after reset or after stress
-    //See VehicleControl checknexttile
     //Vehicles need to wait until they are mid-tile then turn
+    //Vehicle collision handling needs to be re-ordered (CheckNextTile etc..)
 
     /// <summary>
     /// This is the main type for your game
@@ -39,7 +40,8 @@ namespace KruispuntGroep6.Simulator.Main
         public static int LaneLengthHor = (TilesHor - MiddleSize) / 2; //Number of tiles in horizontal lanes
         public static int LaneLengthVer = (TilesVer - MiddleSize) / 2; //Number of tiles in vertical lanes
         public static int TileTextureSize = 32; //32x32p textures
-        
+
+        private Communication communication;
 
         private LevelBuilder levelBuilder;
         private Audio audio;
@@ -82,8 +84,7 @@ namespace KruispuntGroep6.Simulator.Main
             tileControl = new TileControl(lists);
             laneControl = new LaneControl(lists);
 
-
-
+            communication = new Communication(laneControl);
 
             audio = new Audio(Services);
 
@@ -132,7 +133,7 @@ namespace KruispuntGroep6.Simulator.Main
             this.LoadCrossroad("Content/Grids/Crossroad.txt");
             //Create the lanes
             laneControl.LoadLanes();
-            audio.PlayBackgroundMusic();      
+            //audio.PlayBackgroundMusic();      
             simReady = true;
         }
 

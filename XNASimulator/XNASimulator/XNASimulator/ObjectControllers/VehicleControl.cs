@@ -114,8 +114,6 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
 
         private void MakeNextMove(Vehicle vehicle)
         {
-            //TODO: Make cars refuse to enter the wrong lane
-            //TODO: only check when encountering a lane it cannot cross while driving forward
             Tile currentTile = lists.Tiles[(int)vehicle.occupyingtile.X,(int)vehicle.occupyingtile.Y];
             Tile nextTile;
 
@@ -127,7 +125,7 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
 
                 //Check if this tile is part of his path
                 if (!nextTile.laneIDs.Contains(vehicle.destinationLaneID) && //If it's not his destination lane
-                    !nextTile.laneIDs.Contains(vehicle.direction.ToString()) && //...and not his directional lane
+                    !nextTile.laneIDs.Contains(vehicle.path.ToString()) && //...and not his directional lane
                     !nextTile.laneIDs.Contains(vehicle.spawntile.laneIDs[0])) //...and also not his starting lane
                 {
                     //Find the correct tile
@@ -162,12 +160,12 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
 
                 //Check if this is the tile the vehicle should go on
                 if (nextTile.laneIDs.Contains(vehicle.destinationLaneID) || //His destination lane is a valid path
-                    nextTile.laneIDs.Contains(vehicle.direction.ToString()) || //The lane corresponding to his direction is a valid path
+                    nextTile.laneIDs.Contains(vehicle.path.ToString()) || //The lane corresponding to his direction is a valid path
                     nextTile.laneIDs.Contains(vehicle.spawntile.laneIDs[0])) //His starting lane is a valid path
                 {
                     //Rotate the vehicle in the direction of the adjacent tile
                     vehicle.rotation = enumerator.Current.Key;
-
+                    
                     //The given tile was the correct one to take, so return it
                     return nextTile;
                 }
@@ -242,10 +240,10 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
                         int i = 0;
 
                         //if the new lane is the direction that needs to be followed
-                        if (tile.laneIDs.Contains(vehicle.direction.ToString()))
+                        if (tile.laneIDs.Contains(vehicle.path.ToString()))
                         {
                             //get the correct index
-                            i = tile.laneIDs.IndexOf(vehicle.direction.ToString());
+                            i = tile.laneIDs.IndexOf(vehicle.path.ToString());
                         }
 
                         //Add it to the current lane

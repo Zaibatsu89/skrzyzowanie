@@ -68,7 +68,7 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
 
                         newVehicle = lane.AddVehicle(DEBUGvehicleID.ToString());
 
-                        newVehicle.direction = DirectionEnum.NorthToWest;
+                        newVehicle.path = PathsEnum.NorthToWest;
                         newVehicle.destinationLaneID = "W6";
 
                         lists.Vehicles.Add(newVehicle);

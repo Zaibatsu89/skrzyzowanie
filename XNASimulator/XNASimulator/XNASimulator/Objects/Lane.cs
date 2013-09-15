@@ -12,7 +12,7 @@ namespace KruispuntGroep6.Simulator.Objects
         public Queue<Vehicle> vehicleQueue { get; set; }
 
         public string laneID { get; private set; }
-        public DirectionEnum pathLaneID { get; private set; }
+        public PathsEnum pathLaneID { get; private set; }
         public Tile trafficLight { get; set; }
         public Tile detectionFar { get; set; }
         public Tile detectionClose { get; set; }
@@ -30,7 +30,7 @@ namespace KruispuntGroep6.Simulator.Objects
             this.vehicleQueue = new Queue<Vehicle>();
         }
 
-        public Lane(DirectionEnum ID)
+        public Lane(PathsEnum ID)
         {
             this.laneID = ID.ToString();
             this.pathLaneID = ID;

@@ -13,14 +13,14 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
     {
         private Lists lists;
         private List<string> laneIDs;
-        private List<DirectionEnum> pathlaneIDs;
+        private List<PathsEnum> pathlaneIDs;
         private int totalSpawnedVehicles;
 
         public LaneControl(Lists lists)
         {
             this.lists = lists;
             this.laneIDs = new List<string>();
-            this.pathlaneIDs = new List<DirectionEnum>();
+            this.pathlaneIDs = new List<PathsEnum>();
             this.totalSpawnedVehicles = 0;
 
             InitLanes();
@@ -38,21 +38,21 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
 
             #region pathfinding lanes
 
-            pathlaneIDs.Add(DirectionEnum.NorthToEast);
-            pathlaneIDs.Add(DirectionEnum.NorthToSouth);
-            pathlaneIDs.Add(DirectionEnum.NorthToWest);
+            pathlaneIDs.Add(PathsEnum.NorthToEast);
+            pathlaneIDs.Add(PathsEnum.NorthToSouth);
+            pathlaneIDs.Add(PathsEnum.NorthToWest);
 
-            pathlaneIDs.Add(DirectionEnum.EastToSouth);
-            pathlaneIDs.Add(DirectionEnum.EastToWest);
-            pathlaneIDs.Add(DirectionEnum.EastToNorth);
+            pathlaneIDs.Add(PathsEnum.EastToSouth);
+            pathlaneIDs.Add(PathsEnum.EastToWest);
+            pathlaneIDs.Add(PathsEnum.EastToNorth);
 
-            pathlaneIDs.Add(DirectionEnum.SouthToWest);
-            pathlaneIDs.Add(DirectionEnum.SouthToNorth);
-            pathlaneIDs.Add(DirectionEnum.SouthToEast);
+            pathlaneIDs.Add(PathsEnum.SouthToWest);
+            pathlaneIDs.Add(PathsEnum.SouthToNorth);
+            pathlaneIDs.Add(PathsEnum.SouthToEast);
 
-            pathlaneIDs.Add(DirectionEnum.WestToNorth);
-            pathlaneIDs.Add(DirectionEnum.WestToEast);
-            pathlaneIDs.Add(DirectionEnum.WestToSouth);
+            pathlaneIDs.Add(PathsEnum.WestToNorth);
+            pathlaneIDs.Add(PathsEnum.WestToEast);
+            pathlaneIDs.Add(PathsEnum.WestToSouth);
 
             #endregion
 
@@ -60,7 +60,7 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
             {
                 lists.Lanes.Add(ID, new Lane(ID));
             }
-            foreach (DirectionEnum ID in pathlaneIDs)
+            foreach (PathsEnum ID in pathlaneIDs)
             {
                 lists.Lanes.Add(ID.ToString(), new Lane(ID));
             }
@@ -95,11 +95,11 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
 
             switch (lane.pathLaneID)
             {
-                case DirectionEnum.NorthToEast:
+                case PathsEnum.NorthToEast:
                     break;
-                case DirectionEnum.NorthToSouth:
+                case PathsEnum.NorthToSouth:
                     break;
-                case DirectionEnum.NorthToWest:
+                case PathsEnum.NorthToWest:
                     lists.Lanes.TryGetValue("N3", out startLane);
                     lists.Lanes.TryGetValue("W6", out endLane);
 
@@ -107,25 +107,25 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
                     LoadPathLane(startTile, endLane, RotationEnum.West, lane);
                     break;
 
-                case DirectionEnum.EastToSouth:
+                case PathsEnum.EastToSouth:
                     break;
-                case DirectionEnum.EastToWest:
+                case PathsEnum.EastToWest:
                     break;
-                case DirectionEnum.EastToNorth:
-                    break;
-
-                case DirectionEnum.SouthToEast:
-                    break;
-                case DirectionEnum.SouthToWest:
-                    break;
-                case DirectionEnum.SouthToNorth:
+                case PathsEnum.EastToNorth:
                     break;
 
-                case DirectionEnum.WestToNorth:
+                case PathsEnum.SouthToEast:
                     break;
-                case DirectionEnum.WestToEast:
+                case PathsEnum.SouthToWest:
                     break;
-                case DirectionEnum.WestToSouth:
+                case PathsEnum.SouthToNorth:
+                    break;
+
+                case PathsEnum.WestToNorth:
+                    break;
+                case PathsEnum.WestToEast:
+                    break;
+                case PathsEnum.WestToSouth:
                     break;
             }
         }
@@ -346,6 +346,21 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
         {
         }
 
+        public void ChangeTrafficLight(string newValue, string laneID)
+        {
+            Lane lane;
+            lists.Lanes.TryGetValue(laneID, out lane);
+
+
+            switch(newValue)
+            {
+                case "green": lane.trafficLight.Texture = Textures.GreenLight;
+                    break;
+                case "red": lane.trafficLight.Texture = Textures.RedLight;
+                    break;
+            }
+        }
+
         public void SpawnVehicle(string vehicleType, string spawnLaneID, string destinationLaneID)
         {         
             Lane spawnLane;
@@ -369,32 +384,32 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
             #region vehicle route
             switch (spawnLaneID[0].ToString() + destinationLaneID[0].ToString())
             {
-                case "NE": newVehicle.direction = DirectionEnum.NorthToEast;
+                case "NE": newVehicle.path = PathsEnum.NorthToEast;
                     break;
-                case "NS": newVehicle.direction = DirectionEnum.NorthToSouth;
+                case "NS": newVehicle.path = PathsEnum.NorthToSouth;
                     break;
-                case "NW": newVehicle.direction = DirectionEnum.NorthToWest;
-                    break;
-
-                case "ES": newVehicle.direction = DirectionEnum.EastToSouth;
-                    break;
-                case "EW": newVehicle.direction = DirectionEnum.EastToWest;
-                    break;
-                case "EN": newVehicle.direction = DirectionEnum.EastToNorth;
+                case "NW": newVehicle.path = PathsEnum.NorthToWest;
                     break;
 
-                case "SW": newVehicle.direction = DirectionEnum.SouthToWest;
+                case "ES": newVehicle.path = PathsEnum.EastToSouth;
                     break;
-                case "SN": newVehicle.direction = DirectionEnum.SouthToNorth;
+                case "EW": newVehicle.path = PathsEnum.EastToWest;
                     break;
-                case "SE": newVehicle.direction = DirectionEnum.SouthToEast;
+                case "EN": newVehicle.path = PathsEnum.EastToNorth;
                     break;
 
-                case "WN": newVehicle.direction = DirectionEnum.WestToNorth;
+                case "SW": newVehicle.path = PathsEnum.SouthToWest;
                     break;
-                case "WE": newVehicle.direction = DirectionEnum.WestToEast;
+                case "SN": newVehicle.path = PathsEnum.SouthToNorth;
                     break;
-                case "WS": newVehicle.direction = DirectionEnum.WestToSouth;
+                case "SE": newVehicle.path = PathsEnum.SouthToEast;
+                    break;
+
+                case "WN": newVehicle.path = PathsEnum.WestToNorth;
+                    break;
+                case "WE": newVehicle.path = PathsEnum.WestToEast;
+                    break;
+                case "WS": newVehicle.path = PathsEnum.WestToSouth;
                     break;
             }
             #endregion

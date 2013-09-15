@@ -5,7 +5,7 @@ using System.Text;
 
 namespace XNASimulator.Globals
 {
-    enum DirectionEnum
+    enum PathsEnum
     {
         NorthToWest,
         NorthToSouth,
