@@ -19,10 +19,10 @@ namespace KruispuntGroep6.Simulator.Objects
         public Vector2 DrawPosition { get; set; }
         public Rectangle CollisionRectangle { get; set; }
         public Vector2 GridCoordinates { get; set; }
-        public Dictionary<string, Tile> adjacentTiles {get; set; }
+        public Dictionary<RotationEnum, Tile> adjacentTiles {get; set; }
 
         public string OccupiedID { get; set; }
-        public string laneID { get; set; } //The lane this tile is a part of, if any
+        public List<string> laneIDs { get; set; } //The lane(s) this tile is a part of, if any
 
         //Bools
         public bool isOccupied = false;
@@ -43,8 +43,8 @@ namespace KruispuntGroep6.Simulator.Objects
             this.Rotation = rotation;
 
             this.OccupiedID = string.Empty;
-            this.laneID = string.Empty;
-            this.adjacentTiles = new Dictionary<string, Tile>();
+            this.laneIDs = new List<string>();
+            this.adjacentTiles = new Dictionary<RotationEnum, Tile>();
         }
     }
 }

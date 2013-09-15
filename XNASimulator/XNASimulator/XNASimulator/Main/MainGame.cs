@@ -11,8 +11,7 @@ namespace KruispuntGroep6.Simulator.Main
 {
     //TODO: 
     //Add listen class and parser class
-    //Lane vehicle tracking
-    //Pathfinding
+    //Pathfinding (First build regular lanes, then build path lanes using that info)
     //Bus stoplights
     //Add 2-tile vehicle
     //Add tunnels
@@ -20,6 +19,8 @@ namespace KruispuntGroep6.Simulator.Main
 
     //Bugs:
     //Ghost cars that don't move appear after reset or after stress
+    //See VehicleControl checknexttile
+    //Vehicles need to wait until they are mid-tile then turn
 
     /// <summary>
     /// This is the main type for your game

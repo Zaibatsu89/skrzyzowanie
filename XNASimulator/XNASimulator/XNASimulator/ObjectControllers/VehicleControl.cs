@@ -6,6 +6,7 @@ using System;
 using KruispuntGroep6.Simulator.Main;
 using System.Collections.Generic;
 using XNASimulator.Globals;
+using System.Collections;
 
 namespace KruispuntGroep6.Simulator.ObjectControllers
 {
@@ -32,7 +33,7 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
                 if (!vehicle.Equals(string.Empty))
                 {
                     this.CheckAlive(vehicle);
-                    this.CheckNextTile(vehicle);
+                    this.MakeNextMove(vehicle);
 
                     //update rotation of the vehicle 
                     if (!vehicle.stopRedLight && !vehicle.stopCar)
@@ -98,10 +99,9 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
                     lists.Tiles[(int)vehicle.occupyingtile.X, (int)vehicle.occupyingtile.Y].OccupiedID = string.Empty;
                     lists.Tiles[(int)vehicle.occupyingtile.X, (int)vehicle.occupyingtile.Y].isOccupied = false;
 
-                    //Remove the vehicle from the list
+                    //Remove the vehicle from the master list and the lane
                     lists.Vehicles.Remove(vehicle);
-
-                    //lists.Vehicles[vehicle.ID[1]] = new Vehicle(string.Empty);
+                    vehicle.currentLane.laneVehicles.Remove(vehicle);
 
                 }
             }
@@ -112,14 +112,36 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
             }
         }
 
-        private void CheckNextTile(Vehicle vehicle)
+        private void MakeNextMove(Vehicle vehicle)
         {
+            //TODO: Make cars refuse to enter the wrong lane
+            //TODO: only check when encountering a lane it cannot cross while driving forward
             Tile currentTile = lists.Tiles[(int)vehicle.occupyingtile.X,(int)vehicle.occupyingtile.Y];
             Tile nextTile;
 
-            if (currentTile.adjacentTiles.ContainsKey(vehicle.rotation.ToString()))
+            //If the vehicle can move any further in this direction...
+            if (currentTile.adjacentTiles.ContainsKey(vehicle.rotation))
             {
-                nextTile = currentTile.adjacentTiles[vehicle.rotation.ToString()];
+                //Grab the next tile on this vehicle's path
+                nextTile = currentTile.adjacentTiles[vehicle.rotation];
+
+                //Check if this tile is part of his path
+                if (!nextTile.laneIDs.Contains(vehicle.destinationLaneID) && //If it's not his destination lane
+                    !nextTile.laneIDs.Contains(vehicle.direction.ToString()) && //...and not his directional lane
+                    !nextTile.laneIDs.Contains(vehicle.spawntile.laneIDs[0])) //...and also not his starting lane
+                {
+                    //Find the correct tile
+
+                    //The 'index' for the adjacent tiles library
+                    IEnumerator<KeyValuePair<RotationEnum, Tile>> enumerator = currentTile.adjacentTiles.GetEnumerator();
+
+                    //Take the first adjacent tile
+                    nextTile = enumerator.Current.Value;
+
+                    //Pick the correct path
+                    nextTile = ChooseCorrectPath(vehicle, nextTile, enumerator);
+                }    
+
                 if (vehicle.collission.Intersects(nextTile.CollisionRectangle))
                 {
                     CheckTileOccupation(vehicle, nextTile);
@@ -128,6 +150,40 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
                 {
                     CheckTileOccupation(vehicle, currentTile);
                 }
+            }
+        }
+
+        private Tile ChooseCorrectPath(Vehicle vehicle, Tile nextTile, IEnumerator<KeyValuePair<RotationEnum, Tile>> enumerator)
+        {
+            //First check if this tile exists
+            if (enumerator.Current.Value != null)
+            {
+                nextTile = enumerator.Current.Value;
+
+                //Check if this is the tile the vehicle should go on
+                if (nextTile.laneIDs.Contains(vehicle.destinationLaneID) || //His destination lane is a valid path
+                    nextTile.laneIDs.Contains(vehicle.direction.ToString()) || //The lane corresponding to his direction is a valid path
+                    nextTile.laneIDs.Contains(vehicle.spawntile.laneIDs[0])) //His starting lane is a valid path
+                {
+                    //Rotate the vehicle in the direction of the adjacent tile
+                    vehicle.rotation = enumerator.Current.Key;
+
+                    //The given tile was the correct one to take, so return it
+                    return nextTile;
+                }
+                else //The vehicle should look to the next adjacent tile
+                {
+                    enumerator.MoveNext();
+                    nextTile = enumerator.Current.Value;
+
+                    //Check again
+                    return ChooseCorrectPath(vehicle, nextTile, enumerator);
+                }
+            }
+            else //The tile doesn't exist, so take the next adjacent one
+            {
+                enumerator.MoveNext();
+                return ChooseCorrectPath(vehicle, nextTile, enumerator);
             }
         }
 
@@ -175,6 +231,28 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
                     //claim it 
                     tile.isOccupied = true;
                     tile.OccupiedID = vehicle.ID;
+
+                    //update vehicle's lane, if the next tile is part of a new lane
+                    if (tile.laneIDs.Count > 0 && !tile.laneIDs.Contains(vehicle.currentLane.laneID))
+                    {
+                        //Remove the vehicle from the previous lane
+                        Lane lane = vehicle.currentLane;
+                        lane.laneVehicles.Remove(vehicle);
+
+                        int i = 0;
+
+                        //if the new lane is the direction that needs to be followed
+                        if (tile.laneIDs.Contains(vehicle.direction.ToString()))
+                        {
+                            //get the correct index
+                            i = tile.laneIDs.IndexOf(vehicle.direction.ToString());
+                        }
+
+                        //Add it to the current lane
+                        lists.Lanes.TryGetValue(tile.laneIDs[i], out lane); 
+                        vehicle.currentLane = lane;
+                        lane.laneVehicles.Add(vehicle);
+                    }
 
                     //release previous tile
                     lists.Tiles[(int)vehicle.occupyingtile.X, (int)vehicle.occupyingtile.Y].isOccupied = false;

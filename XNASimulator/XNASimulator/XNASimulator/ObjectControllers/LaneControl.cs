@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using KruispuntGroep6.Simulator.Objects;
 using KruispuntGroep6.Simulator.Main;
+using XNASimulator.Globals;
 
 namespace KruispuntGroep6.Simulator.ObjectControllers
 {
@@ -12,12 +13,14 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
     {
         private Lists lists;
         private List<string> laneIDs;
+        private List<DirectionEnum> pathlaneIDs;
         private int totalSpawnedVehicles;
 
         public LaneControl(Lists lists)
         {
             this.lists = lists;
             this.laneIDs = new List<string>();
+            this.pathlaneIDs = new List<DirectionEnum>();
             this.totalSpawnedVehicles = 0;
 
             InitLanes();
@@ -33,18 +36,145 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
                 laneIDs.Add("W" + i);
             }
 
+            #region pathfinding lanes
+
+            pathlaneIDs.Add(DirectionEnum.NorthToEast);
+            pathlaneIDs.Add(DirectionEnum.NorthToSouth);
+            pathlaneIDs.Add(DirectionEnum.NorthToWest);
+
+            pathlaneIDs.Add(DirectionEnum.EastToSouth);
+            pathlaneIDs.Add(DirectionEnum.EastToWest);
+            pathlaneIDs.Add(DirectionEnum.EastToNorth);
+
+            pathlaneIDs.Add(DirectionEnum.SouthToWest);
+            pathlaneIDs.Add(DirectionEnum.SouthToNorth);
+            pathlaneIDs.Add(DirectionEnum.SouthToEast);
+
+            pathlaneIDs.Add(DirectionEnum.WestToNorth);
+            pathlaneIDs.Add(DirectionEnum.WestToEast);
+            pathlaneIDs.Add(DirectionEnum.WestToSouth);
+
+            #endregion
+
             foreach (string ID in laneIDs)
             {
                 lists.Lanes.Add(ID, new Lane(ID));
+            }
+            foreach (DirectionEnum ID in pathlaneIDs)
+            {
+                lists.Lanes.Add(ID.ToString(), new Lane(ID));
             }
         }
 
         public void LoadLanes()
         {
+            //First build all the regular lanes
             foreach (KeyValuePair<string, Lane> lane in lists.Lanes)
             {
-                LoadLane(lane.Value);
+                if (!lane.Value.isPathLane)
+                {
+                    LoadLane(lane.Value);
+                }
             }
+
+            //Then all the pathing lanes
+            foreach (KeyValuePair<string, Lane> lane in lists.Lanes)
+            {
+                if (lane.Value.isPathLane)
+                {
+                    LoadPathLane(lane.Value);
+                }
+            }
+        }
+
+        private void LoadPathLane(Lane lane)
+        {
+            Tile startTile;
+            Lane startLane;
+            Lane endLane;
+
+            switch (lane.pathLaneID)
+            {
+                case DirectionEnum.NorthToEast:
+                    break;
+                case DirectionEnum.NorthToSouth:
+                    break;
+                case DirectionEnum.NorthToWest:
+                    lists.Lanes.TryGetValue("N3", out startLane);
+                    lists.Lanes.TryGetValue("W6", out endLane);
+
+                    startLane.trafficLight.adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
+                    LoadPathLane(startTile, endLane, RotationEnum.West, lane);
+                    break;
+
+                case DirectionEnum.EastToSouth:
+                    break;
+                case DirectionEnum.EastToWest:
+                    break;
+                case DirectionEnum.EastToNorth:
+                    break;
+
+                case DirectionEnum.SouthToEast:
+                    break;
+                case DirectionEnum.SouthToWest:
+                    break;
+                case DirectionEnum.SouthToNorth:
+                    break;
+
+                case DirectionEnum.WestToNorth:
+                    break;
+                case DirectionEnum.WestToEast:
+                    break;
+                case DirectionEnum.WestToSouth:
+                    break;
+            }
+        }
+
+        private void LoadPathLane(Tile startTile, Lane endLane, RotationEnum direction, Lane pathLane)
+        {
+            //Add the first tile
+            pathLane.laneTiles.Add(startTile);
+
+            Tile newTile = startTile;
+            bool endBuild = false;
+
+            while (!endBuild)
+            {
+                newTile.adjacentTiles.TryGetValue(direction, out newTile);
+
+                //When you reach an existing lane...
+                if (newTile.laneIDs.Count > 0)
+                {
+                    //Check the lane IDs
+                    foreach(string ID in newTile.laneIDs)
+                    {
+                        //See if it's the end lane
+                        if (ID.Equals(endLane.laneID))
+                        {
+                            //End building
+                            endBuild = true;
+                        }
+                        else //Keep building
+                        {
+                            pathLane.laneTiles.Add(newTile);
+                        }
+                    }
+                }
+                else //Tile has no lane, so add it
+                {
+                    pathLane.laneTiles.Add(newTile);
+                }
+            }
+
+            //Let the tiles know they're in this lane
+            foreach (Tile tile in pathLane.laneTiles)
+            {
+                if (!tile.laneIDs.Contains(pathLane.laneID))
+                {
+                    tile.laneIDs.Add(pathLane.laneID);
+                }
+            }
+
         }
 
         private void LoadLane(Lane lane)
@@ -156,7 +286,7 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
             for (int i = 0; i < laneSize - 1; i++)
             {
                 //Keep adding tiles in the right direction until you reach the lanelength
-                lane.laneTiles.Add(lane.laneTiles[i].adjacentTiles[laneDirection.ToString()]);
+                lane.laneTiles.Add(lane.laneTiles[i].adjacentTiles[laneDirection]);
 
                 //When the last tile has been added...
                 if (lane.laneTiles.Count == laneSize)
@@ -171,7 +301,7 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
             foreach(Tile tile in lane.laneTiles)
             {
                 //Make each lane tile know it's part of this new lane
-                tile.laneID = lane.laneID;
+                tile.laneIDs.Add(lane.laneID);
 
                 if (tile.Texture.Equals(Textures.RedLight))
                 {
@@ -222,6 +352,8 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
             Vehicle newVehicle;
             string vehicleID;
 
+            
+
             //Get the lane the vehicle needs to be spawned in
             lists.Lanes.TryGetValue(spawnLaneID, out spawnLane);
 
@@ -231,15 +363,47 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
 
             //Create an empty vehicle with only an ID
             newVehicle = new Vehicle(vehicleID);
-     
+            //Set its destination
+            newVehicle.destinationLaneID = destinationLaneID;
+
+            #region vehicle route
+            switch (spawnLaneID[0].ToString() + destinationLaneID[0].ToString())
+            {
+                case "NE": newVehicle.direction = DirectionEnum.NorthToEast;
+                    break;
+                case "NS": newVehicle.direction = DirectionEnum.NorthToSouth;
+                    break;
+                case "NW": newVehicle.direction = DirectionEnum.NorthToWest;
+                    break;
+
+                case "ES": newVehicle.direction = DirectionEnum.EastToSouth;
+                    break;
+                case "EW": newVehicle.direction = DirectionEnum.EastToWest;
+                    break;
+                case "EN": newVehicle.direction = DirectionEnum.EastToNorth;
+                    break;
+
+                case "SW": newVehicle.direction = DirectionEnum.SouthToWest;
+                    break;
+                case "SN": newVehicle.direction = DirectionEnum.SouthToNorth;
+                    break;
+                case "SE": newVehicle.direction = DirectionEnum.SouthToEast;
+                    break;
+
+                case "WN": newVehicle.direction = DirectionEnum.WestToNorth;
+                    break;
+                case "WE": newVehicle.direction = DirectionEnum.WestToEast;
+                    break;
+                case "WS": newVehicle.direction = DirectionEnum.WestToSouth;
+                    break;
+            }
+            #endregion
+
             //If the lane has space...
             if (!spawnLane.spawnTile.isOccupied)
             {
                 //Add the vehicle to the Lane and fill it with the Lane's data
                 newVehicle = spawnLane.AddVehicle(vehicleID);
-
-                //Set its destination
-                newVehicle.destinationLaneID = destinationLaneID;
 
                 //Add the spawned vehicle to the master list
                 lists.Vehicles.Add(newVehicle);
@@ -259,7 +423,9 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
                     if (!lane.spawnTile.isOccupied)
                     {
                         Vehicle vehicle = lane.vehicleQueue.Dequeue();
-                        lane.AddVehicle(vehicle.ID);
+
+                        vehicle = lane.AddVehicle(vehicle.ID); //Add to lane
+                        lists.Vehicles.Add(vehicle); //Add to master list
                     }
                 }           
         }

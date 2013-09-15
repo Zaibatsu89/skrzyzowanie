@@ -88,19 +88,19 @@ namespace KruispuntGroep6.Simulator.Main
 
                 if (tileX > 0)
                 {
-                    tile.adjacentTiles.Add(RotationEnum.West.ToString(), lists.Tiles[tileX - 1, tileY]);
+                    tile.adjacentTiles.Add(RotationEnum.West, lists.Tiles[tileX - 1, tileY]);
                 }
                 if (tileX < MainGame.TilesHor - 1)
                 {
-                    tile.adjacentTiles.Add(RotationEnum.East.ToString(), lists.Tiles[tileX + 1, tileY]);
+                    tile.adjacentTiles.Add(RotationEnum.East, lists.Tiles[tileX + 1, tileY]);
                 }
                 if (tileY > 0)
                 {
-                    tile.adjacentTiles.Add(RotationEnum.North.ToString(), lists.Tiles[tileX, tileY - 1]);
+                    tile.adjacentTiles.Add(RotationEnum.North, lists.Tiles[tileX, tileY - 1]);
                 }
                 if (tileY < MainGame.TilesVer - 1)
                 {
-                    tile.adjacentTiles.Add(RotationEnum.South.ToString(), lists.Tiles[tileX, tileY + 1]);
+                    tile.adjacentTiles.Add(RotationEnum.South, lists.Tiles[tileX, tileY + 1]);
                 }
 
             }

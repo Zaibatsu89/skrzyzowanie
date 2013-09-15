@@ -64,9 +64,12 @@ namespace KruispuntGroep6.Simulator.ObjectControllers
                         Lane lane;
                         Vehicle newVehicle;
 
-                        lists.Lanes.TryGetValue(tile.laneID, out lane);
+                        lists.Lanes.TryGetValue(tile.laneIDs[0], out lane);
 
                         newVehicle = lane.AddVehicle(DEBUGvehicleID.ToString());
+
+                        newVehicle.direction = DirectionEnum.NorthToWest;
+                        newVehicle.destinationLaneID = "W6";
 
                         lists.Vehicles.Add(newVehicle);
 

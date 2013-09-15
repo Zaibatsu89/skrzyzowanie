@@ -116,6 +116,7 @@
   <ItemGroup>
     <Compile Include="Communication\Parser.cs" />
     <Compile Include="Communication\Communication.cs" />
+    <Compile Include="Globals\DirectionEnum.cs" />
     <Compile Include="Globals\LightsEnum.cs" />
     <Compile Include="Globals\Rotation.cs" />
     <Compile Include="Globals\Textures.cs" />

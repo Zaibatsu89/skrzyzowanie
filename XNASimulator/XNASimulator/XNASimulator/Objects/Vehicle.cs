@@ -2,6 +2,7 @@
 using KruispuntGroep6.Simulator.Globals;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using XNASimulator.Globals;
 
 namespace KruispuntGroep6.Simulator.Objects
 {
@@ -23,11 +24,13 @@ namespace KruispuntGroep6.Simulator.Objects
         public Lane currentLane { get; set; }
 
         public string destinationLaneID { get; set; }
+        public DirectionEnum direction { get; set; }
 		
         public Vehicle(Texture2D texture, string ID)
         {
             this.ID = ID;
             rotation = RotationEnum.North;
+            direction = DirectionEnum.NorthToEast;
             position = Vector2.Zero;
             drawposition = Vector2.Zero;
             sprite = texture;
