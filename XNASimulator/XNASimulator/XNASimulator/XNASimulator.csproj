@@ -61,7 +61,10 @@
     <XnaCompressContent>True</XnaCompressContent>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject />
+    <StartupObject>KruispuntGroep4.Simulator.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86">
@@ -97,6 +100,7 @@
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
@@ -114,11 +118,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Communication\CommunicationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Communication\Parser.cs" />
-    <Compile Include="Communication\Communication.cs" />
     <Compile Include="Globals\LightsEnum.cs" />
     <Compile Include="Globals\PathsEnum.cs" />
     <Compile Include="Globals\Rotation.cs" />
+    <Compile Include="Globals\Strings.cs" />
     <Compile Include="Globals\Textures.cs" />
     <Compile Include="Main\Audio.cs" />
     <Compile Include="Main\LevelBuilder.cs" />
@@ -170,7 +177,11 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Communication\CommunicationForm.resx">
+      <DependentUpon>CommunicationForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--

@@ -16,32 +16,43 @@ public class XMLParser
 	    String inputLine = input.get(i);
 	    String outputLine = new String();
 	    
-	    if (!inputLine.startsWith("<?xml"))
+	    if (!inputLine.startsWith(
+		Strings.arrowLeft +
+		Strings.question +
+		Strings.xml
+	    ))
 	    {
-		if
-		(
-		    !inputLine.startsWith("<input>") &&
-		    !inputLine.startsWith("</input>")
-		)
-		{
-		    int start = inputLine.indexOf("<") + 1;
-		    int end = inputLine.indexOf(">");
+		if (!inputLine.startsWith(
+		    Strings.arrowLeft +
+		    Strings.input +
+		    Strings.arrowRight
+		) && !inputLine.startsWith(
+		    Strings.arrowLeft +
+		    Strings.slash +
+		    Strings.input +
+		    Strings.arrowRight
+		)){
+		    int start = inputLine.indexOf(Strings.arrowLeft) + 1;
+		    int end = inputLine.indexOf(Strings.arrowRight);
 		    
 		    String key = inputLine.substring(start, end);
 		    
-		    inputLine = inputLine.split(">")[1];
+		    inputLine = inputLine.split(Strings.arrowRight)[1];
 		    
-		    end = inputLine.indexOf("<");
+		    end = inputLine.indexOf(Strings.arrowLeft);
 		    
 		    String value = inputLine.substring(0, end);
 		    
-		    outputLine = key + ":" + value;
+		    outputLine = key + Strings.doubleDot + value;
 		}
-		else if (inputLine.startsWith("<input>"))
-		{
+		else if (inputLine.startsWith(
+		    Strings.arrowLeft +
+		    Strings.input +
+		    Strings.arrowRight
+		)){
 		    count++;
 		    
-		    outputLine = "input:" + count;
+		    outputLine = Strings.input + Strings.doubleDot + count;
 		}
 	    }
 	    

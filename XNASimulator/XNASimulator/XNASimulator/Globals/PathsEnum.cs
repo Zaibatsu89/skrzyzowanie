@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace XNASimulator.Globals
+﻿namespace KruispuntGroep4.Simulator.Globals
 {
     enum PathsEnum
     {

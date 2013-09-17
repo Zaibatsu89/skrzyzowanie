@@ -1,11 +1,9 @@
-﻿using KruispuntGroep6.Simulator.Globals;
-using KruispuntGroep6.Simulator.Objects;
+﻿using KruispuntGroep4.Simulator.Globals;
+using KruispuntGroep4.Simulator.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using KruispuntGroep6.Simulator.Main;
-using XNASimulator.Globals;
 
-namespace KruispuntGroep6.Simulator.ObjectControllers
+namespace KruispuntGroep4.Simulator.ObjectControllers
 {
     class TileControl
     {

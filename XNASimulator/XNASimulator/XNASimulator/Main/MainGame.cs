@@ -1,14 +1,14 @@
 using System;
 using System.IO;
-using KruispuntGroep6.Simulator.Globals;
-using KruispuntGroep6.Simulator.ObjectControllers;
+using KruispuntGroep4.Simulator.Communication;
+using KruispuntGroep4.Simulator.Globals;
+using KruispuntGroep4.Simulator.ObjectControllers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
-using XNASimulator.Communication;
+using KruispuntGroep4.Globals;
 
-namespace KruispuntGroep6.Simulator.Main
+namespace KruispuntGroep4.Simulator.Main
 {
     //TODO: 
     //Add listen class and parser class
@@ -26,7 +26,7 @@ namespace KruispuntGroep6.Simulator.Main
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class MainGame : Microsoft.Xna.Framework.Game
+    class MainGame : Game
     {
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
@@ -41,7 +41,7 @@ namespace KruispuntGroep6.Simulator.Main
         public static int LaneLengthVer = (TilesVer - MiddleSize) / 2; //Number of tiles in vertical lanes
         public static int TileTextureSize = 32; //32x32p textures
 
-        private Communication communication;
+		private CommunicationForm communication;
 
         private LevelBuilder levelBuilder;
         private Audio audio;
@@ -55,15 +55,17 @@ namespace KruispuntGroep6.Simulator.Main
         private MouseState mouseStatePrevious;
         private Vector2 mousePosition;
 
-        private bool simReady = false;
-
-        public MainGame()
+        public MainGame(CommunicationForm communication)
         {
+			this.communication = communication;
+
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
             graphics.PreferredBackBufferWidth = TilesHor * TileTextureSize;
             graphics.PreferredBackBufferHeight = TilesVer * TileTextureSize;
+
+			Window.Title = Strings.TitleGame;
         }
 
         /// <summary>
@@ -84,7 +86,7 @@ namespace KruispuntGroep6.Simulator.Main
             tileControl = new TileControl(lists);
             laneControl = new LaneControl(lists);
 
-            communication = new Communication(laneControl);
+			communication.SetLaneControl(laneControl);
 
             audio = new Audio(Services);
 
@@ -133,8 +135,6 @@ namespace KruispuntGroep6.Simulator.Main
             this.LoadCrossroad("Content/Grids/Crossroad.txt");
             //Create the lanes
             laneControl.LoadLanes();
-            //audio.PlayBackgroundMusic();      
-            simReady = true;
         }
 
         /// <summary>

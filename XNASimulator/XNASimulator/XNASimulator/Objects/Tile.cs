@@ -1,9 +1,9 @@
-﻿using KruispuntGroep6.Simulator.Globals;
+﻿using System.Collections.Generic;
+using KruispuntGroep4.Simulator.Globals;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
 
-namespace KruispuntGroep6.Simulator.Objects
+namespace KruispuntGroep4.Simulator.Objects
 {
     class Tile
     {

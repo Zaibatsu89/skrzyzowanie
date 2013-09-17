@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using KruispuntGroep6.Simulator.Globals;
-using System;
-using XNASimulator.Globals;
+using KruispuntGroep4.Simulator.Globals;
 
-namespace KruispuntGroep6.Simulator.Objects
+namespace KruispuntGroep4.Simulator.Objects
 {
     class Lane
     {

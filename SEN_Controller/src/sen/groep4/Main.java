@@ -1,21 +1,17 @@
 package sen.groep4;
 
-import java.net.InetAddress;
-import java.util.List;
+import java.io.IOException;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 public class Main
 {
-    public static InetAddress ip;
-    public static List<String> xml;
-    
     public static void main(String[] args)
     {
         try
 	{
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            UIManager.setLookAndFeel(Strings.ui);
         }
 	catch (UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException | ClassNotFoundException ex){}
 	
@@ -24,7 +20,11 @@ public class Main
 	    @Override
 	    public void run()
 	    {
-		UserInterface ui = new UserInterface();
+		try
+		{
+		    new UserInterface();
+		}
+		catch (IOException ex){UserInterface.setText(ex.getMessage());}
 	    }
 	});
     }

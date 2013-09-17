@@ -1,12 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.ServiceModel;
-using KruispuntGroep6.Simulator.Objects;
-using System.Runtime.CompilerServices;
-using System;
-using KruispuntGroep6.Simulator.Main;
-using Microsoft.Xna.Framework.Graphics;
+using KruispuntGroep4.Simulator.Main;
+using KruispuntGroep4.Simulator.Objects;
 
-namespace KruispuntGroep6.Simulator.Globals
+namespace KruispuntGroep4.Simulator.Globals
 {
     class Lists
     {

@@ -1,14 +1,12 @@
-﻿using KruispuntGroep6.Simulator.Globals;
-using KruispuntGroep6.Simulator.Objects;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using KruispuntGroep4.Simulator.Globals;
+using KruispuntGroep4.Simulator.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using KruispuntGroep6.Simulator.Main;
-using System.Collections.Generic;
-using XNASimulator.Globals;
-using System.Collections;
 
-namespace KruispuntGroep6.Simulator.ObjectControllers
+namespace KruispuntGroep4.Simulator.ObjectControllers
 {
     class VehicleControl
     {

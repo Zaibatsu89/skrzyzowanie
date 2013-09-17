@@ -1,10 +1,8 @@
-﻿using System;
-using KruispuntGroep6.Simulator.Globals;
+﻿using KruispuntGroep4.Simulator.Globals;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using XNASimulator.Globals;
 
-namespace KruispuntGroep6.Simulator.Objects
+namespace KruispuntGroep4.Simulator.Objects
 {
     class Vehicle
     {

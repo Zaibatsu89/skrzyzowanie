@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace KruispuntGroep6.Simulator.Globals
+namespace KruispuntGroep4.Simulator.Globals
 {
     enum RotationEnum
     { 

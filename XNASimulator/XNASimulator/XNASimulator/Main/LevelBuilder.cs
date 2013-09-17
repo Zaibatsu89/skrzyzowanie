@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using KruispuntGroep6.Simulator.Globals;
-using KruispuntGroep6.Simulator.Objects;
+using KruispuntGroep4.Globals;
+using KruispuntGroep4.Simulator.Globals;
+using KruispuntGroep4.Simulator.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace KruispuntGroep6.Simulator.Main
+namespace KruispuntGroep4.Simulator.Main
 {
     class LevelBuilder
     {
@@ -45,7 +46,7 @@ namespace KruispuntGroep6.Simulator.Main
                 {
                     lines.Add(line);
                     if (!Int32.Equals(line.Length, width))
-                        throw new Exception(string.Format("The length of line {0} is different from all preceeding lines.", lines.Count));
+                        throw new Exception(string.Format(Strings.LineException, lines.Count));
                     line = reader.ReadLine();
                 }
             }
@@ -210,9 +211,6 @@ namespace KruispuntGroep6.Simulator.Main
                     return LoadTile(Textures.RedLight, RotationEnum.North, new Vector2(x, y));
 
                 #endregion
-                
-
-
 
                 // Unknown tile type character
                 default:
@@ -226,4 +224,3 @@ namespace KruispuntGroep6.Simulator.Main
         }
     }
 }
-
