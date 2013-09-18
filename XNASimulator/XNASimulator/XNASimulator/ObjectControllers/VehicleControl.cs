@@ -120,26 +120,26 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             {
                 //Grab the next tile on this vehicle's path
                 nextTile = currentTile.adjacentTiles[vehicle.rotation];
-
-                //Check if this tile is part of his path
-                if (!nextTile.laneIDs.Contains(vehicle.destinationLaneID) && //If it's not his destination lane
-                    !nextTile.laneIDs.Contains(vehicle.path.ToString()) && //...and not his directional lane
-                    !nextTile.laneIDs.Contains(vehicle.spawntile.laneIDs[0])) //...and also not his starting lane
-                {
-                    //Find the correct tile
-
-                    //The 'index' for the adjacent tiles library
-                    IEnumerator<KeyValuePair<RotationEnum, Tile>> enumerator = currentTile.adjacentTiles.GetEnumerator();
-
-                    //Take the first adjacent tile
-                    nextTile = enumerator.Current.Value;
-
-                    //Pick the correct path
-                    nextTile = ChooseCorrectPath(vehicle, nextTile, enumerator);
-                }    
-
+               
                 if (vehicle.collission.Intersects(nextTile.CollisionRectangle))
                 {
+                    //Check if this tile is part of his path
+                    if (!nextTile.laneIDs.Contains(vehicle.destinationLaneID) && //If it's not his destination lane
+                        !nextTile.laneIDs.Contains(vehicle.path.ToString()) && //...and not his directional lane
+                        !nextTile.laneIDs.Contains(vehicle.spawntile.laneIDs[0])) //...and also not his starting lane
+                    {
+                        //Find the correct tile
+
+                        //The 'index' for the adjacent tiles library
+                        IEnumerator<KeyValuePair<RotationEnum, Tile>> enumerator = currentTile.adjacentTiles.GetEnumerator();
+
+                        //Take the first adjacent tile
+                        nextTile = enumerator.Current.Value;
+
+                        //Pick the correct path
+                        nextTile = ChooseCorrectPath(vehicle, nextTile, enumerator);
+                    }   
+
                     CheckTileOccupation(vehicle, nextTile);
                 }
                 else
@@ -152,18 +152,43 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
         private Tile ChooseCorrectPath(Vehicle vehicle, Tile nextTile, IEnumerator<KeyValuePair<RotationEnum, Tile>> enumerator)
         {
             //First check if this tile exists
-            if (enumerator.Current.Value != null)
+            if (enumerator.Current.Value != null && enumerator.Current.Value.laneIDs.Count > 0)
             {
                 nextTile = enumerator.Current.Value;
+                bool correctPath = false;
 
-                //Check if this is the tile the vehicle should go on
-                if (nextTile.laneIDs.Contains(vehicle.destinationLaneID) || //His destination lane is a valid path
-                    nextTile.laneIDs.Contains(vehicle.path.ToString()) || //The lane corresponding to his direction is a valid path
-                    nextTile.laneIDs.Contains(vehicle.spawntile.laneIDs[0])) //His starting lane is a valid path
+                //Go through the lanes it's part of
+                foreach (string laneID in nextTile.laneIDs)
+                {
+                    Lane tileLane;
+                    lists.Lanes.TryGetValue(laneID, out tileLane);
+
+                    //Check if this is the tile the vehicle should go on
+                    if ((laneID.Equals(vehicle.destinationLaneID) || //His destination lane is a valid path
+                        laneID.Equals(vehicle.path.ToString()) || //The lane corresponding to his direction is a valid path
+                        laneID.Equals(vehicle.spawntile.laneIDs[0])) //His starting lane is a valid path
+                        &&
+                        !isOppositeDirection(vehicle.rotation, enumerator.Current.Key) //He is not allowed to go in the opposite direction
+                        &&
+                        tileLane.pathDirections.Contains(enumerator.Current.Key)) //He is only allowed to go into the direction the pathlane is going
+                    {
+                        correctPath = true;
+                        break;
+                    }
+                    else 
+                    {
+                        correctPath = false;
+                    }
+                }
+
+                if (correctPath)
                 {
                     //Rotate the vehicle in the direction of the adjacent tile
                     vehicle.rotation = enumerator.Current.Key;
-                    
+                    vehicle.drawposition = nextTile.DrawPosition;
+                    vehicle.collission = nextTile.CollisionRectangle;
+                    vehicle.position = nextTile.Position;
+
                     //The given tile was the correct one to take, so return it
                     return nextTile;
                 }
@@ -181,6 +206,33 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                 enumerator.MoveNext();
                 return ChooseCorrectPath(vehicle, nextTile, enumerator);
             }
+        }
+
+        private bool isOppositeDirection(RotationEnum currentDirection, RotationEnum newDirection)
+        {
+            bool result = false;
+
+            switch(newDirection)
+            {
+                case RotationEnum.North:
+                    if (currentDirection.Equals(RotationEnum.South))
+                        result = true;
+                    break;
+                case RotationEnum.East:
+                    if (currentDirection.Equals(RotationEnum.West))
+                        result = true;
+                    break;
+                case RotationEnum.South:
+                    if (currentDirection.Equals(RotationEnum.North))
+                        result = true;
+                    break;
+                case RotationEnum.West:
+                    if (currentDirection.Equals(RotationEnum.East))
+                        result = true;
+                    break;
+            }
+            
+            return result;
         }
 
         private void CheckTileOccupation(Vehicle vehicle, Tile tile)

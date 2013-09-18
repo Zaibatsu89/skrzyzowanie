@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using KruispuntGroep4.Globals;
+using XNASimulator.Main;
 
 namespace KruispuntGroep4.Simulator.Main
 {
@@ -22,6 +23,7 @@ namespace KruispuntGroep4.Simulator.Main
     //Ghost cars that don't move appear after reset or after stress
     //Vehicles need to wait until they are mid-tile then turn
     //Vehicle collision handling needs to be re-ordered (CheckNextTile etc..)
+    //Stop vehicles from going backwards
 
     /// <summary>
     /// This is the main type for your game
@@ -44,6 +46,7 @@ namespace KruispuntGroep4.Simulator.Main
 		private CommunicationForm communication;
 
         private LevelBuilder levelBuilder;
+        private LaneBuilder laneBuilder;
         private Audio audio;
         private Lists lists;
 
@@ -81,6 +84,7 @@ namespace KruispuntGroep4.Simulator.Main
             lists = new Lists();
 
             levelBuilder = new LevelBuilder(lists);
+            laneBuilder = new LaneBuilder(lists);
 
 			vehicleControl = new VehicleControl(this.GraphicsDevice, lists);
             tileControl = new TileControl(lists);
@@ -134,7 +138,7 @@ namespace KruispuntGroep4.Simulator.Main
             //Create the level
             this.LoadCrossroad("Content/Grids/Crossroad.txt");
             //Create the lanes
-            laneControl.LoadLanes();
+            laneBuilder.LoadLanes();
         }
 
         /// <summary>
