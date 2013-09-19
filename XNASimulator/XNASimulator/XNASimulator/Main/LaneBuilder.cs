@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using KruispuntGroep6.Simulator.Globals;
-using KruispuntGroep6.Simulator.Objects;
-using KruispuntGroep6.Simulator.Main;
+﻿using System.Collections.Generic;
+using KruispuntGroep4.Simulator.Globals;
+using KruispuntGroep4.Simulator.Main;
+using KruispuntGroep4.Simulator.Objects;
 using Microsoft.Xna.Framework;
-using XNASimulator.Globals;
 
-namespace XNASimulator.Main
+namespace KruispuntGroep4.Main
 {
     class LaneBuilder
     {
@@ -24,7 +20,6 @@ namespace XNASimulator.Main
 
             InitLanes();
         }
-
 
         private void InitLanes()
         {

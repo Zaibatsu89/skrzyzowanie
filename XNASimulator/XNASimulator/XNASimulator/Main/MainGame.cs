@@ -1,13 +1,13 @@
 using System;
 using System.IO;
+using KruispuntGroep4.Globals;
+using KruispuntGroep4.Main;
 using KruispuntGroep4.Simulator.Communication;
 using KruispuntGroep4.Simulator.Globals;
 using KruispuntGroep4.Simulator.ObjectControllers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using KruispuntGroep4.Globals;
-using XNASimulator.Main;
 
 namespace KruispuntGroep4.Simulator.Main
 {
