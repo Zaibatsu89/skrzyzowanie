@@ -37,12 +37,29 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             lists.Lanes.TryGetValue(laneID, out lane);
 
 
-            switch(newValue)
+            if (!laneID[1].Equals('0') && !laneID[1].Equals('7'))
             {
-                case LightsEnum.Green: lane.trafficLight.Texture = Textures.GreenLight;
-                    break;
-                case LightsEnum.Red: lane.trafficLight.Texture = Textures.RedLight;
-                    break;
+                switch (newValue)
+                {
+                    case LightsEnum.Blink: lane.trafficLight.Texture = Textures.BlinkLight;
+                        break;
+                    case LightsEnum.Red: lane.trafficLight.Texture = Textures.RedLight;
+                        break;
+                    case LightsEnum.Green: lane.trafficLight.Texture = Textures.GreenLight;
+                        break;
+                    case LightsEnum.Yellow: lane.trafficLight.Texture = Textures.YellowLight;
+                        break;
+                }
+            }
+            else
+            {
+                switch (newValue)
+                {
+                    case LightsEnum.Red: lane.trafficLight.Texture = Textures.SidewalkLightRed;
+                        break;
+                    case LightsEnum.Green: lane.trafficLight.Texture = Textures.SidewalkLightGreen;
+                        break;
+                }
             }
         }
 
