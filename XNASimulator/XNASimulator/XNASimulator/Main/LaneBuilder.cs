@@ -445,7 +445,9 @@ namespace KruispuntGroep4.Main
                 else if (tile.Texture.Equals(Textures.CarSortDown) ||
                         tile.Texture.Equals(Textures.CarSortLeft) ||
                         tile.Texture.Equals(Textures.CarSortRight) ||
-                        tile.Texture.Equals(Textures.Buslane))
+                        tile.Texture.Equals(Textures.Buslane) ||
+                        tile.Texture.Equals(Textures.BikeDetect) ||
+                        tile.Texture.Equals(Textures.SidewalkDetect))
                 {
                     //set the detection tiles
                     lane.detectionClose = tile;

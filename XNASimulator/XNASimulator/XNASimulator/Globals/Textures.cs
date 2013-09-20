@@ -24,6 +24,8 @@ namespace KruispuntGroep4.Simulator.Globals
         public static Texture2D RoadCenter;
 
         public static Texture2D Buslane;
+        public static Texture2D BikeDetect;
+        public static Texture2D SidewalkDetect;
         public static Texture2D Bikelane;
         public static Texture2D CarSortDown;
         public static Texture2D CarSortLeft;

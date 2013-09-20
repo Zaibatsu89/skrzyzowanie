@@ -13,6 +13,7 @@ namespace KruispuntGroep4.Simulator.Main
 {
     //TODO: 
     //Better Pathing
+    //Detections for pedestrians and bicycles
 
     //Bugs:
 
@@ -113,6 +114,8 @@ namespace KruispuntGroep4.Simulator.Main
             Textures.SidewalkLightRed = Content.Load<Texture2D>("Tiles/32p/SidewalkLightRed32x32");
 
             Textures.Bikelane = Content.Load<Texture2D>("Tiles/32p/SortBike32x32");
+            Textures.BikeDetect = Content.Load<Texture2D>("Tiles/32p/BikeDetect32x32");
+            Textures.SidewalkDetect = Content.Load<Texture2D>("Tiles/32p/SidewalkDetect32x32");
             Textures.Buslane = Content.Load<Texture2D>("Tiles/32p/SortBus32x32");
             Textures.CarSortDown = Content.Load<Texture2D>("Tiles/32p/SortDown32x32");
             Textures.CarSortLeft = Content.Load<Texture2D>("Tiles/32p/SortLeft32x32");
