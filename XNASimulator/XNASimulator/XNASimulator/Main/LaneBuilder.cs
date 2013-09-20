@@ -86,7 +86,9 @@ namespace KruispuntGroep4.Main
         {
             Tile startTile;
             Lane startLane;
+            Tile removeTile;
             Lane endLane;
+
 
             #region create pathing lanes
             switch (lane.pathLaneID)
@@ -98,10 +100,19 @@ namespace KruispuntGroep4.Main
                     //Go East first
                     startLane.trafficLight.adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.East, lane);
+                   
+                    //Remove the last tile
+                    removeTile = lane.laneTiles[lane.laneTiles.Count - 1];
+                    removeTile.laneIDs.Remove(PathsEnum.NorthToEast.ToString());
+                    lane.laneTiles.Remove(removeTile);
 
-                    //Then South
+                    //Then go South
                     lane.laneTiles[lane.laneTiles.Count - 1].adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.South, lane);
+
+                    //And one tile to the East again
+                    lane.laneTiles[lane.laneTiles.Count - 1].adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
+                    LoadPathLane(startTile, endLane, RotationEnum.East, lane);
                     break;
                 case PathsEnum.NorthToSouth:
                     lists.Lanes.TryGetValue("N4", out startLane);

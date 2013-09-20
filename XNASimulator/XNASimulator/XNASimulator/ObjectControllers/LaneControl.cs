@@ -30,7 +30,7 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
         {
         }
 
-        public void ChangeTrafficLight(string newValue, string laneID)
+        public void ChangeTrafficLight(LightsEnum newValue, string laneID)
         {
             Lane lane;
             lists.Lanes.TryGetValue(laneID, out lane);
@@ -38,9 +38,9 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 
             switch(newValue)
             {
-                case "green": lane.trafficLight.Texture = Textures.GreenLight;
+                case LightsEnum.Green: lane.trafficLight.Texture = Textures.GreenLight;
                     break;
-                case "red": lane.trafficLight.Texture = Textures.RedLight;
+                case LightsEnum.Red: lane.trafficLight.Texture = Textures.RedLight;
                     break;
             }
         }

@@ -518,7 +518,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		private void ChangeLight()
 		{
 			// Change traffic light with color value and spawn lane ID
-			_laneControl.ChangeTrafficLight(Strings.TrafficLightValue, Strings.SpawnLaneID);
+			//_laneControl.ChangeTrafficLight(Strings.TrafficLightValue, Strings.SpawnLaneID);
 		}
 
 		/// <summary>

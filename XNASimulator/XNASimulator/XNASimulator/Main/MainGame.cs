@@ -16,6 +16,7 @@ namespace KruispuntGroep4.Simulator.Main
     //Bike detectiontile
     //Use vehicle textures
     //Add pedestrians
+    //Add detection
 
     //Bugs:
     //Ghost cars that don't move appear after reset or after stress

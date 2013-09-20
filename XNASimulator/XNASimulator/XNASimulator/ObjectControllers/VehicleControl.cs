@@ -269,15 +269,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     {
                         //yes, so go..
                         vehicle.stopCar = false;
-
-                        if (tile.Equals(vehicle.currentLane.detectionClose))
-                        {
-
-                        }
-                        else if (tile.Equals(vehicle.currentLane.detectionFar))
-                        {
-
-                        }
                     }
                     else
                     {
@@ -315,11 +306,13 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                         lane.laneVehicles.Add(vehicle);
                     }
 
-                    //release previous tile
-                    lists.Tiles[(int)vehicle.occupyingtile.X, (int)vehicle.occupyingtile.Y].isOccupied = false;
-                    lists.Tiles[(int)vehicle.occupyingtile.X, (int)vehicle.occupyingtile.Y].OccupiedID = string.Empty;
+                    Tile previousTile = lists.Tiles[(int)vehicle.occupyingtile.X, (int)vehicle.occupyingtile.Y];
 
-                    //let the detection know
+                    //release previous tile
+                    previousTile.isOccupied = false;
+                    previousTile.OccupiedID = string.Empty;
+
+                    //Check if it's leaving a detection tile
                     if (tile.Equals(vehicle.currentLane.detectionClose))
                     {
 
@@ -329,6 +322,15 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 
                     }
 
+                    //Check if it's entering a detection tile
+                    if (tile.Equals(vehicle.currentLane.detectionClose))
+                    {
+
+                    }
+                    else if (tile.Equals(vehicle.currentLane.detectionFar))
+                    {
+
+                    }
 
                     //set the new tile
                     vehicle.occupyingtile = tile.GridCoordinates;

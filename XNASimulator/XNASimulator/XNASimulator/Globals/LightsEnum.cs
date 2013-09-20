@@ -5,6 +5,7 @@
         Red,
         Green,
         Yellow,
-        Blink
+        Blink,
+        Off
     }
 }
