@@ -38,7 +38,7 @@ namespace KruispuntGroep4.Simulator.Main
         public static int LaneLengthVer = (TilesVer - MiddleSize) / 2; //Number of tiles in vertical lanes
         public static int TileTextureSize = 32; //32x32p textures
 
-		private CommunicationForm communication;
+		private CommunicationForm communicationForm;
 
         private LevelBuilder levelBuilder;
         private LaneBuilder laneBuilder;
@@ -55,7 +55,7 @@ namespace KruispuntGroep4.Simulator.Main
 
         public MainGame(CommunicationForm communication)
         {
-			this.communication = communication;
+			this.communicationForm = communication;
 
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -85,7 +85,7 @@ namespace KruispuntGroep4.Simulator.Main
             tileControl = new TileControl(lists);
             laneControl = new LaneControl(lists);
 
-			communication.SetLaneControl(laneControl);
+			
 
             audio = new Audio(Services);
 
@@ -134,6 +134,9 @@ namespace KruispuntGroep4.Simulator.Main
             this.LoadCrossroad("Content/Grids/Crossroad.txt");
             //Create the lanes
             laneBuilder.LoadLanes();
+
+			// Send lane control to communicationForm form
+			communicationForm.SetLaneControl(laneControl);
         }
 
         /// <summary>

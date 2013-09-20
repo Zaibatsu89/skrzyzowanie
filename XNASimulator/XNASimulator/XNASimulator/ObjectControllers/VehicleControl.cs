@@ -25,7 +25,7 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 
         public void Update(GameTime gameTime)
         {
-            for (int i = lists.Vehicles.Count - 1; i > 0; i--)
+            for (int i = lists.Vehicles.Count - 1; i >= 0; i--)
             {
                 Vehicle vehicle = lists.Vehicles[i];
 

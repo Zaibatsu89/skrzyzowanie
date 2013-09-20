@@ -1,3 +1,4 @@
+using System;
 using System.Windows.Forms;
 using KruispuntGroep4.Simulator.Communication;
 
@@ -11,6 +12,7 @@ namespace KruispuntGroep4.Simulator
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
+		[STAThread]
         public static void Main(string[] args)
         {
 			Application.EnableVisualStyles();

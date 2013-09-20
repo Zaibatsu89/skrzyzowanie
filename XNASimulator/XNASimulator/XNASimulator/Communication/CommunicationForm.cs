@@ -3,11 +3,13 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Windows.Forms;
 using KruispuntGroep4.Globals;
+using KruispuntGroep4.Simulator.Globals;
 using KruispuntGroep4.Simulator.Main;
 using KruispuntGroep4.Simulator.ObjectControllers;
 #endregion
@@ -42,6 +44,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			InitializeComponent();
 			
 			// Initialize backend
+			InitializeBackgroundWorkerInput();
 			InitializeBackgroundWorkerRead();
 			InitializeBackgroundWorkerWrite();
 		}
@@ -51,11 +54,13 @@ namespace KruispuntGroep4.Simulator.Communication
 		delegate void SwitchTextButtonStartDelegate();
 
 		// Appoint private attributes
+		private BackgroundWorker _bwInput;
 		private BackgroundWorker _bwRead;
 		private BackgroundWorker _bwWrite;
-		private Button _btnSend, _btnStart;
+		private Button _btnInput, _btnStart;
 		private TcpClient _client;
 		private IContainer _components = null;
+		private string[] _json;
 		private LaneControl _laneControl;
 		private TableLayoutPanel _tableLayoutPanel1,
 			_tableLayoutPanel2, _tableLayoutPanel3,
@@ -78,6 +83,15 @@ namespace KruispuntGroep4.Simulator.Communication
 
 			// Let my father execute the same function
 			base.Dispose(disposing);
+		}
+
+		/// <summary>
+		/// Initialize backend: background worker input
+		/// </summary>
+		private void InitializeBackgroundWorkerInput()
+		{
+			_bwInput.DoWork += new DoWorkEventHandler(DoWorkInput);
+			_bwInput.RunWorkerCompleted += new RunWorkerCompletedEventHandler(RunWorkerCompletedInput);
 		}
 
 		/// <summary>
@@ -106,12 +120,12 @@ namespace KruispuntGroep4.Simulator.Communication
 		private void InitializeComponent()
 		{
 			// Initialize private attributes
+			_bwInput = new BackgroundWorker();
 			_bwRead = new BackgroundWorker();
-			_bwRead.WorkerReportsProgress = true;
 			_bwWrite = new BackgroundWorker();
 			_bwWrite.WorkerReportsProgress = true;
 			_bwWrite.WorkerSupportsCancellation = true;
-			_btnSend = new Button();
+			_btnInput = new Button();
 			_btnStart = new Button();
 			_tableLayoutPanel1 = new TableLayoutPanel();
 			_tableLayoutPanel2 = new TableLayoutPanel();
@@ -178,9 +192,7 @@ namespace KruispuntGroep4.Simulator.Communication
 				((AnchorStyles)((((AnchorStyles.Top |
 				AnchorStyles.Bottom) | AnchorStyles.Left) |
 				AnchorStyles.Right)));
-			_tableLayoutPanel2.CellBorderStyle = TableLayoutPanelCellBorderStyle.None;
-			_tableLayoutPanel2.ColumnCount = 1;
-			_tableLayoutPanel2.Controls.Add(_btnStart, 0, 0);
+			_tableLayoutPanel2.Controls.Add(_btnInput, 0, 0);
 			_tableLayoutPanel2.Location = new Point(0, 23);
 			_tableLayoutPanel2.Size = new Size(315, 30);
 
@@ -191,6 +203,7 @@ namespace KruispuntGroep4.Simulator.Communication
 				AnchorStyles.Bottom) | AnchorStyles.Left) |
 				AnchorStyles.Right));
 			_btnStart.Click += new EventHandler(_btnStart_Click);
+			_btnStart.Enabled = false;
 			SwitchTextButtonStart();
 
 			// Set third table layout panel
@@ -198,12 +211,7 @@ namespace KruispuntGroep4.Simulator.Communication
 				(AnchorStyles)((((AnchorStyles.Top |
 				AnchorStyles.Bottom) | AnchorStyles.Left) |
 				AnchorStyles.Right));
-			_tableLayoutPanel3.CellBorderStyle = TableLayoutPanelCellBorderStyle.None;
-			_tableLayoutPanel3.ColumnCount = 2;
-			_tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-			_tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-			_tableLayoutPanel3.Controls.Add(_tbMessage, 0, 0);
-			_tableLayoutPanel3.Controls.Add(_btnSend, 1, 0);
+			_tableLayoutPanel3.Controls.Add(_btnStart, 0, 0);
 			_tableLayoutPanel3.Location = new Point(0, 53);
 			_tableLayoutPanel3.Size = new Size(315, 30);
 
@@ -218,21 +226,18 @@ namespace KruispuntGroep4.Simulator.Communication
 
 			// Position this button to all directions
 			// in the table layout panel 
-			_btnSend.Anchor =
+			_btnInput.Anchor =
 				(AnchorStyles)((((AnchorStyles.Top |
 				AnchorStyles.Bottom) | AnchorStyles.Left) |
 				AnchorStyles.Right));
-			_btnSend.Click += new EventHandler(_btnSend_Click);
-			_btnSend.Enabled = false;
-			_btnSend.Text = Strings.Send;
+			_btnInput.Click += new EventHandler(_btnInput_Click);
+			_btnInput.Text = Strings.Input;
 
 			// Set fourth table layout panel
 			_tableLayoutPanel4.Anchor =
 				(AnchorStyles)((((AnchorStyles.Top |
 				AnchorStyles.Bottom) | AnchorStyles.Left) |
 				AnchorStyles.Right));
-			_tableLayoutPanel4.CellBorderStyle = TableLayoutPanelCellBorderStyle.None;
-			_tableLayoutPanel4.ColumnCount = 1;
 			_tableLayoutPanel4.Controls.Add(_tbConsole, 0, 0);
 			_tableLayoutPanel4.Location = new Point(0, 83);
 			_tableLayoutPanel4.Size = new Size(315, 635);
@@ -269,18 +274,29 @@ namespace KruispuntGroep4.Simulator.Communication
 
 		#region Events
 		/// <summary>
-		/// Button 'Verzenden',
-		/// to send the specified message to the host
+		/// Button 'Laad invoerbestand',
+		/// to read JSON input file
 		/// </summary>
 		/// <param name="sender">Sender</param>
 		/// <param name="e">Event args</param>
-		private void _btnSend_Click(object sender, EventArgs e)
+		private void _btnInput_Click(object sender, EventArgs e)
 		{
-			// The message is the text from textbox Message
-			string message = _tbMessage.Text;
+			// Initialize open file dialog
+			FileDialog dialog = new OpenFileDialog();
+			DialogResult result = dialog.ShowDialog();
 
-			// Write the message
-			WriteMessage(message);
+			// If the dialog result is OK
+			if (result.Equals(DialogResult.OK))
+			{
+				// Disable button Input
+				_btnInput.Enabled = false;
+
+				// Read JSON from selected file
+				_json = File.ReadAllLines(dialog.FileName);
+
+				// Enable button Start
+				_btnStart.Enabled = true;
+			}
 		}
 
 		/// <summary>
@@ -295,7 +311,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			if (_btnStart.Text.Equals(Strings.StartView))
 			{
 				// Disable buttons and textboxes
-				_btnSend.Enabled = false;
+				_btnInput.Enabled = false;
 				_tbAddress.Enabled = false;
 				_tbMessage.Enabled = false;
 				_tbPort.Enabled = false;
@@ -322,7 +338,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			{
 				// User wants to cancel while connecting,
 				// so request cancellation of
-				// background workers read and write
+				// background worker write
 				_bwWrite.CancelAsync();
 			}
 		}
@@ -367,6 +383,84 @@ namespace KruispuntGroep4.Simulator.Communication
 		{
 			// Private lane control is specified lane control
 			_laneControl = laneControl;
+		}
+
+		/// <summary>
+		/// Write the specified detection message to the host
+		/// </summary>
+		/// <param name="vType">Vehicle type</param>
+		/// <param name="loop">Loop: close or far</param>
+		/// <param name="empty">Empty: true or false</param>
+		/// <param name="laneIDfrom">Direction and number</param>
+		/// <param name="laneIDto">Direction and number</param>
+		public void WriteDetectionMessage(string vType, LoopEnum loop, string empty, string laneIDfrom, string laneIDto)
+		{
+			// Initialize the message
+			string message = string.Empty;
+
+			// Is it close or far?
+			switch (loop)
+			{
+				case LoopEnum.close: /* It is close */
+					// Is it occupied?
+					switch (empty)
+					{
+						case Strings.True: /* It is occupied */
+							// Create the message
+							message =
+								@"[{""light"":""" +
+								laneIDfrom +
+								@""", ""type"":""" +
+								vType +
+								@""", ""loop"":""close"", ""empty"":""true"", ""to"":""" +
+								laneIDto +
+								@"""}]";
+							break;
+						case Strings.False: /* It isn't occupied */
+							// Create the message
+							message =
+								@"[{""light"":""" +
+								laneIDfrom +
+								@""", ""type"":""" +
+								vType +
+								@""", ""loop"":""close"", ""empty"":""false"", ""to"":""" +
+								laneIDto +
+								@"""}]";
+							break;
+					}
+					break;
+				case LoopEnum.far: /* It is far */
+					// Is it occupied?
+					switch (empty)
+					{
+						case Strings.True: /* It is occupied */
+							// Create the message
+							message =
+								@"[{""light"":""" +
+								laneIDfrom +
+								@""", ""type"":""" +
+								vType +
+								@""", ""loop"":""far"", ""empty"":""true"", ""to"":""" +
+								laneIDto +
+								@"""}]";
+							break;
+						case Strings.False: /* It isn't occupied */
+							// Create the message
+							message =
+								@"[{""light"":""" +
+								laneIDfrom +
+								@""", ""type"":""" +
+								vType +
+								@""", ""loop"":""far"", ""empty"":""false"", ""to"":""" +
+								laneIDto +
+								@"""}]";
+							break;
+					}
+					break;
+			}
+			
+			// Write the detection message
+			WriteMessage(message);
 		}
 
 		/// <summary>
@@ -458,6 +552,16 @@ namespace KruispuntGroep4.Simulator.Communication
 		}
 
 		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void DoWorkInput(object sender, DoWorkEventArgs e)
+		{
+			// TODO: Spawn all vehicles from the JSON input file
+		}
+
+		/// <summary>
 		/// Read a message from the host
 		/// </summary>
 		/// <param name="sender">Background worker read</param>
@@ -508,12 +612,12 @@ namespace KruispuntGroep4.Simulator.Communication
 			// If the cancel property is false
 			if (!e.Cancel)
 			{
+				// Read messages in the background, so the UI stays responsive
+				_bwRead.RunWorkerAsync();
+
 				// When there is a TCP client created,
 				// give the user a connected result
 				e.Result = Strings.Connected;
-
-				// Read messages in the background, so the UI stays responsive
-				_bwRead.RunWorkerAsync();
 			}
 		}
 
@@ -548,6 +652,280 @@ namespace KruispuntGroep4.Simulator.Communication
 		}
 
 		/// <summary>
+		/// Get the type of a JSON string
+		/// </summary>
+		/// <param name="message">String used to contain a dynamic JSON</param>
+		/// <returns>String used to contain the JSON type</returns>
+		private static string GetJsonType(string message)
+		{
+			string jsonType = string.Empty;
+
+			if (message.Contains("from") || message.Contains("FROM"))
+				jsonType = "INPUT";
+			else if (message.Contains("state") || message.Contains("STATE"))
+				jsonType = "STOPLIGHT";
+			else if (message.Contains("loop") || message.Contains("LOOP"))
+				jsonType = "DETECTOR";
+			else if (message.Contains("starttime") || message.Contains("STARTTIME"))
+				jsonType = "STARTTIME";
+			else if (message.Contains("multiplier") || message.Contains("MULTIPLIER"))
+				jsonType = "MULTIPLIER";
+
+			return jsonType;
+		}
+
+		/// <summary>
+		/// Get readable JSON
+		/// </summary>
+		/// <param name="json">String used to contain a JSON object or JSON array</param>
+		/// <returns>Strings used to contain a message</returns>
+		private string GetReadableJson(string json)
+		{
+			string encryptedJson = string.Empty;
+
+			if (json.StartsWith(Strings.BraceOpen))
+			{
+				encryptedJson = JsonObjectToMessage(json);
+			}
+			else if (json.StartsWith(Strings.BracketOpen))
+			{
+				encryptedJson = JsonArrayToMessage(json);
+			}
+
+			return encryptedJson;
+		}
+
+		/// <summary>
+		/// Converts dynamic JSON array string to readable message.
+		/// </summary>
+		/// <param name="json">String used to contain a dynamic JSON array.</param>
+		/// <returns>String used to contain a readable message.</returns>
+		public static string JsonArrayToMessage(string strJson)
+		{
+			var json = DynamicJson.Parse(strJson);
+			string jsonType = GetJsonType(strJson);
+			var count = ((dynamic[])json).Count();
+			string message = string.Empty;
+
+			switch (jsonType)
+			{
+				case "DETECTOR":
+					var dLight = ((dynamic[])json).Select(d => d.light);
+					var dType = ((dynamic[])json).Select(d => d.type);
+					var loop = ((dynamic[])json).Select(d => d.loop);
+					var empty = ((dynamic[])json).Select(d => d.empty);
+					var dTo = ((dynamic[])json).Select(d => d.to);
+
+					for (int i = 0; i < count; i++)
+					{
+						string strLight = dLight.ElementAt(i);
+						string strType = dType.ElementAt(i);
+						string strLoop = loop.ElementAt(i);
+						bool boolEmpty = empty.ElementAt(i);
+						string strEmpty = boolEmpty.ToString();
+						string strTo = dTo.ElementAt(i);
+
+						message += "[";
+						message += jsonType;
+						message += ",";
+						message += strLight.ToUpper();
+						message += ",";
+						message += strType.ToUpper();
+						message += ",";
+						message += strLoop.ToUpper();
+						message += ",";
+						message += strEmpty.ToUpper();
+						message += ",";
+						message += strTo.ToUpper();
+						message += "],";
+					}
+
+					message = message.Remove(message.Length - 1);
+
+					break;
+				case "INPUT":
+					var time = ((dynamic[])json).Select(d => d.time);
+					var type = ((dynamic[])json).Select(d => d.type);
+					var from = ((dynamic[])json).Select(d => d.from);
+					var to = ((dynamic[])json).Select(d => d.to);
+
+					for (int i = 0; i < count; i++)
+					{
+						string strTime = time.ElementAt(i);
+						string strType = type.ElementAt(i);
+						string strFrom = from.ElementAt(i);
+						string strTo = to.ElementAt(i);
+
+						message += "[";
+						message += jsonType;
+						message += ",";
+						message += strTime.ToUpper();
+						message += ",";
+						message += strType.ToUpper();
+						message += ",";
+						message += strFrom.ToUpper();
+						message += ",";
+						message += strTo.ToUpper();
+						message += "],";
+					}
+
+					message = message.Remove(message.Length - 1);
+
+					break;
+				case "MULTIPLIER":
+					var multiplier = ((dynamic[])json).Select(d => d.multiplier);
+
+					for (int i = 0; i < count; i++)
+					{
+						string strMultiplier = multiplier.ElementAt(i);
+
+						message += "[";
+						message += jsonType;
+						message += ",";
+						message += strMultiplier.ToUpper();
+						message += "],";
+					}
+
+					message = message.Remove(message.Length - 1);
+
+					break;
+				case "STOPLIGHT":
+					var light = ((dynamic[])json).Select(d => d.light);
+					var state = ((dynamic[])json).Select(d => d.state);
+
+					for (int i = 0; i < count; i++)
+					{
+						string strLight = light.ElementAt(i);
+						string strState = state.ElementAt(i);
+
+						message += "[";
+						message += jsonType;
+						message += ",";
+						message += strLight.ToUpper();
+						message += ",";
+						message += strState.ToUpper();
+						message += "],";
+					}
+
+					message = message.Remove(message.Length - 1);
+
+					break;
+
+				case "STARTTIME":
+					var starttime = ((dynamic[])json).Select(d => d.starttime);
+
+					for (int i = 0; i < count; i++)
+					{
+						string strStarttime = starttime.ElementAt(i);
+
+						message += "[";
+						message += jsonType;
+						message += ",";
+						message += strStarttime.ToUpper();
+						message += "],";
+					}
+
+					message = message.Remove(message.Length - 1);
+
+					break;
+
+				default:
+					throw new Exception(string.Format("JSON {0} heeft geen herkenbaar type!", strJson));
+			}
+
+			return message;
+		}
+
+		/// <summary>
+		/// Converts dynamic JSON object string to readable message.
+		/// </summary>
+		/// <param name="json">String used to contain a dynamic JSON object.</param>
+		/// <returns>String used to contain a readable message.</returns>
+		private string JsonObjectToMessage(string strJson)
+		{
+			var json = DynamicJson.Parse(strJson);
+			string message = GetJsonType(strJson);
+
+			switch (message)
+			{
+				case "DETECTOR":
+					string strDetectorLight = json.light;
+					string strDetectorType = json.type;
+					string strLoop = json.loop;
+					bool boolEmpty = json.empty;
+					string strEmpty = boolEmpty.ToString();
+					string strDetectorTo = json.to;
+
+					message = message.Insert(0, "[");
+					message += ",";
+					message += strDetectorLight.ToUpper();
+					message += ",";
+					message += strDetectorType.ToUpper();
+					message += ",";
+					message += strLoop.ToUpper();
+					message += ",";
+					message += strEmpty.ToUpper();
+					message += ",";
+					message += strDetectorTo.ToUpper();
+					message += "]";
+
+					break;
+				case "INPUT":
+					string strTime = json.time;
+					string strType = json.type;
+					string strFrom = json.from;
+					string strTo = json.to;
+
+					message = message.Insert(0, "[");
+					message += ",";
+					message += strTime.ToUpper();
+					message += ",";
+					message += strType.ToUpper();
+					message += ",";
+					message += strFrom.ToUpper();
+					message += ",";
+					message += strTo.ToUpper();
+					message += "]";
+
+					break;
+				case "MULTIPLIER":
+					string strMultiplier = json.multiplier;
+
+					message = message.Insert(0, "[");
+					message += ",";
+					message += strMultiplier.ToUpper();
+					message += "]";
+
+					break;
+				case "STARTTIME":
+					string strStarttime = json.starttime;
+
+					message = message.Insert(0, "[");
+					message += ",";
+					message += strStarttime.ToUpper();
+					message += "]";
+
+					break;
+				case "STOPLIGHT":
+					string strLight = json.light;
+					string strState = json.state;
+
+					message = message.Insert(0, "[");
+					message += ",";
+					message += strLight.ToUpper();
+					message += ",";
+					message += strState.ToUpper();
+					message += "]";
+
+					break;
+				default:
+					throw new Exception(string.Format("JSON {0} heeft geen herkenbaar type!", strJson));
+			}
+
+			return message;
+		}
+
+		/// <summary>
 		/// Display an error message in case of socket exception while connecting
 		/// </summary>
 		/// <param name="sender">Background worker write</param>
@@ -556,6 +934,17 @@ namespace KruispuntGroep4.Simulator.Communication
 		{
 			// Display error message
 			DisplayMessage(e.UserState as string);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void RunWorkerCompletedInput(object sender, RunWorkerCompletedEventArgs e)
+		{
+			// TODO: display a message saying all vehicles from
+			// the JSON input file are sent
 		}
 
 		/// <summary>
@@ -591,14 +980,17 @@ namespace KruispuntGroep4.Simulator.Communication
 			}
 			else /* Else if the user didn't interfere, display a success message */
 			{
-				// Enable button Send
-				_btnSend.Enabled = true;
-
 				// Disable button Start
 				_btnStart.Enabled = false;
 
 				// Display success message
 				DisplayMessage(e.Result as string);
+
+				// Wait for lane control
+				while (_laneControl == null) { }
+
+				// Spawn all vehicles from the JSON input file in the background
+				_bwInput.RunWorkerAsync();
 			}
 		}
 
