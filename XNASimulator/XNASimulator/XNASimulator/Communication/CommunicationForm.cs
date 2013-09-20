@@ -1,5 +1,6 @@
 ﻿#region Usings
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
@@ -408,24 +409,24 @@ namespace KruispuntGroep4.Simulator.Communication
 						case Strings.True: /* It is occupied */
 							// Create the message
 							message =
-								@"[{""light"":""" +
+								Strings.DetectionMessageLight +
 								laneIDfrom +
-								@""", ""type"":""" +
+								Strings.DetectionMessageType +
 								vType.ToString() +
-								@""", ""loop"":""close"", ""empty"":""true"", ""to"":""" +
+								Strings.DetectionMessageLoopCloseEmptyTrue +
 								laneIDto +
-								@"""}]";
+								Strings.DetectionMessageEnding;
 							break;
 						case Strings.False: /* It isn't occupied */
 							// Create the message
 							message =
-								@"[{""light"":""" +
+								Strings.DetectionMessageLight +
 								laneIDfrom +
-								@""", ""type"":""" +
+								Strings.DetectionMessageType +
 								vType.ToString() +
-								@""", ""loop"":""close"", ""empty"":""false"", ""to"":""" +
+								Strings.DetectionMessageLoopCloseEmptyFalse +
 								laneIDto +
-								@"""}]";
+								Strings.DetectionMessageEnding;
 							break;
 					}
 					break;
@@ -436,24 +437,24 @@ namespace KruispuntGroep4.Simulator.Communication
 						case Strings.True: /* It is occupied */
 							// Create the message
 							message =
-								@"[{""light"":""" +
+								Strings.DetectionMessageLight +
 								laneIDfrom +
-								@""", ""type"":""" +
+								Strings.DetectionMessageType +
 								vType.ToString() +
-								@""", ""loop"":""far"", ""empty"":""true"", ""to"":""" +
+								Strings.DetectionMessageLoopFarEmptyTrue +
 								laneIDto +
-								@"""}]";
+								Strings.DetectionMessageEnding;
 							break;
 						case Strings.False: /* It isn't occupied */
 							// Create the message
 							message =
-								@"[{""light"":""" +
+								Strings.DetectionMessageLight +
 								laneIDfrom +
-								@""", ""type"":""" +
+								Strings.DetectionMessageType +
 								vType.ToString() +
-								@""", ""loop"":""far"", ""empty"":""false"", ""to"":""" +
+								Strings.DetectionMessageLoopFarEmptyFalse +
 								laneIDto +
-								@"""}]";
+								Strings.DetectionMessageEnding;
 							break;
 					}
 					break;
@@ -513,15 +514,6 @@ namespace KruispuntGroep4.Simulator.Communication
 
 		#region Private methods
 		/// <summary>
-		/// Change a traffic light in a view
-		/// </summary>
-		private void ChangeLight()
-		{
-			// Change traffic light with color value and spawn lane ID
-			_laneControl.ChangeTrafficLight(LightsEnum.Green, Strings.SpawnLaneID);
-		}
-
-		/// <summary>
 		/// Display the specified message in the Console listbox
 		/// </summary>
 		/// <param name="message">Message</param>
@@ -552,16 +544,72 @@ namespace KruispuntGroep4.Simulator.Communication
 		}
 
 		/// <summary>
-		/// 
+		/// Read the JSON input file and spawn vehicles
 		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
+		/// <param name="sender">Background worker input</param>
+		/// <param name="e">Do work event args</param>
 		private void DoWorkInput(object sender, DoWorkEventArgs e)
 		{
-			// TODO: Spawn all vehicles from the JSON input file
+			// Initialize previous time
+			int previousTime = -1;
 
-			// Test
-			SpawnVehicle();
+			// For each JSON string in JSON array
+			foreach (string json in _json)
+			{
+				// Initialize whether Godzilla exists and vehicle type
+				bool isGodzilla = false;
+				VehicleTypeEnum vehicleType = VehicleTypeEnum.car;
+
+				// Initialize vehicle type parameter value
+				string type = json.Split(',')[1];
+
+				// What type is it?
+				switch (type)
+				{
+					case Strings.VehicleTypeBike: /* It is a bike */
+						vehicleType = VehicleTypeEnum.bike;
+						break;
+					case Strings.VehicleTypeBus: /* It is a bus */
+						vehicleType = VehicleTypeEnum.bus;
+						break;
+					case Strings.VehicleTypeCar: /* It is a car */
+						vehicleType = VehicleTypeEnum.car;
+						break;
+					case Strings.VehicleTypePedestrian: /* It is a pedestrian */
+						vehicleType = VehicleTypeEnum.pedestrian;
+						break;
+					case Strings.VehicleTypeTruck: /* It is a truck */
+						vehicleType = VehicleTypeEnum.truck;
+						break;
+					default: /* It is a Godzilla */
+						isGodzilla = true;
+						break;
+				}
+
+				// If the vehicle type isn't Godzilla
+				if (!isGodzilla)
+				{
+					// Initialize from and to parameter values
+					string from = json.Split(',')[2];
+					string to = (json.Split(',')[3]).Split(']')[0];
+
+					// Spawn the vehicle
+					_laneControl.SpawnVehicle(vehicleType, from, to);
+				}
+
+				// Initialize time parameter value
+				int time = int.Parse((json.Split('[')[1]).Split(',')[0]);
+
+				// If the time is after the previous time
+				if (time > previousTime)
+				{
+					// Sleep for a second
+					Thread.Sleep(1000);
+				}
+
+				// The previous time is time
+				previousTime = time;
+			}
 		}
 
 		/// <summary>
@@ -655,267 +703,84 @@ namespace KruispuntGroep4.Simulator.Communication
 		}
 
 		/// <summary>
-		/// Get the type of a JSON string
-		/// </summary>
-		/// <param name="message">String used to contain a dynamic JSON</param>
-		/// <returns>String used to contain the JSON type</returns>
-		private static string GetJsonType(string message)
-		{
-			string jsonType = string.Empty;
-
-			if (message.Contains("from") || message.Contains("FROM"))
-				jsonType = "INPUT";
-			else if (message.Contains("state") || message.Contains("STATE"))
-				jsonType = "STOPLIGHT";
-			else if (message.Contains("loop") || message.Contains("LOOP"))
-				jsonType = "DETECTOR";
-			else if (message.Contains("starttime") || message.Contains("STARTTIME"))
-				jsonType = "STARTTIME";
-			else if (message.Contains("multiplier") || message.Contains("MULTIPLIER"))
-				jsonType = "MULTIPLIER";
-
-			return jsonType;
-		}
-
-		/// <summary>
-		/// DEPRICATED
-		/// Converts dynamic JSON array string to readable message.
-		/// </summary>
-		/// <param name="json">String used to contain a dynamic JSON array.</param>
-		/// <returns>String used to contain a readable message.</returns>
-		public static string JsonArrayToMessage(string strJson)
-		{
-			var json = DynamicJson.Parse(strJson);
-			string jsonType = GetJsonType(strJson);
-			var count = ((dynamic[])json).Count();
-			string message = string.Empty;
-
-			switch (jsonType)
-			{
-				case "DETECTOR":
-					var dLight = ((dynamic[])json).Select(d => d.light);
-					var dType = ((dynamic[])json).Select(d => d.type);
-					var loop = ((dynamic[])json).Select(d => d.loop);
-					var empty = ((dynamic[])json).Select(d => d.empty);
-					var dTo = ((dynamic[])json).Select(d => d.to);
-
-					for (int i = 0; i < count; i++)
-					{
-						string strLight = dLight.ElementAt(i);
-						string strType = dType.ElementAt(i);
-						string strLoop = loop.ElementAt(i);
-						bool boolEmpty = empty.ElementAt(i);
-						string strEmpty = boolEmpty.ToString();
-						string strTo = dTo.ElementAt(i);
-
-						message += "[";
-						message += jsonType;
-						message += ",";
-						message += strLight.ToUpper();
-						message += ",";
-						message += strType.ToUpper();
-						message += ",";
-						message += strLoop.ToUpper();
-						message += ",";
-						message += strEmpty.ToUpper();
-						message += ",";
-						message += strTo.ToUpper();
-						message += "],";
-					}
-
-					message = message.Remove(message.Length - 1);
-
-					break;
-				case "INPUT":
-					var time = ((dynamic[])json).Select(d => d.time);
-					var type = ((dynamic[])json).Select(d => d.type);
-					var from = ((dynamic[])json).Select(d => d.from);
-					var to = ((dynamic[])json).Select(d => d.to);
-
-					for (int i = 0; i < count; i++)
-					{
-						string strTime = time.ElementAt(i);
-						string strType = type.ElementAt(i);
-						string strFrom = from.ElementAt(i);
-						string strTo = to.ElementAt(i);
-
-						message += "[";
-						message += jsonType;
-						message += ",";
-						message += strTime.ToUpper();
-						message += ",";
-						message += strType.ToUpper();
-						message += ",";
-						message += strFrom.ToUpper();
-						message += ",";
-						message += strTo.ToUpper();
-						message += "],";
-					}
-
-					message = message.Remove(message.Length - 1);
-
-					break;
-				case "MULTIPLIER":
-					var multiplier = ((dynamic[])json).Select(d => d.multiplier);
-
-					for (int i = 0; i < count; i++)
-					{
-						string strMultiplier = multiplier.ElementAt(i);
-
-						message += "[";
-						message += jsonType;
-						message += ",";
-						message += strMultiplier.ToUpper();
-						message += "],";
-					}
-
-					message = message.Remove(message.Length - 1);
-
-					break;
-				case "STOPLIGHT":
-					var light = ((dynamic[])json).Select(d => d.light);
-					var state = ((dynamic[])json).Select(d => d.state);
-
-					for (int i = 0; i < count; i++)
-					{
-						string strLight = light.ElementAt(i);
-						string strState = state.ElementAt(i);
-
-						message += "[";
-						message += jsonType;
-						message += ",";
-						message += strLight.ToUpper();
-						message += ",";
-						message += strState.ToUpper();
-						message += "],";
-					}
-
-					message = message.Remove(message.Length - 1);
-
-					break;
-
-				case "STARTTIME":
-					var starttime = ((dynamic[])json).Select(d => d.starttime);
-
-					for (int i = 0; i < count; i++)
-					{
-						string strStarttime = starttime.ElementAt(i);
-
-						message += "[";
-						message += jsonType;
-						message += ",";
-						message += strStarttime.ToUpper();
-						message += "],";
-					}
-
-					message = message.Remove(message.Length - 1);
-
-					break;
-
-				default:
-					throw new Exception(string.Format("JSON {0} heeft geen herkenbaar type!", strJson));
-			}
-
-			return message;
-		}
-
-		/// <summary>
 		/// Convert JSON array to messages
 		/// </summary>
 		/// <returns>Readable JSON messages</returns>
 		private string[] JsonArrayToMessages()
 		{
-			// TODO: copy function JsonArrayToMessage
+			// Initialize list of messages
+			List<string> messages = new List<string>();
 
-			return _json;
+			// Parse JSON string array as string
+			var json = DynamicJson.Parse(string.Join(string.Empty, _json));
+
+			// Extract parameter values in dynamic JSON format
+			var count = ((dynamic[])json).Count();
+			var time = ((dynamic[])json).Select(d => d.time);
+			var type = ((dynamic[])json).Select(d => d.type);
+			var from = ((dynamic[])json).Select(d => d.from);
+			var to = ((dynamic[])json).Select(d => d.to);
+
+			// For every JSON object
+			for (int i = 0; i < count; i++)
+			{
+				// Initialize parameter values
+				string strTime = time.ElementAt(i);
+				string strType = type.ElementAt(i);
+				string strFrom = from.ElementAt(i);
+				string strTo = to.ElementAt(i);
+
+				// Create message with parameter values in upper case
+				string message = string.Empty;
+				message += Strings.BracketOpen;
+				message += strTime;
+				message += Strings.Comma;
+				message += strType;
+				message += Strings.Comma;
+				message += strFrom;
+				message += Strings.Comma;
+				message += strTo;
+				message += Strings.BracketClose;
+
+				// Add this message to the list of messages
+				messages.Add(message);
+			}
+
+			// Convert the list of messages to a string array,
+			// store it in the private _json attribute
+			// and return it
+			return _json = messages.ToArray();
 		}
 
 		/// <summary>
-		/// Converts dynamic JSON object string to readable message.
+		/// Converts dynamic JSON object string to readable message
 		/// </summary>
-		/// <param name="json">String used to contain a dynamic JSON object.</param>
-		/// <returns>String used to contain a readable message.</returns>
+		/// <param name="json">String used to contain a dynamic JSON object</param>
+		/// <returns>String used to contain a readable message</returns>
 		private string JsonObjectToMessage()
 		{
+			// Parse JSON string
 			var json = DynamicJson.Parse(_json[0]);
-			string message = GetJsonType(_json[0]);
 
-			switch (message)
-			{
-				case "DETECTOR":
-					string strDetectorLight = json.light;
-					string strDetectorType = json.type;
-					string strLoop = json.loop;
-					bool boolEmpty = json.empty;
-					string strEmpty = boolEmpty.ToString();
-					string strDetectorTo = json.to;
+			// Initialize parameter values
+			string time = json.time;
+			string type = json.type;
+			string from = json.from;
+			string to = json.to;
 
-					message = message.Insert(0, "[");
-					message += ",";
-					message += strDetectorLight.ToUpper();
-					message += ",";
-					message += strDetectorType.ToUpper();
-					message += ",";
-					message += strLoop.ToUpper();
-					message += ",";
-					message += strEmpty.ToUpper();
-					message += ",";
-					message += strDetectorTo.ToUpper();
-					message += "]";
+			// Create a message with parameter values in upper case
+			string message = string.Empty;
+			message += Strings.BracketOpen;
+			message += time;
+			message += Strings.Comma;
+			message += type;
+			message += Strings.Comma;
+			message += from;
+			message += Strings.Comma;
+			message += to;
+			message += Strings.BracketClose;
 
-					break;
-				case "INPUT":
-					string strTime = json.time;
-					string strType = json.type;
-					string strFrom = json.from;
-					string strTo = json.to;
-
-					message = message.Insert(0, "[");
-					message += ",";
-					message += strTime.ToUpper();
-					message += ",";
-					message += strType.ToUpper();
-					message += ",";
-					message += strFrom.ToUpper();
-					message += ",";
-					message += strTo.ToUpper();
-					message += "]";
-
-					break;
-				case "MULTIPLIER":
-					string strMultiplier = json.multiplier;
-
-					message = message.Insert(0, "[");
-					message += ",";
-					message += strMultiplier.ToUpper();
-					message += "]";
-
-					break;
-				case "STARTTIME":
-					string strStarttime = json.starttime;
-
-					message = message.Insert(0, "[");
-					message += ",";
-					message += strStarttime.ToUpper();
-					message += "]";
-
-					break;
-				case "STOPLIGHT":
-					string strLight = json.light;
-					string strState = json.state;
-
-					message = message.Insert(0, "[");
-					message += ",";
-					message += strLight.ToUpper();
-					message += ",";
-					message += strState.ToUpper();
-					message += "]";
-
-					break;
-				default:
-					throw new Exception(string.Format("JSON {0} heeft geen herkenbaar type!", _json[0]));
-			}
-
+			// Return this message
 			return message;
 		}
 
@@ -931,14 +796,14 @@ namespace KruispuntGroep4.Simulator.Communication
 		}
 
 		/// <summary>
-		/// 
+		/// Display a message saying all input JSONs are sent
 		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
+		/// <param name="sender">Background worker input</param>
+		/// <param name="e">Run worker completed event args</param>
 		private void RunWorkerCompletedInput(object sender, RunWorkerCompletedEventArgs e)
 		{
-			// TODO: display a message saying all vehicles from
-			// the JSON input file are sent
+			// Display all input JSONs sent message
+			DisplayMessage(Strings.Sent + Strings.AllInputJsons);
 		}
 
 		/// <summary>
@@ -985,15 +850,6 @@ namespace KruispuntGroep4.Simulator.Communication
 				// Spawn all vehicles from the JSON input file in the background
 				_bwInput.RunWorkerAsync();
 			}
-		}
-
-		/// <summary>
-		/// Spawn a vehicle in a view
-		/// </summary>
-        private void SpawnVehicle()
-        {
-			// Spawn vehicle with type, spawn lane ID and destination lane ID
-            _laneControl.SpawnVehicle(VehicleTypeEnum.bus, Strings.SpawnLaneID, Strings.DestinationLaneID);
 		}
 
 		/// <summary>
