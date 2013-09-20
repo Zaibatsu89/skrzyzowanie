@@ -88,7 +88,7 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     break;
                 case VehicleTypeEnum.truck: newVehicle = new Vehicle(Textures.Truck, vehicleID);
                     break;
-                case VehicleTypeEnum.bike: newVehicle =  new Vehicle(Textures.Bike, vehicleID);
+                case VehicleTypeEnum.bicycle: newVehicle =  new Vehicle(Textures.Bike, vehicleID);
                     break;
                 case VehicleTypeEnum.pedestrian: newVehicle = new Vehicle(Textures.Pedestrian, vehicleID);
                     break;
@@ -139,7 +139,7 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                 //Add the vehicle to the Lane and fill it with the Lane's data
                 newVehicle = spawnLane.AddVehicle(newVehicle);
 
-                //Add randomness to the location of bikes and pedestrians
+                //Add randomness to the location of bicycles and pedestrians
                 if (newVehicle.sprite.Equals(Textures.Bike) || newVehicle.sprite.Equals(Textures.Pedestrian))
                 {
                     Random random = new Random();

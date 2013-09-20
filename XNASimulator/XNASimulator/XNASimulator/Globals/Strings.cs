@@ -11,11 +11,14 @@
 		public const string BracketOpen = "[";
 		public const string Comma = ",";
 		public const string Connected = "Verbonden.";
+		public const string DateTimeFormat = "HH:mm";
 		public const string DetectionMessageEnding = @"""}]";
 		public const string DetectionMessageLight = @"[{""light"":""";
 		public const string DetectionMessageLoopCloseEmptyFalse = @""", ""loop"":""close"", ""empty"":""false"", ""to"":""";
+		public const string DetectionMessageLoopCloseEmptyNull = @""", ""loop"":""close"", ""empty"":""null"", ""to"":""";
 		public const string DetectionMessageLoopCloseEmptyTrue = @""", ""loop"":""close"", ""empty"":""true"", ""to"":""";
 		public const string DetectionMessageLoopFarEmptyFalse = @""", ""loop"":""far"", ""empty"":""false"", ""to"":""";
+		public const string DetectionMessageLoopFarEmptyNull = @""", ""loop"":""far"", ""empty"":""null"", ""to"":""";
 		public const string DetectionMessageLoopFarEmptyTrue = @""", ""loop"":""far"", ""empty"":""true"", ""to"":""";
 		public const string DetectionMessageType = @""", ""type"":""";
 		public const string Error = "Fout tijdens verbinden.";
@@ -35,7 +38,7 @@
 		public const string TitleCommunication = "Communicatie - SEN Groep 4";
 		public const string TitleGame = "Weergave - SEN Groep 4";
 		public const string True = "true";
-		public const string VehicleTypeBike = "bike";
+		public const string VehicleTypeBicycle = "bicycle";
 		public const string VehicleTypeBus = "bus";
 		public const string VehicleTypeCar = "car";
 		public const string VehicleTypePedestrian = "pedestrian";

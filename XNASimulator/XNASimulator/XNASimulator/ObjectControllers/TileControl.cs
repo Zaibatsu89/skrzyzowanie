@@ -73,7 +73,7 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                                 break;
                             case VehicleTypeEnum.truck: newVehicle = new Vehicle(Textures.Truck, DEBUGvehicleID.ToString());
                                 break;
-                            case VehicleTypeEnum.bike: newVehicle = new Vehicle(Textures.Bike, DEBUGvehicleID.ToString());
+                            case VehicleTypeEnum.bicycle: newVehicle = new Vehicle(Textures.Bike, DEBUGvehicleID.ToString());
                                 break;
                         }
 

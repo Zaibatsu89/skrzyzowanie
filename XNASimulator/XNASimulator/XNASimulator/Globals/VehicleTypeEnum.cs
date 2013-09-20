@@ -2,10 +2,10 @@
 {
 	enum VehicleTypeEnum
 	{
-		car,
+		bicycle,
 		bus,
-		truck,
-		bike,
-		pedestrian
+		car,
+		pedestrian,
+		truck
 	}
 }

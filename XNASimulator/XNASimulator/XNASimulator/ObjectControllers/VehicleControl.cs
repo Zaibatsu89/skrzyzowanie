@@ -278,8 +278,7 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     else
                     {
                         //no, so wait..
-                        if(!vehicle.sprite.Equals(Textures.Pedestrian))
-                            vehicle.stopCar = true;
+                        vehicle.stopCar = true;
                     }
                 }
                 else //not occupied

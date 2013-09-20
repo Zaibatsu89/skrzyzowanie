@@ -347,36 +347,6 @@ namespace KruispuntGroep4.Simulator.Communication
 
 		#region Public methods
 		/// <summary>
-		/// Read a message from the host,
-		/// if the TCP client is connected,
-		/// else an empty message is returned
-		/// </summary>
-		/// <returns></returns>
-		public string ReadMessage()
-		{
-			string message = string.Empty;
-
-			// If the TCP client exists
-			if (_client != null)
-			{
-				// If the TCP client is connected
-				if (_client.Connected)
-				{
-					// Create a stream reader for the TCP client stream
-					StreamReader reader = new StreamReader(_client.GetStream());
-
-					// The message is received from the host
-					message = reader.ReadLine();
-
-					// Display message
-					DisplayMessage(Strings.Received + message);
-				}
-			}
-
-			return message;
-		}
-
-		/// <summary>
 		/// Set lane control, used by a view
 		/// </summary>
 		/// <param name="laneControl"></param>
@@ -428,6 +398,17 @@ namespace KruispuntGroep4.Simulator.Communication
 								laneIDto +
 								Strings.DetectionMessageEnding;
 							break;
+						default:
+							// Create the message
+							message =
+								Strings.DetectionMessageLight +
+								laneIDfrom +
+								Strings.DetectionMessageType +
+								vType.ToString() +
+								Strings.DetectionMessageLoopCloseEmptyNull +
+								laneIDto +
+								Strings.DetectionMessageEnding;
+							break;
 					}
 					break;
 				case LoopEnum.far: /* It is far */
@@ -456,40 +437,23 @@ namespace KruispuntGroep4.Simulator.Communication
 								laneIDto +
 								Strings.DetectionMessageEnding;
 							break;
+						default:
+							// Create the message
+							message =
+								Strings.DetectionMessageLight +
+								laneIDfrom +
+								Strings.DetectionMessageType +
+								vType.ToString() +
+								Strings.DetectionMessageLoopFarEmptyNull +
+								laneIDto +
+								Strings.DetectionMessageEnding;
+							break;
 					}
 					break;
 			}
 			
 			// Write the detection message
 			WriteMessage(message);
-		}
-
-		/// <summary>
-		/// Write the specified message to the host,
-		/// if the TCP client is connected
-		/// </summary>
-		/// <param name="message"></param>
-		public void WriteMessage(string message)
-		{
-			// If the TCP client exists
-			if (_client != null)
-			{
-				// If the TCP client is connected and the message isn't empty
-				if (_client.Connected && message != string.Empty)
-				{
-					// Create a stream writer for the TCP client stream
-					StreamWriter writer = new StreamWriter(_client.GetStream());
-
-					// Write the message
-					writer.WriteLine(message);
-
-					// Ensure that the buffer is empty
-					writer.Flush();
-
-					// Display the message in the Console listbox
-					DisplayMessage(Strings.Sent + message);
-				}
-			}
 		}
 		#endregion
 
@@ -566,8 +530,8 @@ namespace KruispuntGroep4.Simulator.Communication
 				// What type is it?
 				switch (type)
 				{
-					case Strings.VehicleTypeBike: /* It is a bike */
-						vehicleType = VehicleTypeEnum.bike;
+					case Strings.VehicleTypeBicycle: /* It is a bicycle */
+						vehicleType = VehicleTypeEnum.bicycle;
 						break;
 					case Strings.VehicleTypeBus: /* It is a bus */
 						vehicleType = VehicleTypeEnum.bus;
@@ -619,7 +583,8 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <param name="e">Do work event args</param>
 		private void DoWorkReading(object sender, DoWorkEventArgs e)
 		{
-			ReadMessage();
+			// The result is the received message
+			e.Result = ReadMessage();
 		}
 
 		/// <summary>
@@ -796,6 +761,36 @@ namespace KruispuntGroep4.Simulator.Communication
 		}
 
 		/// <summary>
+		/// Read a message from the host,
+		/// if the TCP client is connected,
+		/// else an empty message is returned
+		/// </summary>
+		/// <returns></returns>
+		private string ReadMessage()
+		{
+			string message = string.Empty;
+
+			// If the TCP client exists
+			if (_client != null)
+			{
+				// If the TCP client is connected
+				if (_client.Connected)
+				{
+					// Create a stream reader for the TCP client stream
+					StreamReader reader = new StreamReader(_client.GetStream());
+
+					// The message is received from the host
+					message = reader.ReadLine();
+
+					// Display message
+					DisplayMessage(Strings.Received + message);
+				}
+			}
+
+			return message;
+		}
+
+		/// <summary>
 		/// Display a message saying all input JSONs are sent
 		/// </summary>
 		/// <param name="sender">Background worker input</param>
@@ -814,6 +809,44 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <param name="e">Whether the connection with the host was lost</param>
 		private void RunWorkerCompletedReading(object sender, RunWorkerCompletedEventArgs e)
 		{
+			// Initialize the received message
+			string message = e.Result as string;
+
+			var json = DynamicJson.Parse(message);
+
+			var count = ((dynamic[])json).Count();
+			var light = ((dynamic[])json).Select(d => d.light);
+			var state = ((dynamic[])json).Select(d => d.state);
+
+			for (int i = 0; i < count; i++)
+			{
+				string strLight = light.ElementAt(i);
+				string strState = state.ElementAt(i).ToUpper();
+
+				LightsEnum lightsEnum = LightsEnum.Off;
+
+				switch (strState)
+				{
+					case "BLINK":
+						lightsEnum = LightsEnum.Blink;
+						break;
+					case "GREEN":
+						lightsEnum = LightsEnum.Green;
+						break;
+					case "OFF":
+						lightsEnum = LightsEnum.Off;
+						break;
+					case "RED":
+						lightsEnum = LightsEnum.Red;
+						break;
+					case "YELLOW":
+						lightsEnum = LightsEnum.Yellow;
+						break;
+				}
+
+				_laneControl.ChangeTrafficLight(lightsEnum, strLight);
+			}
+
 			// Read messages in the background, so the UI stays responsive
 			_bwRead.RunWorkerAsync();
 		}
@@ -847,6 +880,17 @@ namespace KruispuntGroep4.Simulator.Communication
 				// Wait for lane control
 				while (_laneControl == null) { }
 
+				// Initialize start time and multiplier
+				string time = DateTime.Now.ToString(Strings.DateTimeFormat);
+				string startTime = DynamicJson.Serialize(new object[] { new { starttime = time } });
+				string multiplier = DynamicJson.Serialize(new object[] { new { multiplier = 8 } });
+
+				// Send start time
+				WriteMessage(startTime);
+
+				// Send multiplier
+				WriteMessage(multiplier);
+
 				// Spawn all vehicles from the JSON input file in the background
 				_bwInput.RunWorkerAsync();
 			}
@@ -877,6 +921,34 @@ namespace KruispuntGroep4.Simulator.Communication
 			{
 				// The button start text is 'Stop simulatie'
 				_btnStart.Text = Strings.StopView;
+			}
+		}
+
+		/// <summary>
+		/// Write the specified message to the host,
+		/// if the TCP client is connected
+		/// </summary>
+		/// <param name="message"></param>
+		private void WriteMessage(string message)
+		{
+			// If the TCP client exists
+			if (_client != null)
+			{
+				// If the TCP client is connected and the message isn't empty
+				if (_client.Connected && message != string.Empty)
+				{
+					// Create a stream writer for the TCP client stream
+					StreamWriter writer = new StreamWriter(_client.GetStream());
+
+					// Write the message
+					writer.WriteLine(message);
+
+					// Ensure that the buffer is empty
+					writer.Flush();
+
+					// Display the message in the Console listbox
+					DisplayMessage(Strings.Sent + message);
+				}
 			}
 		}
 		#endregion
