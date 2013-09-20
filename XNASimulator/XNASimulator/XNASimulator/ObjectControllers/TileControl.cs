@@ -79,7 +79,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 
                         newVehicle = lane.AddVehicle(newVehicle);
 
-                        //newVehicle.path = PathsEnum.WestToSouth;
                         string spawnLaneID = "N1";
                         string destinationLaneID = "E6";
 

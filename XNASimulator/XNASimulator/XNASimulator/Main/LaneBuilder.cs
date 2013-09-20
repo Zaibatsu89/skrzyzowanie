@@ -433,7 +433,7 @@ namespace KruispuntGroep4.Main
                 //Make each lane tile know it's part of this new lane
                 tile.laneIDs.Add(lane.laneID);
 
-                if (tile.Texture.Equals(Textures.RedLight))
+                if (tile.Texture.Equals(Textures.RedLight) || tile.Texture.Equals(Textures.SidewalkLightRed))
                 {
                     lane.trafficLight = tile;
                 }
