@@ -64,7 +64,7 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 
                         lists.Lanes.TryGetValue(tile.laneIDs[0], out lane);
 
-                        VehicleTypeEnum vehicleType = VehicleTypeEnum.bus;
+                        VehicleTypeEnum vehicleType = VehicleTypeEnum.pedestrian;
                         switch (vehicleType)
                         {
                             case VehicleTypeEnum.bus: newVehicle = new Vehicle(Textures.Bus, DEBUGvehicleID.ToString());
@@ -79,8 +79,8 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 
                         newVehicle = lane.AddVehicle(newVehicle);
 
-                        string spawnLaneID = "N1";
-                        string destinationLaneID = "E6";
+                        string spawnLaneID = "N0";
+                        string destinationLaneID = "S7";
 
                         switch (spawnLaneID[0].ToString() + destinationLaneID[0].ToString())
                         {
@@ -159,6 +159,16 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     case LightsEnum.Green: lane.trafficLight.Texture = Textures.GreenLight;
                         break;
                     case LightsEnum.Yellow: lane.trafficLight.Texture = Textures.YellowLight;
+                        break;
+                }
+            }
+            else
+            {
+                switch (colour)
+                {
+                    case LightsEnum.Red: lane.trafficLight.Texture = Textures.SidewalkLightRed;
+                        break;
+                    case LightsEnum.Green: lane.trafficLight.Texture = Textures.SidewalkLightGreen;
                         break;
                 }
             }

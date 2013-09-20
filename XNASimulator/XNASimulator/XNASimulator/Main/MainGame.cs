@@ -13,7 +13,6 @@ namespace KruispuntGroep4.Simulator.Main
 {
     //TODO: 
     //Better Pathing
-    //Add pedestrians
 
     //Bugs:
 
