@@ -19,6 +19,7 @@ namespace KruispuntGroep4.Simulator.Objects
 
         public bool isPathLane { get; set; }
         public List<RotationEnum> pathDirections { get; set; }
+        public RotationEnum laneDirection { get; set; }
 
         public Lane(string ID)
         {
@@ -44,7 +45,7 @@ namespace KruispuntGroep4.Simulator.Objects
         public Vehicle AddVehicle(string vehicleID)
         {
             Vehicle vehicle = new Vehicle(Textures.Car, vehicleID);
-            vehicle.rotation = this.spawnTile.Rotation;
+            vehicle.rotation = this.laneDirection;
             vehicle.position = this.spawnTile.Position;
             vehicle.drawposition = this.spawnTile.DrawPosition;
 

@@ -51,8 +51,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             Vehicle newVehicle;
             string vehicleID;
 
-            
-
             //Get the lane the vehicle needs to be spawned in
             lists.Lanes.TryGetValue(spawnLaneID, out spawnLane);
 

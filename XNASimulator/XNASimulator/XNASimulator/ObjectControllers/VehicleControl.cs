@@ -13,11 +13,13 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
         private Lists lists;
         private GraphicsDevice graphics;
 		private Random random;
+        private int nrOfTries;
 
         public VehicleControl(GraphicsDevice graphics, Lists lists)
         {
             this.lists = lists;
             this.graphics = graphics;
+            this.nrOfTries = 0;
 			random = new Random();
         }
 
@@ -151,60 +153,71 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 
         private Tile ChooseCorrectPath(Vehicle vehicle, Tile nextTile, IEnumerator<KeyValuePair<RotationEnum, Tile>> enumerator)
         {
-            //First check if this tile exists
-            if (enumerator.Current.Value != null && enumerator.Current.Value.laneIDs.Count > 0)
+            if (!(nrOfTries > 4))
             {
-                nextTile = enumerator.Current.Value;
-                bool correctPath = false;
-
-                //Go through the lanes it's part of
-                foreach (string laneID in nextTile.laneIDs)
+                //First check if this tile exists
+                if (enumerator.Current.Value != null && enumerator.Current.Value.laneIDs.Count > 0)
                 {
-                    Lane tileLane;
-                    lists.Lanes.TryGetValue(laneID, out tileLane);
+                    nextTile = enumerator.Current.Value;
+                    bool correctPath = false;
 
-                    //Check if this is the tile the vehicle should go on
-                    if ((laneID.Equals(vehicle.destinationLaneID) || //His destination lane is a valid path
-                        laneID.Equals(vehicle.path.ToString()) || //The lane corresponding to his direction is a valid path
-                        laneID.Equals(vehicle.spawntile.laneIDs[0])) //His starting lane is a valid path
-                        &&
-                        !isOppositeDirection(vehicle.rotation, enumerator.Current.Key) //He is not allowed to go in the opposite direction
-                        &&
-                        tileLane.pathDirections.Contains(enumerator.Current.Key)) //He is only allowed to go into the direction the pathlane is going
+                    //Go through the lanes it's part of
+                    foreach (string laneID in nextTile.laneIDs)
                     {
-                        correctPath = true;
-                        break;
+                        Lane tileLane;
+                        lists.Lanes.TryGetValue(laneID, out tileLane);
+
+                        //Check if this is the tile the vehicle should go on
+                        if ((laneID.Equals(vehicle.destinationLaneID) || //His destination lane is a valid path
+                            laneID.Equals(vehicle.path.ToString()) || //The lane corresponding to his direction is a valid path
+                            laneID.Equals(vehicle.spawntile.laneIDs[0])) //His starting lane is a valid path
+                            &&
+                            !isOppositeDirection(vehicle.rotation, enumerator.Current.Key) //He is not allowed to go in the opposite direction
+                            &&
+                            tileLane.pathDirections.Contains(enumerator.Current.Key)) //He is only allowed to go into the direction the pathlane is going
+                        {
+                            correctPath = true;
+                            break;
+                        }
+                        else
+                        {
+                            correctPath = false;
+                        }
                     }
-                    else 
+
+                    if (correctPath)
                     {
-                        correctPath = false;
+                        //Rotate the vehicle in the direction of the adjacent tile
+                        vehicle.rotation = enumerator.Current.Key;
+                        vehicle.drawposition = nextTile.DrawPosition;
+                        vehicle.collission = nextTile.CollisionRectangle;
+                        vehicle.position = nextTile.Position;
+
+                        //The given tile was the correct one to take, so return it
+                        nrOfTries = 0;
+                        return nextTile;
+                    }
+                    else //The vehicle should look to the next adjacent tile
+                    {
+                        enumerator.MoveNext();
+                        nextTile = enumerator.Current.Value;
+
+                        //Check again
+                        this.nrOfTries++;
+                        return ChooseCorrectPath(vehicle, nextTile, enumerator);
                     }
                 }
-
-                if (correctPath)
-                {
-                    //Rotate the vehicle in the direction of the adjacent tile
-                    vehicle.rotation = enumerator.Current.Key;
-                    vehicle.drawposition = nextTile.DrawPosition;
-                    vehicle.collission = nextTile.CollisionRectangle;
-                    vehicle.position = nextTile.Position;
-
-                    //The given tile was the correct one to take, so return it
-                    return nextTile;
-                }
-                else //The vehicle should look to the next adjacent tile
+                else //The tile doesn't exist, so take the next adjacent one
                 {
                     enumerator.MoveNext();
-                    nextTile = enumerator.Current.Value;
-
-                    //Check again
+                    this.nrOfTries++;
                     return ChooseCorrectPath(vehicle, nextTile, enumerator);
                 }
             }
-            else //The tile doesn't exist, so take the next adjacent one
+            else
             {
-                enumerator.MoveNext();
-                return ChooseCorrectPath(vehicle, nextTile, enumerator);
+                nrOfTries = 0;
+                throw new Exception("Vehicle cannot find path");
             }
         }
 

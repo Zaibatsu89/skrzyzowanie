@@ -567,7 +567,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		private void RunWorkerCompletedReading(object sender, RunWorkerCompletedEventArgs e)
 		{
 			// Read messages in the background, so the UI stays responsive
-			bwRead.RunWorkerAsync();
+			_bwRead.RunWorkerAsync();
 		}
 
 		/// <summary>

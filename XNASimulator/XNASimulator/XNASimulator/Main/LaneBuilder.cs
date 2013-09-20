@@ -376,24 +376,28 @@ namespace KruispuntGroep4.Main
                         lane.pathDirections.Add(RotationEnum.North);
                     laneDirection = RotationEnum.North;
                     laneSize = MainGame.LaneLengthVer;
+                    lane.laneDirection = RotationEnum.South;
                     break;
                 case 'E':
                     if (lane.laneID[1].Equals('6'))
                         lane.pathDirections.Add(RotationEnum.East);
                     laneDirection = RotationEnum.East;
                     laneSize = MainGame.LaneLengthHor;
+                    lane.laneDirection = RotationEnum.West;
                     break;
                 case 'S':
                     if (lane.laneID[1].Equals('6'))
                         lane.pathDirections.Add(RotationEnum.South);
                     laneDirection = RotationEnum.South;
                     laneSize = MainGame.LaneLengthVer;
+                    lane.laneDirection = RotationEnum.North;
                     break;
                 case 'W':
                     if (lane.laneID[1].Equals('6'))
                         lane.pathDirections.Add(RotationEnum.West);
                     laneDirection = RotationEnum.West;
                     laneSize = MainGame.LaneLengthHor;
+                    lane.laneDirection = RotationEnum.East;
                     break;
             }
 

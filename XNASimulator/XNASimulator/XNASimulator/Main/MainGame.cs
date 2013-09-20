@@ -12,18 +12,13 @@ using Microsoft.Xna.Framework.Input;
 namespace KruispuntGroep4.Simulator.Main
 {
     //TODO: 
-    //Add listen class and parser class
-    //Add remaining pathing lanes
     //Bus stoplights
-    //Add 2-tile vehicle
-    //Add tunnels
     //Bike detectiontile
+    //Use vehicle textures
+    //Add pedestrians
 
     //Bugs:
     //Ghost cars that don't move appear after reset or after stress
-    //Vehicles need to wait until they are mid-tile then turn
-    //Vehicle collision handling needs to be re-ordered (CheckNextTile etc..)
-    //Stop vehicles from going backwards
 
     /// <summary>
     /// This is the main type for your game

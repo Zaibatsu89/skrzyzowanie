@@ -66,8 +66,42 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 
                         newVehicle = lane.AddVehicle(DEBUGvehicleID.ToString());
 
-                        newVehicle.path = PathsEnum.WestToSouth;
-                        newVehicle.destinationLaneID = "S6";
+                        //newVehicle.path = PathsEnum.WestToSouth;
+                        string spawnLaneID = "N1";
+                        string destinationLaneID = "E6";
+
+                        switch (spawnLaneID[0].ToString() + destinationLaneID[0].ToString())
+                        {
+                            case "NE": newVehicle.path = PathsEnum.NorthToEast;
+                                break;
+                            case "NS": newVehicle.path = PathsEnum.NorthToSouth;
+                                break;
+                            case "NW": newVehicle.path = PathsEnum.NorthToWest;
+                                break;
+
+                            case "ES": newVehicle.path = PathsEnum.EastToSouth;
+                                break;
+                            case "EW": newVehicle.path = PathsEnum.EastToWest;
+                                break;
+                            case "EN": newVehicle.path = PathsEnum.EastToNorth;
+                                break;
+
+                            case "SW": newVehicle.path = PathsEnum.SouthToWest;
+                                break;
+                            case "SN": newVehicle.path = PathsEnum.SouthToNorth;
+                                break;
+                            case "SE": newVehicle.path = PathsEnum.SouthToEast;
+                                break;
+
+                            case "WN": newVehicle.path = PathsEnum.WestToNorth;
+                                break;
+                            case "WE": newVehicle.path = PathsEnum.WestToEast;
+                                break;
+                            case "WS": newVehicle.path = PathsEnum.WestToSouth;
+                                break;
+                        }
+
+                        newVehicle.destinationLaneID = destinationLaneID;
 
                         lists.Vehicles.Add(newVehicle);
 
