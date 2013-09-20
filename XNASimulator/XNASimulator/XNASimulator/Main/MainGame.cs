@@ -12,14 +12,13 @@ using Microsoft.Xna.Framework.Input;
 namespace KruispuntGroep4.Simulator.Main
 {
     //TODO: 
+    //Better Pathing
     //Bus stoplights
     //Bike detectiontile
     //Use vehicle textures
     //Add pedestrians
-    //Add detection
 
     //Bugs:
-    //Ghost cars that don't move appear after reset or after stress
 
     /// <summary>
     /// This is the main type for your game
@@ -130,6 +129,9 @@ namespace KruispuntGroep4.Simulator.Main
             #endregion
 
             Textures.Car = Content.Load<Texture2D>("Sprites/Car32x32");
+            Textures.Bus = Content.Load<Texture2D>("Sprites/Bus32x32");
+            Textures.Truck = Content.Load<Texture2D>("Sprites/Truck32x32");
+            Textures.Bike = Content.Load<Texture2D>("Sprites/Bike32x32");
 
             //Create the level
             this.LoadCrossroad("Content/Grids/Crossroad.txt");

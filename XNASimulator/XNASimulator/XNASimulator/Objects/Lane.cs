@@ -42,9 +42,8 @@ namespace KruispuntGroep4.Simulator.Objects
             this.pathDirections = new List<RotationEnum>();
         }
 
-        public Vehicle AddVehicle(string vehicleID)
+        public Vehicle AddVehicle(Vehicle vehicle)
         {
-            Vehicle vehicle = new Vehicle(Textures.Car, vehicleID);
             vehicle.rotation = this.laneDirection;
             vehicle.position = this.spawnTile.Position;
             vehicle.drawposition = this.spawnTile.DrawPosition;

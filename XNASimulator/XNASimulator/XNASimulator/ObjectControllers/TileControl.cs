@@ -60,11 +60,24 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     if (tile.isSpawn)
                     {
                         Lane lane;
-                        Vehicle newVehicle;
+                        Vehicle newVehicle = new Vehicle(DEBUGvehicleID.ToString());
 
                         lists.Lanes.TryGetValue(tile.laneIDs[0], out lane);
 
-                        newVehicle = lane.AddVehicle(DEBUGvehicleID.ToString());
+                        VehicleTypeEnum vehicleType = VehicleTypeEnum.bus;
+                        switch (vehicleType)
+                        {
+                            case VehicleTypeEnum.bus: newVehicle = new Vehicle(Textures.Bus, DEBUGvehicleID.ToString());
+                                break;
+                            case VehicleTypeEnum.car: newVehicle = new Vehicle(Textures.Car, DEBUGvehicleID.ToString());
+                                break;
+                            case VehicleTypeEnum.truck: newVehicle = new Vehicle(Textures.Truck, DEBUGvehicleID.ToString());
+                                break;
+                            case VehicleTypeEnum.bike: newVehicle = new Vehicle(Textures.Bike, DEBUGvehicleID.ToString());
+                                break;
+                        }
+
+                        newVehicle = lane.AddVehicle(newVehicle);
 
                         //newVehicle.path = PathsEnum.WestToSouth;
                         string spawnLaneID = "N1";

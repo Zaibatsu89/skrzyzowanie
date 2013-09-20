@@ -45,7 +45,7 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             }
         }
 
-        public void SpawnVehicle(string vehicleType, string spawnLaneID, string destinationLaneID)
+        public void SpawnVehicle(VehicleTypeEnum vehicleType, string spawnLaneID, string destinationLaneID)
         {         
             Lane spawnLane;
             Vehicle newVehicle;
@@ -55,52 +55,69 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             lists.Lanes.TryGetValue(spawnLaneID, out spawnLane);
 
             //Calculate a unique ID
-            vehicleID = vehicleType + totalSpawnedVehicles;
+            vehicleID = vehicleType.ToString() + totalSpawnedVehicles;
             totalSpawnedVehicles++;
 
             //Create an empty vehicle with only an ID
             newVehicle = new Vehicle(vehicleID);
 
+            #region vehicle creation
+            switch (vehicleType)
+            {
+                case VehicleTypeEnum.bus: newVehicle = new Vehicle(Textures.Bus, vehicleID);
+                    break;
+                case VehicleTypeEnum.car: newVehicle = new Vehicle(Textures.Car, vehicleID);
+                    break;
+                case VehicleTypeEnum.truck: newVehicle = new Vehicle(Textures.Truck, vehicleID);
+                    break;
+                case VehicleTypeEnum.bike: new Vehicle(Textures.Bike, vehicleID);
+                    break;
+            }
+            #endregion
+
+            newVehicle.destinationLaneID = destinationLaneID;
+
+            #region vehicle route
+            switch (spawnLaneID[0].ToString() + destinationLaneID[0].ToString())
+            {
+                case "NE": newVehicle.path = PathsEnum.NorthToEast;
+                    break;
+                case "NS": newVehicle.path = PathsEnum.NorthToSouth;
+                    break;
+                case "NW": newVehicle.path = PathsEnum.NorthToWest;
+                    break;
+
+                case "ES": newVehicle.path = PathsEnum.EastToSouth;
+                    break;
+                case "EW": newVehicle.path = PathsEnum.EastToWest;
+                    break;
+                case "EN": newVehicle.path = PathsEnum.EastToNorth;
+                    break;
+
+                case "SW": newVehicle.path = PathsEnum.SouthToWest;
+                    break;
+                case "SN": newVehicle.path = PathsEnum.SouthToNorth;
+                    break;
+                case "SE": newVehicle.path = PathsEnum.SouthToEast;
+                    break;
+
+                case "WN": newVehicle.path = PathsEnum.WestToNorth;
+                    break;
+                case "WE": newVehicle.path = PathsEnum.WestToEast;
+                    break;
+                case "WS": newVehicle.path = PathsEnum.WestToSouth;
+                    break;
+            }
+            #endregion
+          
+
+
+
             //If the lane has space...
             if (!spawnLane.spawnTile.isOccupied)
             {
                 //Add the vehicle to the Lane and fill it with the Lane's data
-                newVehicle = spawnLane.AddVehicle(vehicleID);
-
-				newVehicle.destinationLaneID = destinationLaneID;
-
-				#region vehicle route
-				switch (spawnLaneID[0].ToString() + destinationLaneID[0].ToString())
-				{
-					case "NE": newVehicle.path = PathsEnum.NorthToEast;
-						break;
-					case "NS": newVehicle.path = PathsEnum.NorthToSouth;
-						break;
-					case "NW": newVehicle.path = PathsEnum.NorthToWest;
-						break;
-
-					case "ES": newVehicle.path = PathsEnum.EastToSouth;
-						break;
-					case "EW": newVehicle.path = PathsEnum.EastToWest;
-						break;
-					case "EN": newVehicle.path = PathsEnum.EastToNorth;
-						break;
-
-					case "SW": newVehicle.path = PathsEnum.SouthToWest;
-						break;
-					case "SN": newVehicle.path = PathsEnum.SouthToNorth;
-						break;
-					case "SE": newVehicle.path = PathsEnum.SouthToEast;
-						break;
-
-					case "WN": newVehicle.path = PathsEnum.WestToNorth;
-						break;
-					case "WE": newVehicle.path = PathsEnum.WestToEast;
-						break;
-					case "WS": newVehicle.path = PathsEnum.WestToSouth;
-						break;
-				}
-				#endregion
+                newVehicle = spawnLane.AddVehicle(newVehicle);
 
                 //Add the spawned vehicle to the master list
                 lists.Vehicles.Add(newVehicle);
@@ -121,7 +138,7 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     {
                         Vehicle vehicle = lane.vehicleQueue.Dequeue();
 
-                        vehicle = lane.AddVehicle(vehicle.ID); //Add to lane
+                        vehicle = lane.AddVehicle(vehicle); //Add to lane
                         lists.Vehicles.Add(vehicle); //Add to master list
                     }
                 }           
