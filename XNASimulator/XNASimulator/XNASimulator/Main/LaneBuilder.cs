@@ -98,7 +98,7 @@ namespace KruispuntGroep4.Main
                     lists.Lanes.TryGetValue("E6", out endLane);
 
                     //Go East first
-                    startLane.trafficLight.adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
+                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.East, lane);
                    
                     //Remove the last tile
@@ -119,7 +119,7 @@ namespace KruispuntGroep4.Main
                     lists.Lanes.TryGetValue("S6", out endLane);
 
                     //Go West first
-                    startLane.trafficLight.adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
+                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.West, lane);
 
                     //Then South
@@ -131,7 +131,7 @@ namespace KruispuntGroep4.Main
                     lists.Lanes.TryGetValue("W6", out endLane);
 
                     //West
-                    startLane.trafficLight.adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
+                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.West, lane);
                     break;
 
@@ -140,7 +140,7 @@ namespace KruispuntGroep4.Main
                     lists.Lanes.TryGetValue("S6", out endLane);
 
                     //South
-                    startLane.trafficLight.adjacentTiles.TryGetValue(RotationEnum.West, out startTile);
+                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.West, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.South, lane);
 
                     //West
@@ -152,7 +152,7 @@ namespace KruispuntGroep4.Main
                     lists.Lanes.TryGetValue("W6", out endLane);
 
                     //North
-                    startLane.trafficLight.adjacentTiles.TryGetValue(RotationEnum.West, out startTile);
+                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.West, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.North, lane);
 
                     //West
@@ -164,7 +164,7 @@ namespace KruispuntGroep4.Main
                     lists.Lanes.TryGetValue("N6", out endLane);
 
                     //North
-                    startLane.trafficLight.adjacentTiles.TryGetValue(RotationEnum.West, out startTile);
+                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.West, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.North, lane);
                     break;
 
@@ -173,7 +173,7 @@ namespace KruispuntGroep4.Main
                     lists.Lanes.TryGetValue("E6", out endLane);
 
                     //East
-                    startLane.trafficLight.adjacentTiles.TryGetValue(RotationEnum.North, out startTile);
+                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.North, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.East, lane);
                     break;
                 case PathsEnum.SouthToWest:
@@ -181,7 +181,7 @@ namespace KruispuntGroep4.Main
                     lists.Lanes.TryGetValue("W6", out endLane);
 
                     //West
-                    startLane.trafficLight.adjacentTiles.TryGetValue(RotationEnum.North, out startTile);
+                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.North, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.West, lane);
 
                     //North
@@ -193,7 +193,7 @@ namespace KruispuntGroep4.Main
                     lists.Lanes.TryGetValue("N6", out endLane);
 
                     //East
-                    startLane.trafficLight.adjacentTiles.TryGetValue(RotationEnum.North, out startTile);
+                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.North, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.East, lane);
 
                     //North
@@ -206,7 +206,7 @@ namespace KruispuntGroep4.Main
                     lists.Lanes.TryGetValue("N6", out endLane);
 
                     //North
-                    startLane.trafficLight.adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
+                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.North, lane);
 
                     //East
@@ -218,7 +218,7 @@ namespace KruispuntGroep4.Main
                     lists.Lanes.TryGetValue("E6", out endLane);
 
                     //South
-                    startLane.trafficLight.adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
+                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.South, lane);
 
                     //East
@@ -230,7 +230,7 @@ namespace KruispuntGroep4.Main
                     lists.Lanes.TryGetValue("S6", out endLane);
 
                     //South
-                    startLane.trafficLight.adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
+                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.South, lane);
                     break;
             }
@@ -436,6 +436,11 @@ namespace KruispuntGroep4.Main
                 if (tile.Texture.Equals(Textures.RedLight))
                 {
                     lane.trafficLight = tile;
+                }
+
+                else if (tile.Texture.Equals(Textures.Crossing))
+                {
+                    lane.sidewalkCrossing = tile;
                 }
                 else if (tile.Texture.Equals(Textures.CarSortDown) ||
                         tile.Texture.Equals(Textures.CarSortLeft) ||

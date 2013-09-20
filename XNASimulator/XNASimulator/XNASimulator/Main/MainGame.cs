@@ -13,9 +13,6 @@ namespace KruispuntGroep4.Simulator.Main
 {
     //TODO: 
     //Better Pathing
-    //Bus stoplights
-    //Bike detectiontile
-    //Use vehicle textures
     //Add pedestrians
 
     //Bugs:
@@ -29,8 +26,8 @@ namespace KruispuntGroep4.Simulator.Main
         private SpriteBatch spriteBatch;
 
         //Static ints for crossroad size
-        public static int TilesHor = 22; //Total horizontal tiles
-        public static int TilesVer = 20; //Total vertical tiles
+        public static int TilesHor = 24; //Total horizontal tiles
+        public static int TilesVer = 22; //Total vertical tiles
         public static int MiddleSize = 6; // Lenght of the middle section (always square)
         public static int DetectionLoopLength = 4; //Number of tiles between the detection tiles
         public static int NrOfLanes = 8; //6 vehicle lanes and 2 sidewalks per direction
@@ -113,6 +110,8 @@ namespace KruispuntGroep4.Simulator.Main
             Textures.Sidewalk2Green = Content.Load<Texture2D>("Tiles/32p/Sidewalk2Green32x32");
             Textures.SidewalkRightRed = Content.Load<Texture2D>("Tiles/32p/SidewalkRightRed32x32");
             Textures.SidewalkDownRed = Content.Load<Texture2D>("Tiles/32p/SidewalkDownRed32x32");
+            Textures.SidewalkLightGreen = Content.Load<Texture2D>("Tiles/32p/SidewalkLightGreen32x32");
+            Textures.SidewalkLightRed = Content.Load<Texture2D>("Tiles/32p/SidewalkLightRed32x32");
 
             Textures.Bikelane = Content.Load<Texture2D>("Tiles/32p/SortBike32x32");
             Textures.Buslane = Content.Load<Texture2D>("Tiles/32p/SortBus32x32");
@@ -132,6 +131,7 @@ namespace KruispuntGroep4.Simulator.Main
             Textures.Bus = Content.Load<Texture2D>("Sprites/Bus32x32");
             Textures.Truck = Content.Load<Texture2D>("Sprites/Truck32x32");
             Textures.Bike = Content.Load<Texture2D>("Sprites/Bike32x32");
+            Textures.Pedestrian = Content.Load<Texture2D>("Sprites/Pedestrian32x32");
 
             //Create the level
             this.LoadCrossroad("Content/Grids/Crossroad.txt");

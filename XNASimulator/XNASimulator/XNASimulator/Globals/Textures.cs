@@ -13,6 +13,8 @@ namespace KruispuntGroep4.Simulator.Globals
         public static Texture2D Sidewalk2Green;
         public static Texture2D SidewalkRightRed;
         public static Texture2D SidewalkDownRed;
+        public static Texture2D SidewalkLightGreen;
+        public static Texture2D SidewalkLightRed;
 
         public static Texture2D Crossing;
         public static Texture2D Grass; 
@@ -31,6 +33,8 @@ namespace KruispuntGroep4.Simulator.Globals
         public static Texture2D Bus;
         public static Texture2D Truck;
         public static Texture2D Bike;
+        public static Texture2D Pedestrian;
+
         public static Texture2D Default;
     }
 }

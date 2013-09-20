@@ -993,7 +993,7 @@ namespace KruispuntGroep4.Simulator.Communication
         private void SpawnVehicle()
         {
 			// Spawn vehicle with type, spawn lane ID and destination lane ID
-            _laneControl.SpawnVehicle(Strings.VehicleType, Strings.SpawnLaneID, Strings.DestinationLaneID);
+            _laneControl.SpawnVehicle(VehicleTypeEnum.bus, Strings.SpawnLaneID, Strings.DestinationLaneID);
 		}
 
 		/// <summary>

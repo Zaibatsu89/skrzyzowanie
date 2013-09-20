@@ -4,6 +4,7 @@ using KruispuntGroep4.Simulator.Main;
 using KruispuntGroep4.Simulator.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace KruispuntGroep4.Simulator.ObjectControllers
 {
@@ -70,7 +71,9 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     break;
                 case VehicleTypeEnum.truck: newVehicle = new Vehicle(Textures.Truck, vehicleID);
                     break;
-                case VehicleTypeEnum.bike: new Vehicle(Textures.Bike, vehicleID);
+                case VehicleTypeEnum.bike: newVehicle =  new Vehicle(Textures.Bike, vehicleID);
+                    break;
+                case VehicleTypeEnum.pedestrian: newVehicle = new Vehicle(Textures.Pedestrian, vehicleID);
                     break;
             }
             #endregion
@@ -118,6 +121,14 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             {
                 //Add the vehicle to the Lane and fill it with the Lane's data
                 newVehicle = spawnLane.AddVehicle(newVehicle);
+
+                //Add randomness to the location of bikes and pedestrians
+                if (newVehicle.sprite.Equals(Textures.Bike) || newVehicle.sprite.Equals(Textures.Pedestrian))
+                {
+                    Random random = new Random();
+                    Vector2 randomiser = new Vector2(random.Next(-4,4), random.Next(-4,4));
+                    newVehicle.drawposition += randomiser;
+                }
 
                 //Add the spawned vehicle to the master list
                 lists.Vehicles.Add(newVehicle);

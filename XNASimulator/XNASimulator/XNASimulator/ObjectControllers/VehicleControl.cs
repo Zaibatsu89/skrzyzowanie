@@ -129,22 +129,24 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                 if (vehicle.collission.Intersects(nextTile.CollisionRectangle))
                 {
                     //Check if this tile is part of his path
-                    if (!nextTile.laneIDs.Contains(vehicle.destinationLaneID) && //If it's not his destination lane
-                        !nextTile.laneIDs.Contains(vehicle.path.ToString()) && //...and not his directional lane
-                        !nextTile.laneIDs.Contains(vehicle.spawntile.laneIDs[0])) //...and also not his starting lane
+                    if (!vehicle.sprite.Equals(Textures.Pedestrian))
                     {
-                        //Find the correct tile
+                        if (!nextTile.laneIDs.Contains(vehicle.destinationLaneID) && //If it's not his destination lane
+                            !nextTile.laneIDs.Contains(vehicle.path.ToString()) && //...and not his directional lane
+                            !nextTile.laneIDs.Contains(vehicle.spawntile.laneIDs[0])) //...and also not his starting lane
+                        {
+                            //Find the correct tile
 
-                        //The 'index' for the adjacent tiles library
-                        IEnumerator<KeyValuePair<RotationEnum, Tile>> enumerator = currentTile.adjacentTiles.GetEnumerator();
+                            //The 'index' for the adjacent tiles library
+                            IEnumerator<KeyValuePair<RotationEnum, Tile>> enumerator = currentTile.adjacentTiles.GetEnumerator();
 
-                        //Take the first adjacent tile
-                        nextTile = enumerator.Current.Value;
+                            //Take the first adjacent tile
+                            nextTile = enumerator.Current.Value;
 
-                        //Pick the correct path
-                        nextTile = ChooseCorrectPath(vehicle, nextTile, enumerator);
-                    }   
-
+                            //Pick the correct path
+                            nextTile = ChooseCorrectPath(vehicle, nextTile, enumerator);
+                        }
+                    }
                     CheckTileOccupation(vehicle, nextTile);
                 }
                 else
@@ -255,7 +257,7 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
         {
             
             //first check if it's a red light ahead
-            if (tile.Texture.Equals(Textures.RedLight))
+            if (tile.Texture.Equals(Textures.RedLight) || tile.Texture.Equals(Textures.SidewalkLightRed))
             {
                 vehicle.stopRedLight = true;
             }
