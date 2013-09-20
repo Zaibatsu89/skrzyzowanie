@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using KruispuntGroep4.Globals;
 using KruispuntGroep4.Simulator.Communication;
 using KruispuntGroep4.Simulator.Globals;
 using KruispuntGroep4.Simulator.Objects;
@@ -71,8 +72,10 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            foreach (Vehicle vehicle in lists.Vehicles)
+			for (int i = lists.Vehicles.Count - 1; i >= 0; i--)
             {
+				Vehicle vehicle = lists.Vehicles[i];
+
                 if (vehicle.alive)
                 {
                     spriteBatch.Draw(vehicle.sprite,
@@ -320,22 +323,50 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     //Check if it's leaving a detection tile
 					if (previousTile.Equals(vehicle.currentLane.detectionClose))
                     {
-						communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, (!previousTile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+						if (!vehicle.currentLane.laneID[1].Equals(0) && !vehicle.currentLane.laneID[1].Equals(1) && !vehicle.currentLane.laneID[1].Equals(7))
+						{
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, (!previousTile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+						}
+						else
+						{
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, Strings.Null, vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+						}
                     }
 					else if (previousTile.Equals(vehicle.currentLane.detectionFar))
-                    {
-						communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.far, (!previousTile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
-                    }
+					{
+						if (!vehicle.currentLane.laneID[1].Equals(0) && !vehicle.currentLane.laneID[1].Equals(1) && !vehicle.currentLane.laneID[1].Equals(7))
+						{
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, (!previousTile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+						}
+						else
+						{
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.far, Strings.Null, vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+						}
+					}
 
                     //Check if it's entering a detection tile
                     if (tile.Equals(vehicle.currentLane.detectionClose))
                     {
-						communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, (!tile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+						if (!vehicle.currentLane.laneID[1].Equals(0) && !vehicle.currentLane.laneID[1].Equals(1) && !vehicle.currentLane.laneID[1].Equals(7))
+						{
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, (!tile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+						}
+						else
+						{
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, Strings.Null, vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+						}
                     }
-                    else if (tile.Equals(vehicle.currentLane.detectionFar))
-                    {
-						communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.far, (!tile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
-                    }
+					else if (tile.Equals(vehicle.currentLane.detectionFar))
+					{
+						if (!vehicle.currentLane.laneID[1].Equals(0) && !vehicle.currentLane.laneID[1].Equals(1) && !vehicle.currentLane.laneID[1].Equals(7))
+						{
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, (!tile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+						}
+						else
+						{
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.far, Strings.Null, vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+						}
+					}
 
                     //set the new tile
                     vehicle.occupyingtile = tile.GridCoordinates;

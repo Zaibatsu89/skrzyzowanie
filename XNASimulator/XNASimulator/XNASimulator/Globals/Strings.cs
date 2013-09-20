@@ -25,8 +25,13 @@
 		public const string False = "false";
 		public const string Icon = "$this.Icon";
 		public const string Input = "Laad invoerbestand";
+		public const string LightStateBlink = "blink";
+		public const string LightStateGreen = "green";
+		public const string LightStateOff = "off";
+		public const string LightStateRed = "red";
+		public const string LightStateYellow = "yellow";
 		public const string LineException = "The length of line {0} is different from all preceeding lines.";
-		public const string Message = @"[{""starttime"":""12:00""}]";
+		public const string Null = "null";
 		public const string PortKey = "Poort:";
 		public const string PortValue = "1337";
 		public const string Received = "Ontvangen: ";

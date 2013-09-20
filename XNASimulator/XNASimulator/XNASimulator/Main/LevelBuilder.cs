@@ -123,6 +123,16 @@ namespace KruispuntGroep4.Simulator.Main
                     return LoadTile(Textures.Crossing, RotationEnum.East, new Vector2(x, y));
                 case 'R':
                     return LoadTile(Textures.SidewalkLightRed, RotationEnum.North, new Vector2(x, y));
+				case 'E':
+					return LoadTile(Textures.BikeDetect, RotationEnum.South, new Vector2(x, y));
+				case 'e':
+					return LoadTile(Textures.BikeDetect, RotationEnum.East, new Vector2(x, y));
+				case 'W':
+					return LoadTile(Textures.BikeDetect, RotationEnum.West, new Vector2(x, y));
+				case 'w':
+					return LoadTile(Textures.BikeDetect, RotationEnum.North, new Vector2(x, y));
+				case 'H':
+					return LoadTile(Textures.SidewalkDetect, RotationEnum.North, new Vector2(x, y));
 
                 #region Roads
                 case 'A':

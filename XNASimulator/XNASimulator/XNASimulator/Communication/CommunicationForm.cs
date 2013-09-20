@@ -821,25 +821,25 @@ namespace KruispuntGroep4.Simulator.Communication
 			for (int i = 0; i < count; i++)
 			{
 				string strLight = light.ElementAt(i);
-				string strState = state.ElementAt(i).ToUpper();
+				string strState = state.ElementAt(i).ToLower();
 
 				LightsEnum lightsEnum = LightsEnum.Off;
 
 				switch (strState)
 				{
-					case "BLINK":
+					case Strings.LightStateBlink:
 						lightsEnum = LightsEnum.Blink;
 						break;
-					case "GREEN":
+					case Strings.LightStateGreen:
 						lightsEnum = LightsEnum.Green;
 						break;
-					case "OFF":
+					case Strings.LightStateOff:
 						lightsEnum = LightsEnum.Off;
 						break;
-					case "RED":
+					case Strings.LightStateRed:
 						lightsEnum = LightsEnum.Red;
 						break;
-					case "YELLOW":
+					case Strings.LightStateYellow:
 						lightsEnum = LightsEnum.Yellow;
 						break;
 				}
