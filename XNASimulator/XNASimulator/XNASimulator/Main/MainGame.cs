@@ -82,7 +82,7 @@ namespace KruispuntGroep4.Simulator.Main
             levelBuilder = new LevelBuilder(lists);
             laneBuilder = new LaneBuilder(lists);
 
-			vehicleControl = new VehicleControl(this.GraphicsDevice, lists);
+			vehicleControl = new VehicleControl(this.GraphicsDevice, lists, communicationForm);
             tileControl = new TileControl(lists);
             laneControl = new LaneControl(lists);
 

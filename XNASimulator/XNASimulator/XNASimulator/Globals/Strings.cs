@@ -26,7 +26,6 @@
 		public const string Time = "HH:mm:ss.fff";
 		public const string TitleCommunication = "Communicatie - SEN Groep 4";
 		public const string TitleGame = "Weergave - SEN Groep 4";
-		public const string TrafficLightValue = "green";
 		public const string True = "true";
 		public const string VehicleType = "car";
 	}

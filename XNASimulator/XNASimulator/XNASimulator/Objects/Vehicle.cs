@@ -18,6 +18,7 @@ namespace KruispuntGroep4.Simulator.Objects
 		public float speed { get; set; }
         public bool stopCar { get; set; }
         public bool stopRedLight { get; set; }
+		public VehicleTypeEnum type { get; set; }
         public Vector2 occupyingtile { get; set; }
         public Lane currentLane { get; set; }
 
@@ -37,6 +38,7 @@ namespace KruispuntGroep4.Simulator.Objects
             speed = 3f;
             stopCar = false;
             stopRedLight = false;
+			type = VehicleTypeEnum.car;
             collission = new Rectangle((int)position.X, (int)position.Y, sprite.Width, sprite.Height);
             occupyingtile = Vector2.Zero;
             destinationLaneID = string.Empty;
@@ -56,6 +58,7 @@ namespace KruispuntGroep4.Simulator.Objects
 			speed = 1f;
             stopCar = false;
             stopRedLight = false;
+			type = VehicleTypeEnum.car;
             collission = new Rectangle((int)position.X, (int)position.Y, sprite.Width, sprite.Height);
             destinationLaneID = string.Empty;
         }

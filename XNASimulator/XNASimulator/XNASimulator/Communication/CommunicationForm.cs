@@ -66,7 +66,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			_tableLayoutPanel2, _tableLayoutPanel3,
 			_tableLayoutPanel4;
 		private TextBox _tbAddress, _tbConsole,
-			_tbMessage, _tbPort;
+			_tbPort;
 
 		/// <summary>
 		/// Dispose the form
@@ -133,7 +133,6 @@ namespace KruispuntGroep4.Simulator.Communication
 			_tableLayoutPanel4 = new TableLayoutPanel();
 			_tbAddress = new TextBox();
 			_tbConsole = new TextBox();
-			_tbMessage = new TextBox();
 			_tbPort = new TextBox();
 
 			// Temporary suspend the layout logic for the form
@@ -215,15 +214,6 @@ namespace KruispuntGroep4.Simulator.Communication
 			_tableLayoutPanel3.Location = new Point(0, 53);
 			_tableLayoutPanel3.Size = new Size(315, 30);
 
-			// Position this textbox to the left,
-			// the right and the bottom
-			// in the table layout panel
-			_tbMessage.Anchor =
-				(AnchorStyles)(((AnchorStyles.Bottom |
-				AnchorStyles.Left) |
-				AnchorStyles.Right));
-			_tbMessage.Text = Strings.Message;
-
 			// Position this button to all directions
 			// in the table layout panel 
 			_btnInput.Anchor =
@@ -294,6 +284,17 @@ namespace KruispuntGroep4.Simulator.Communication
 				// Read JSON from selected file
 				_json = File.ReadAllLines(dialog.FileName);
 
+				if (_json[0].StartsWith(Strings.BraceOpen))
+				{
+					// Convert JSON object to message
+					_json[0] = JsonObjectToMessage();
+				}
+				else if (_json[0].StartsWith(Strings.BracketOpen))
+				{
+					// Convert JSON array to messages
+					_json = JsonArrayToMessages();
+				}
+
 				// Enable button Start
 				_btnStart.Enabled = true;
 			}
@@ -313,7 +314,6 @@ namespace KruispuntGroep4.Simulator.Communication
 				// Disable buttons and textboxes
 				_btnInput.Enabled = false;
 				_tbAddress.Enabled = false;
-				_tbMessage.Enabled = false;
 				_tbPort.Enabled = false;
 
 				// Switch the text of button Start
@@ -393,7 +393,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <param name="empty">Empty: true or false</param>
 		/// <param name="laneIDfrom">Direction and number</param>
 		/// <param name="laneIDto">Direction and number</param>
-		public void WriteDetectionMessage(string vType, LoopEnum loop, string empty, string laneIDfrom, string laneIDto)
+		public void WriteDetectionMessage(VehicleTypeEnum vType, LoopEnum loop, string empty, string laneIDfrom, string laneIDto)
 		{
 			// Initialize the message
 			string message = string.Empty;
@@ -411,7 +411,7 @@ namespace KruispuntGroep4.Simulator.Communication
 								@"[{""light"":""" +
 								laneIDfrom +
 								@""", ""type"":""" +
-								vType +
+								vType.ToString() +
 								@""", ""loop"":""close"", ""empty"":""true"", ""to"":""" +
 								laneIDto +
 								@"""}]";
@@ -422,7 +422,7 @@ namespace KruispuntGroep4.Simulator.Communication
 								@"[{""light"":""" +
 								laneIDfrom +
 								@""", ""type"":""" +
-								vType +
+								vType.ToString() +
 								@""", ""loop"":""close"", ""empty"":""false"", ""to"":""" +
 								laneIDto +
 								@"""}]";
@@ -439,7 +439,7 @@ namespace KruispuntGroep4.Simulator.Communication
 								@"[{""light"":""" +
 								laneIDfrom +
 								@""", ""type"":""" +
-								vType +
+								vType.ToString() +
 								@""", ""loop"":""far"", ""empty"":""true"", ""to"":""" +
 								laneIDto +
 								@"""}]";
@@ -450,7 +450,7 @@ namespace KruispuntGroep4.Simulator.Communication
 								@"[{""light"":""" +
 								laneIDfrom +
 								@""", ""type"":""" +
-								vType +
+								vType.ToString() +
 								@""", ""loop"":""far"", ""empty"":""false"", ""to"":""" +
 								laneIDto +
 								@"""}]";
@@ -486,7 +486,7 @@ namespace KruispuntGroep4.Simulator.Communication
 					writer.Flush();
 
 					// Display the message in the Console listbox
-					DisplayMessage(Strings.Sent + _tbMessage.Text);
+					DisplayMessage(Strings.Sent + message);
 				}
 			}
 		}
@@ -518,7 +518,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		private void ChangeLight()
 		{
 			// Change traffic light with color value and spawn lane ID
-			//_laneControl.ChangeTrafficLight(Strings.TrafficLightValue, Strings.SpawnLaneID);
+			_laneControl.ChangeTrafficLight(LightsEnum.Green, Strings.SpawnLaneID);
 		}
 
 		/// <summary>
@@ -559,6 +559,9 @@ namespace KruispuntGroep4.Simulator.Communication
 		private void DoWorkInput(object sender, DoWorkEventArgs e)
 		{
 			// TODO: Spawn all vehicles from the JSON input file
+
+			// Test
+			SpawnVehicle();
 		}
 
 		/// <summary>
@@ -675,27 +678,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		}
 
 		/// <summary>
-		/// Get readable JSON
-		/// </summary>
-		/// <param name="json">String used to contain a JSON object or JSON array</param>
-		/// <returns>Strings used to contain a message</returns>
-		private string GetReadableJson(string json)
-		{
-			string encryptedJson = string.Empty;
-
-			if (json.StartsWith(Strings.BraceOpen))
-			{
-				encryptedJson = JsonObjectToMessage(json);
-			}
-			else if (json.StartsWith(Strings.BracketOpen))
-			{
-				encryptedJson = JsonArrayToMessage(json);
-			}
-
-			return encryptedJson;
-		}
-
-		/// <summary>
+		/// DEPRICATED
 		/// Converts dynamic JSON array string to readable message.
 		/// </summary>
 		/// <param name="json">String used to contain a dynamic JSON array.</param>
@@ -837,14 +820,25 @@ namespace KruispuntGroep4.Simulator.Communication
 		}
 
 		/// <summary>
+		/// Convert JSON array to messages
+		/// </summary>
+		/// <returns>Readable JSON messages</returns>
+		private string[] JsonArrayToMessages()
+		{
+			// TODO: copy function JsonArrayToMessage
+
+			return _json;
+		}
+
+		/// <summary>
 		/// Converts dynamic JSON object string to readable message.
 		/// </summary>
 		/// <param name="json">String used to contain a dynamic JSON object.</param>
 		/// <returns>String used to contain a readable message.</returns>
-		private string JsonObjectToMessage(string strJson)
+		private string JsonObjectToMessage()
 		{
-			var json = DynamicJson.Parse(strJson);
-			string message = GetJsonType(strJson);
+			var json = DynamicJson.Parse(_json[0]);
+			string message = GetJsonType(_json[0]);
 
 			switch (message)
 			{
@@ -919,7 +913,7 @@ namespace KruispuntGroep4.Simulator.Communication
 
 					break;
 				default:
-					throw new Exception(string.Format("JSON {0} heeft geen herkenbaar type!", strJson));
+					throw new Exception(string.Format("JSON {0} heeft geen herkenbaar type!", _json[0]));
 			}
 
 			return message;
@@ -969,7 +963,6 @@ namespace KruispuntGroep4.Simulator.Communication
 		{
 			// Enable buttons and textboxes
 			_tbAddress.Enabled = true;
-			_tbMessage.Enabled = true;
 			_tbPort.Enabled = true;
 
 			// If the user interfered
