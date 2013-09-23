@@ -831,7 +831,11 @@ namespace KruispuntGroep4.Simulator.Communication
 						// The message is received from the host
 						message = reader.ReadLine();
 					}
-					catch (IOException) { } /* Catch IO exception */
+					catch (IOException e) /* Catch IO exception */
+					{
+						// The message is the exception message
+						message = e.Message;
+					}
 
 					// Display the message
 					DisplayMessage(Strings.Received + Strings.Space + message);
@@ -849,6 +853,10 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <param name="e">Run worker completed event args</param>
 		private void RunWorkerCompletedInput(object sender, RunWorkerCompletedEventArgs e)
 		{
+			// Disable speed down/up Buttons
+			_btnSpeedDown.Enabled = false;
+			_btnSpeedUp.Enabled = false;
+
 			// Display all input JSONs sent message
 			DisplayMessage(Strings.Sent + Strings.Space + Strings.AllInputJsons);
 		}
