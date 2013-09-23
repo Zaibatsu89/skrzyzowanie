@@ -281,7 +281,28 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     else
                     {
                         //no, so wait..
-                        vehicle.stopCar = true;
+                        if (!vehicle.type.Equals(VehicleTypeEnum.pedestrian)) //not pedestrian
+                        {
+                            vehicle.stopCar = true;
+                        }
+                        else //pedestrian
+                        {
+                            int x = 0;
+                            int y = 0;
+                            switch(vehicle.rotation)
+                            {
+                                case RotationEnum.North: y--;
+                                    break;
+                                case RotationEnum.East: x++;
+                                    break;
+                                case RotationEnum.South: y++;
+                                    break;
+                                case RotationEnum.West: x--;
+                                    break;
+                            }
+                            vehicle.stopCar = false;
+                            vehicle.occupyingtile += new Vector2(x, y);
+                        }
                     }
                 }
                 else //not occupied
