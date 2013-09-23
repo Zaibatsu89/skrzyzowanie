@@ -5,7 +5,6 @@
 		bicycle,
 		bus,
 		car,
-		pedestrian,
-		truck
+		pedestrian
 	}
 }

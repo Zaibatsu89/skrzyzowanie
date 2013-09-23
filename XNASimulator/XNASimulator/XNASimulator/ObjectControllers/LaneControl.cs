@@ -121,8 +121,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     break;
                 case VehicleTypeEnum.car: newVehicle = new Vehicle(Textures.Car, vehicleID, VehicleTypeEnum.car);
                     break;
-                case VehicleTypeEnum.truck: newVehicle = new Vehicle(Textures.Truck, vehicleID, VehicleTypeEnum.truck);
-                    break;
                 case VehicleTypeEnum.bicycle: newVehicle =  new Vehicle(Textures.Bike, vehicleID, VehicleTypeEnum.bicycle);
                     break;
                 case VehicleTypeEnum.pedestrian: newVehicle = new Vehicle(Textures.Pedestrian, vehicleID, VehicleTypeEnum.pedestrian);

@@ -131,7 +131,6 @@
     <Compile Include="Globals\Strings.cs" />
     <Compile Include="Globals\Textures.cs" />
     <Compile Include="Globals\VehicleTypeEnum.cs" />
-    <Compile Include="Main\Audio.cs" />
     <Compile Include="Main\LaneBuilder.cs" />
     <Compile Include="Main\LevelBuilder.cs" />
     <Compile Include="Globals\Lists.cs" />

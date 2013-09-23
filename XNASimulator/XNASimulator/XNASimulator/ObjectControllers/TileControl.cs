@@ -65,13 +65,12 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                         lists.Lanes.TryGetValue(tile.laneIDs[0], out lane);
 
                         VehicleTypeEnum vehicleType = VehicleTypeEnum.pedestrian;
-                        switch (vehicleType)
+                        
+						switch (vehicleType)
                         {
                             case VehicleTypeEnum.bus: newVehicle = new Vehicle(Textures.Bus, DEBUGvehicleID.ToString(), VehicleTypeEnum.bus);
                                 break;
                             case VehicleTypeEnum.car: newVehicle = new Vehicle(Textures.Car, DEBUGvehicleID.ToString(), VehicleTypeEnum.car);
-                                break;
-                            case VehicleTypeEnum.truck: newVehicle = new Vehicle(Textures.Truck, DEBUGvehicleID.ToString(), VehicleTypeEnum.truck);
                                 break;
                             case VehicleTypeEnum.bicycle: newVehicle = new Vehicle(Textures.Bike, DEBUGvehicleID.ToString(), VehicleTypeEnum.bicycle);
                                 break;
