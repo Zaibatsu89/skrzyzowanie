@@ -499,7 +499,7 @@ namespace KruispuntGroep4.Simulator.Communication
 				{
 					light = laneIDfrom,
 					type = vType.ToString(),
-					loop = loop,
+					loop = loop.ToString(),
 					empty = empty,
 					to = laneIDto
 				}
