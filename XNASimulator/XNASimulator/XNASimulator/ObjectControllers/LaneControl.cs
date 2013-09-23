@@ -34,32 +34,67 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
         public void ChangeTrafficLight(LightsEnum newValue, string laneID)
         {
             Lane lane;
+            string opposite = string.Empty;
+
             lists.Lanes.TryGetValue(laneID, out lane);
 
-
-            if (!laneID[1].Equals('0') && !laneID[1].Equals('7'))
+            switch (laneID[0])
             {
-                switch (newValue)
-                {
-                    case LightsEnum.Blink: lane.trafficLight.Texture = Textures.BlinkLight;
-                        break;
-                    case LightsEnum.Red: lane.trafficLight.Texture = Textures.RedLight;
-                        break;
-                    case LightsEnum.Green: lane.trafficLight.Texture = Textures.GreenLight;
-                        break;
-                    case LightsEnum.Yellow: lane.trafficLight.Texture = Textures.YellowLight;
-                        break;
-                }
+                case 'N': opposite = "S";
+                    break;
+                case 'E': opposite = "W";
+                    break;
+                case 'S': opposite = "N";
+                    break;
+                case 'W': opposite = "E";
+                    break;               
             }
-            else
+
+            switch (laneID[1])
             {
-                switch (newValue)
-                {
-                    case LightsEnum.Red: lane.trafficLight.Texture = Textures.SidewalkLightRed;
-                        break;
-                    case LightsEnum.Green: lane.trafficLight.Texture = Textures.SidewalkLightGreen;
-                        break;
-                }
+                case '0':
+                    switch (newValue)
+                    {
+                        case LightsEnum.Red: 
+                            lane.trafficLight.Texture = Textures.SidewalkLightRed;
+                            lists.Lanes.TryGetValue((opposite + '7'), out lane);
+                            lane.trafficLight.Texture = Textures.SidewalkLightRed;
+                            break;
+                        case LightsEnum.Green: 
+                            lane.trafficLight.Texture = Textures.SidewalkLightGreen;
+                            lists.Lanes.TryGetValue((opposite + '7'), out lane);
+                            lane.trafficLight.Texture = Textures.SidewalkLightGreen;
+                            break;
+                    }
+                    break;
+                case '7':
+                    switch (newValue)
+                    {
+                        case LightsEnum.Red: 
+                            lane.trafficLight.Texture = Textures.SidewalkLightRed;
+                            lists.Lanes.TryGetValue((opposite + '0'), out lane);
+                            lane.trafficLight.Texture = Textures.SidewalkLightRed;
+                            break;
+                        case LightsEnum.Green: 
+                            lane.trafficLight.Texture = Textures.SidewalkLightGreen;
+                            lists.Lanes.TryGetValue((opposite + '0'), out lane);
+                            lane.trafficLight.Texture = Textures.SidewalkLightGreen;
+                            break;
+                    }
+                    break;
+                default :
+                    switch (newValue)
+                    {
+                        case LightsEnum.Blink: lane.trafficLight.Texture = Textures.BlinkLight;
+                            break;
+                        case LightsEnum.Red: lane.trafficLight.Texture = Textures.RedLight;
+                            break;
+                        case LightsEnum.Green: lane.trafficLight.Texture = Textures.GreenLight;
+                            break;
+                        case LightsEnum.Yellow: lane.trafficLight.Texture = Textures.YellowLight;
+                            break;
+                    }
+                    break;
             }
         }
 
