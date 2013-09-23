@@ -325,10 +325,12 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     {
 						if (!vehicle.currentLane.laneID[1].Equals(0) && !vehicle.currentLane.laneID[1].Equals(1) && !vehicle.currentLane.laneID[1].Equals(7))
 						{
+							// Send a detection message to the host
 							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, (!previousTile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
 						}
 						else
 						{
+							// Send a detection message to the host
 							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, Strings.Null, vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
 						}
                     }
@@ -336,10 +338,12 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 					{
 						if (!vehicle.currentLane.laneID[1].Equals(0) && !vehicle.currentLane.laneID[1].Equals(1) && !vehicle.currentLane.laneID[1].Equals(7))
 						{
-							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, (!previousTile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+							// Send a detection message to the host
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.far, (!previousTile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
 						}
 						else
 						{
+							// Send a detection message to the host
 							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.far, Strings.Null, vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
 						}
 					}
@@ -349,10 +353,12 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     {
 						if (!vehicle.currentLane.laneID[1].Equals(0) && !vehicle.currentLane.laneID[1].Equals(1) && !vehicle.currentLane.laneID[1].Equals(7))
 						{
+							// Send a detection message to the host
 							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, (!tile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
 						}
 						else
 						{
+							// Send a detection message to the host
 							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, Strings.Null, vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
 						}
                     }
@@ -360,10 +366,12 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 					{
 						if (!vehicle.currentLane.laneID[1].Equals(0) && !vehicle.currentLane.laneID[1].Equals(1) && !vehicle.currentLane.laneID[1].Equals(7))
 						{
-							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, (!tile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+							// Send a detection message to the host
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.far, (!tile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
 						}
 						else
 						{
+							// Send a detection message to the host
 							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.far, Strings.Null, vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
 						}
 					}

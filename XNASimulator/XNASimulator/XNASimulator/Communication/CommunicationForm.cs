@@ -28,7 +28,7 @@ namespace KruispuntGroep4.Simulator.Communication
 	/// </copyright>
 	/// <author>Rinse Cramer</author>
 	/// <email>rinsecramer@gmail.com</email>
-	/// <date>19-09-2013</date>
+	/// <date>23-09-2013</date>
 	/// <summary>CommunicationForm is a form with
 	/// inputfields for host address/port & messages,
 	/// buttons for start/stop view & sending messages
@@ -52,20 +52,22 @@ namespace KruispuntGroep4.Simulator.Communication
 
 		// Appoint delegates
 		delegate void DisplayMessageDelegate(string message);
-		delegate void SwitchTextButtonStartDelegate();
 
 		// Appoint private attributes
 		private BackgroundWorker _bwInput;
 		private BackgroundWorker _bwRead;
 		private BackgroundWorker _bwWrite;
-		private Button _btnInput, _btnStart;
+		private Button _btnInput, _btnSpeedDown,
+			_btnSpeedUp, _btnStart;
 		private TcpClient _client;
 		private IContainer _components = null;
 		private string[] _json;
 		private LaneControl _laneControl;
+		private Label _lblSpeedValue;
+		private int _multiplier;
 		private TableLayoutPanel _tableLayoutPanel1,
 			_tableLayoutPanel2, _tableLayoutPanel3,
-			_tableLayoutPanel4;
+			_tableLayoutPanel4, _tableLayoutPanel5;
 		private TextBox _tbAddress, _tbConsole,
 			_tbPort;
 
@@ -127,11 +129,16 @@ namespace KruispuntGroep4.Simulator.Communication
 			_bwWrite.WorkerReportsProgress = true;
 			_bwWrite.WorkerSupportsCancellation = true;
 			_btnInput = new Button();
+			_btnSpeedDown = new Button();
+			_btnSpeedUp = new Button();
 			_btnStart = new Button();
+			_lblSpeedValue = new Label();
+			_multiplier = 1;
 			_tableLayoutPanel1 = new TableLayoutPanel();
 			_tableLayoutPanel2 = new TableLayoutPanel();
 			_tableLayoutPanel3 = new TableLayoutPanel();
 			_tableLayoutPanel4 = new TableLayoutPanel();
+			_tableLayoutPanel5 = new TableLayoutPanel();
 			_tbAddress = new TextBox();
 			_tbConsole = new TextBox();
 			_tbPort = new TextBox();
@@ -154,24 +161,6 @@ namespace KruispuntGroep4.Simulator.Communication
 			lblPort.Anchor = AnchorStyles.Right;
 			lblPort.AutoSize = true;
 			lblPort.Text = Strings.PortKey;
-			
- 			// Set first table layout panel
-			_tableLayoutPanel1.Anchor =
-				((AnchorStyles)((((AnchorStyles.Top |
-				AnchorStyles.Bottom) | AnchorStyles.Left) |
-				AnchorStyles.Right)));
-			_tableLayoutPanel1.CellBorderStyle = TableLayoutPanelCellBorderStyle.None;
-			_tableLayoutPanel1.ColumnCount = 4;
-			_tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
-			_tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
-			_tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-			_tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-			_tableLayoutPanel1.Controls.Add(lblAddress, 0, 0);
-			_tableLayoutPanel1.Controls.Add(_tbAddress, 1, 0);
-			_tableLayoutPanel1.Controls.Add(lblPort, 2, 0);
-			_tableLayoutPanel1.Controls.Add(_tbPort, 3, 0);
-			_tableLayoutPanel1.Location = new Point(0, 0);
-			_tableLayoutPanel1.Size = new Size(315, 23);
 
 			// Position this label to the left and
 			// the right in the table layout panel
@@ -186,6 +175,32 @@ namespace KruispuntGroep4.Simulator.Communication
 				(AnchorStyles)((AnchorStyles.Left |
 				AnchorStyles.Right));
 			_tbPort.Text = Strings.PortValue;
+
+ 			// Set first table layout panel
+			_tableLayoutPanel1.Anchor =
+				((AnchorStyles)((((AnchorStyles.Top |
+				AnchorStyles.Bottom) | AnchorStyles.Left) |
+				AnchorStyles.Right)));
+			_tableLayoutPanel1.ColumnCount = 4;
+			_tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
+			_tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
+			_tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			_tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			_tableLayoutPanel1.Controls.Add(lblAddress, 0, 0);
+			_tableLayoutPanel1.Controls.Add(_tbAddress, 1, 0);
+			_tableLayoutPanel1.Controls.Add(lblPort, 2, 0);
+			_tableLayoutPanel1.Controls.Add(_tbPort, 3, 0);
+			_tableLayoutPanel1.Location = new Point(0, 0);
+			_tableLayoutPanel1.Size = new Size(315, 23);
+
+			// Position this button to all directions
+			// in the table layout panel
+			_btnInput.Anchor =
+				(AnchorStyles)((((AnchorStyles.Top |
+				AnchorStyles.Bottom) | AnchorStyles.Left) |
+				AnchorStyles.Right));
+			_btnInput.Click += new EventHandler(_btnInput_Click);
+			_btnInput.Text = Strings.Input;
 
 			// Set second table layout panel
 			_tableLayoutPanel2.Anchor =
@@ -204,6 +219,7 @@ namespace KruispuntGroep4.Simulator.Communication
 				AnchorStyles.Right));
 			_btnStart.Click += new EventHandler(_btnStart_Click);
 			_btnStart.Enabled = false;
+			// Switch the text of button Start
 			SwitchTextButtonStart();
 
 			// Set third table layout panel
@@ -216,22 +232,59 @@ namespace KruispuntGroep4.Simulator.Communication
 			_tableLayoutPanel3.Size = new Size(315, 30);
 
 			// Position this button to all directions
-			// in the table layout panel 
-			_btnInput.Anchor =
+			// in the table layout panel
+			_btnSpeedDown = new Button();
+			_btnSpeedDown.Anchor =
 				(AnchorStyles)((((AnchorStyles.Top |
 				AnchorStyles.Bottom) | AnchorStyles.Left) |
 				AnchorStyles.Right));
-			_btnInput.Click += new EventHandler(_btnInput_Click);
-			_btnInput.Text = Strings.Input;
+			_btnSpeedDown.Click += new EventHandler(_btnSpeedDown_Click);
+			_btnSpeedDown.Enabled = false;
+			_btnSpeedDown.Text = Strings.SpeedDown;
+
+			// Position this button to all directions
+			// in the table layout panel
+			_btnSpeedUp = new Button();
+			_btnSpeedUp.Anchor =
+				(AnchorStyles)((((AnchorStyles.Top |
+				AnchorStyles.Bottom) | AnchorStyles.Left) |
+				AnchorStyles.Right));
+			_btnSpeedUp.Click += new EventHandler(_btnSpeedUp_Click);
+			_btnSpeedUp.Enabled = false;
+			_btnSpeedUp.Text = Strings.SpeedUp;
+
+			// Create speed key label
+			Label lblSpeedKey = new Label();
+			// Position this label to the right
+			// in the table layout panel
+			lblSpeedKey.Anchor = AnchorStyles.Right;
+			lblSpeedKey.AutoSize = true;
+			lblSpeedKey.Text = Strings.SpeedKey;
+
+			// Create speed value label
+			_lblSpeedValue = new Label();
+			// Position this label to the left
+			// in the table layout panel
+			_lblSpeedValue.Anchor = AnchorStyles.Left;
+			_lblSpeedValue.AutoSize = true;
+			_lblSpeedValue.Text = Strings.SpeedValue;
 
 			// Set fourth table layout panel
 			_tableLayoutPanel4.Anchor =
 				(AnchorStyles)((((AnchorStyles.Top |
 				AnchorStyles.Bottom) | AnchorStyles.Left) |
 				AnchorStyles.Right));
-			_tableLayoutPanel4.Controls.Add(_tbConsole, 0, 0);
+			_tableLayoutPanel4.ColumnCount = 4;
+			_tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			_tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			_tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			_tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+			_tableLayoutPanel4.Controls.Add(lblSpeedKey, 0, 0);
+			_tableLayoutPanel4.Controls.Add(_lblSpeedValue, 1, 0);
+			_tableLayoutPanel4.Controls.Add(_btnSpeedDown, 2, 0);
+			_tableLayoutPanel4.Controls.Add(_btnSpeedUp, 3, 0);
 			_tableLayoutPanel4.Location = new Point(0, 83);
-			_tableLayoutPanel4.Size = new Size(315, 635);
+			_tableLayoutPanel4.Size = new Size(315, 30);
 
 			// Position this textbox to all directions
 			// in the table layout panel
@@ -241,16 +294,27 @@ namespace KruispuntGroep4.Simulator.Communication
 				AnchorStyles.Right));
 			_tbConsole.Multiline = true;
 			_tbConsole.ScrollBars = ScrollBars.Vertical;
+
+			// Set fifth table layout panel
+			_tableLayoutPanel5.Anchor =
+				(AnchorStyles)((((AnchorStyles.Top |
+				AnchorStyles.Bottom) | AnchorStyles.Left) |
+				AnchorStyles.Right));
+			_tableLayoutPanel5.Controls.Add(_tbConsole, 0, 0);
+			_tableLayoutPanel5.Location = new Point(0, 113);
+			_tableLayoutPanel5.Size = new Size(315, 605);
 			
 			// Set other visual candy
 			AutoScaleDimensions = new SizeF(120F, 120F);
 			AutoScaleMode = AutoScaleMode.Dpi;
 			ClientSize = new Size(new Point(315, 732));
-			ComponentResourceManager resources = new ComponentResourceManager(typeof(CommunicationForm));
+			ComponentResourceManager resources =
+				new ComponentResourceManager(typeof(CommunicationForm));
 			Controls.Add(_tableLayoutPanel1);
 			Controls.Add(_tableLayoutPanel2);
 			Controls.Add(_tableLayoutPanel3);
 			Controls.Add(_tableLayoutPanel4);
+			Controls.Add(_tableLayoutPanel5);
 			FormBorderStyle = FormBorderStyle.Fixed3D;
 			Icon = resources.GetObject(Strings.Icon) as Icon;
 			Location = Settings.Default.Location;
@@ -268,11 +332,11 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// Button 'Laad invoerbestand',
 		/// to read JSON input file
 		/// </summary>
-		/// <param name="sender">Sender</param>
+		/// <param name="sender">Input Button</param>
 		/// <param name="e">Event args</param>
 		private void _btnInput_Click(object sender, EventArgs e)
 		{
-			// Initialize open file dialog
+			// Create open file dialog
 			FileDialog dialog = new OpenFileDialog();
 			DialogResult result = dialog.ShowDialog();
 
@@ -302,20 +366,78 @@ namespace KruispuntGroep4.Simulator.Communication
 		}
 
 		/// <summary>
+		/// Button to decrease multiplier times two and send multiplier
+		/// </summary>
+		/// <param name="sender">Speed down Button</param>
+		/// <param name="e">Event args</param>
+		private void _btnSpeedDown_Click(object sender, EventArgs e)
+		{
+			// Decrease the multiplier times two
+			_multiplier /= 2;
+
+			// Send multiplier to host
+			WriteMultiplierMessage();
+
+			// Speed value Label text is multiplier to string
+			_lblSpeedValue.Text = _multiplier.ToString();
+
+			// If the multiplier is less than 2
+			if (_multiplier < 2)
+			{
+				// Disable speed down Button
+				_btnSpeedDown.Enabled = false;
+			}
+			else /* Else if the multiplier equals or is greater than 2 */
+			{
+				// Enable speed up Button
+				_btnSpeedUp.Enabled = true;
+			}
+		}
+
+		/// <summary>
+		/// Button to increase multiplier times two and send multiplier
+		/// </summary>
+		/// <param name="sender">Speed up Button</param>
+		/// <param name="e">Event args</param>
+		private void _btnSpeedUp_Click(object sender, EventArgs e)
+		{
+			// Increase the multiplier times two
+			_multiplier *= 2;
+
+			// Send multiplier to host
+			WriteMultiplierMessage();
+
+			// Speed value Label text is multiplier to string
+			_lblSpeedValue.Text = _multiplier.ToString();
+
+			// If the multiplier equals or is greater than 512
+			if (_multiplier >= 512)
+			{
+				// Disable speed up Button
+				_btnSpeedUp.Enabled = false;
+			}
+			else /* Else if the multiplier is less than 512 */
+			{
+				// Enable speed down Button
+				_btnSpeedDown.Enabled = true;
+			}
+		}
+
+		/// <summary>
 		/// Button 'Start simulatie', to run new view and to
 		/// connect to the specified host address and port
 		/// </summary>
-		/// <param name="sender">Object</param>
+		/// <param name="sender">Start Button</param>
 		/// <param name="e">Event args</param>
 		private void _btnStart_Click(object sender, EventArgs e)
 		{
 			// If the button reads 'Start simulatie'
 			if (_btnStart.Text.Equals(Strings.StartView))
 			{
-				// Disable buttons and textboxes
+				// Disable buttons and enable read only textboxes
 				_btnInput.Enabled = false;
-				_tbAddress.Enabled = false;
-				_tbPort.Enabled = false;
+				_tbAddress.ReadOnly = true;
+				_tbPort.ReadOnly = true;
 
 				// Switch the text of button Start
 				SwitchTextButtonStart();
@@ -366,93 +488,24 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <param name="laneIDto">Direction and number</param>
 		public void WriteDetectionMessage(VehicleTypeEnum vType, LoopEnum loop, string empty, string laneIDfrom, string laneIDto)
 		{
-			// Initialize the message
+			// Initialize the detection message
 			string message = string.Empty;
 
-			// Is it close or far?
-			switch (loop)
+			// Create the message
+			message =
+			DynamicJson.Serialize(new object[]
 			{
-				case LoopEnum.close: /* It is close */
-					// Is it occupied?
-					switch (empty)
-					{
-						case Strings.True: /* It is occupied */
-							// Create the message
-							message =
-								Strings.DetectionMessageLight +
-								laneIDfrom +
-								Strings.DetectionMessageType +
-								vType.ToString() +
-								Strings.DetectionMessageLoopCloseEmptyTrue +
-								laneIDto +
-								Strings.DetectionMessageEnding;
-							break;
-						case Strings.False: /* It isn't occupied */
-							// Create the message
-							message =
-								Strings.DetectionMessageLight +
-								laneIDfrom +
-								Strings.DetectionMessageType +
-								vType.ToString() +
-								Strings.DetectionMessageLoopCloseEmptyFalse +
-								laneIDto +
-								Strings.DetectionMessageEnding;
-							break;
-						default:
-							// Create the message
-							message =
-								Strings.DetectionMessageLight +
-								laneIDfrom +
-								Strings.DetectionMessageType +
-								vType.ToString() +
-								Strings.DetectionMessageLoopCloseEmptyNull +
-								laneIDto +
-								Strings.DetectionMessageEnding;
-							break;
-					}
-					break;
-				case LoopEnum.far: /* It is far */
-					// Is it occupied?
-					switch (empty)
-					{
-						case Strings.True: /* It is occupied */
-							// Create the message
-							message =
-								Strings.DetectionMessageLight +
-								laneIDfrom +
-								Strings.DetectionMessageType +
-								vType.ToString() +
-								Strings.DetectionMessageLoopFarEmptyTrue +
-								laneIDto +
-								Strings.DetectionMessageEnding;
-							break;
-						case Strings.False: /* It isn't occupied */
-							// Create the message
-							message =
-								Strings.DetectionMessageLight +
-								laneIDfrom +
-								Strings.DetectionMessageType +
-								vType.ToString() +
-								Strings.DetectionMessageLoopFarEmptyFalse +
-								laneIDto +
-								Strings.DetectionMessageEnding;
-							break;
-						default:
-							// Create the message
-							message =
-								Strings.DetectionMessageLight +
-								laneIDfrom +
-								Strings.DetectionMessageType +
-								vType.ToString() +
-								Strings.DetectionMessageLoopFarEmptyNull +
-								laneIDto +
-								Strings.DetectionMessageEnding;
-							break;
-					}
-					break;
-			}
+				new
+				{
+					light = laneIDfrom,
+					type = vType.ToString(),
+					loop = loop,
+					empty = empty,
+					to = laneIDto
+				}
+			});
 			
-			// Write the detection message
+			// Write the message
 			WriteMessage(message);
 		}
 		#endregion
@@ -483,9 +536,6 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <param name="message">Message</param>
 		private void DisplayMessage(string message)
 		{
-			// Initialize the time
-			string time = DateTime.Now.ToString(Strings.Time);
-
 			// If the caller comes from a different thread
 			if (InvokeRequired)
 			{
@@ -496,12 +546,9 @@ namespace KruispuntGroep4.Simulator.Communication
 				return;
 			}
 
-			// Append the time and the message
-			// to the Console listbox,
+			// Append the message to the Console listbox,
 			// ending with a new line
 			_tbConsole.AppendText(
-				time +
-				Strings.Space +
 				message +
 				Environment.NewLine
 			);
@@ -520,11 +567,12 @@ namespace KruispuntGroep4.Simulator.Communication
 			// For each JSON string in JSON array
 			foreach (string json in _json)
 			{
-				// Initialize whether Godzilla exists and vehicle type
+				// Initialize whether Godzilla exists
+				// and create vehicle type
 				bool isGodzilla = false;
 				VehicleTypeEnum vehicleType = VehicleTypeEnum.car;
 
-				// Initialize vehicle type parameter value
+				// Create vehicle type parameter value from JSON string
 				string type = json.Split(',')[1];
 
 				// What type is it?
@@ -542,9 +590,6 @@ namespace KruispuntGroep4.Simulator.Communication
 					case Strings.VehicleTypePedestrian: /* It is a pedestrian */
 						vehicleType = VehicleTypeEnum.pedestrian;
 						break;
-					case Strings.VehicleTypeTruck: /* It is a truck */
-						vehicleType = VehicleTypeEnum.truck;
-						break;
 					default: /* It is a Godzilla */
 						isGodzilla = true;
 						break;
@@ -553,7 +598,7 @@ namespace KruispuntGroep4.Simulator.Communication
 				// If the vehicle type isn't Godzilla
 				if (!isGodzilla)
 				{
-					// Initialize from and to parameter values
+					// Create from and to parameter values from JSON string
 					string from = json.Split(',')[2];
 					string to = (json.Split(',')[3]).Split(']')[0];
 
@@ -561,7 +606,7 @@ namespace KruispuntGroep4.Simulator.Communication
 					_laneControl.SpawnVehicle(vehicleType, from, to);
 				}
 
-				// Initialize time parameter value
+				// Create time parameter value from JSON string
 				int time = int.Parse((json.Split('[')[1]).Split(',')[0]);
 
 				// If the time is after the previous time
@@ -594,7 +639,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <param name="e">Tuple with address string and port int</param>
 		private void DoWorkWriting(object sender, DoWorkEventArgs e)
 		{
-			// Initialize background worker write and host tuple
+			// Create background worker write and host tuple
 			BackgroundWorker backgroundWorkerWrite = sender as BackgroundWorker;
 			Tuple<string, int> host = e.Argument as Tuple<string, int>;
 
@@ -642,7 +687,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// </summary>
 		private string GetAddress()
 		{
-			// Initialize IP address and host;
+			// Initialize IP address and create host;
 			string address = string.Empty;
 			IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
 
@@ -689,7 +734,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			// For every JSON object
 			for (int i = 0; i < count; i++)
 			{
-				// Initialize parameter values
+				// Create strings from parameter values
 				string strTime = time.ElementAt(i);
 				string strType = type.ElementAt(i);
 				string strFrom = from.ElementAt(i);
@@ -727,7 +772,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			// Parse JSON string
 			var json = DynamicJson.Parse(_json[0]);
 
-			// Initialize parameter values
+			// Create strings from parameter values
 			string time = json.time;
 			string type = json.type;
 			string from = json.from;
@@ -768,6 +813,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <returns></returns>
 		private string ReadMessage()
 		{
+			// Initialize the message
 			string message = string.Empty;
 
 			// If the TCP client exists
@@ -779,14 +825,20 @@ namespace KruispuntGroep4.Simulator.Communication
 					// Create a stream reader for the TCP client stream
 					StreamReader reader = new StreamReader(_client.GetStream());
 
-					// The message is received from the host
-					message = reader.ReadLine();
+					// Try to receive the message
+					try
+					{
+						// The message is received from the host
+						message = reader.ReadLine();
+					}
+					catch (IOException) { } /* Catch IO exception */
 
-					// Display message
-					DisplayMessage(Strings.Received + message);
+					// Display the message
+					DisplayMessage(Strings.Received + Strings.Space + message);
 				}
 			}
 
+			// Return the message
 			return message;
 		}
 
@@ -798,7 +850,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		private void RunWorkerCompletedInput(object sender, RunWorkerCompletedEventArgs e)
 		{
 			// Display all input JSONs sent message
-			DisplayMessage(Strings.Sent + Strings.AllInputJsons);
+			DisplayMessage(Strings.Sent + Strings.Space + Strings.AllInputJsons);
 		}
 
 		/// <summary>
@@ -809,42 +861,54 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <param name="e">Whether the connection with the host was lost</param>
 		private void RunWorkerCompletedReading(object sender, RunWorkerCompletedEventArgs e)
 		{
-			// Initialize the received message
+			// Create the received message from the result
 			string message = e.Result as string;
 
-			var json = DynamicJson.Parse(message);
-
-			var count = ((dynamic[])json).Count();
-			var light = ((dynamic[])json).Select(d => d.light);
-			var state = ((dynamic[])json).Select(d => d.state);
-
-			for (int i = 0; i < count; i++)
+			// If the message probably is valid JSON
+			if (message.StartsWith(Strings.BraceOpen) ||
+				message.StartsWith(Strings.BracketOpen))
 			{
-				string strLight = light.ElementAt(i);
-				string strState = state.ElementAt(i).ToLower();
+				// Parse JSON string
+				var json = DynamicJson.Parse(message);
 
-				LightsEnum lightsEnum = LightsEnum.Off;
+				// Extract parameter values in dynamic JSON format
+				var count = ((dynamic[])json).Count();
+				var light = ((dynamic[])json).Select(d => d.light);
+				var state = ((dynamic[])json).Select(d => d.state);
 
-				switch (strState)
+				// For every JSON object
+				for (int i = 0; i < count; i++)
 				{
-					case Strings.LightStateBlink:
-						lightsEnum = LightsEnum.Blink;
-						break;
-					case Strings.LightStateGreen:
-						lightsEnum = LightsEnum.Green;
-						break;
-					case Strings.LightStateOff:
-						lightsEnum = LightsEnum.Off;
-						break;
-					case Strings.LightStateRed:
-						lightsEnum = LightsEnum.Red;
-						break;
-					case Strings.LightStateYellow:
-						lightsEnum = LightsEnum.Yellow;
-						break;
-				}
+					// Create strings from parameter values
+					string strLight = light.ElementAt(i);
+					string strState = state.ElementAt(i).ToLower();
 
-				_laneControl.ChangeTrafficLight(lightsEnum, strLight);
+					// Initialize lights enum
+					LightsEnum lightsEnum = LightsEnum.Off;
+
+					// What state is it?
+					switch (strState)
+					{
+						case Strings.LightStateBlink: /* It is blinking */
+							lightsEnum = LightsEnum.Blink;
+							break;
+						case Strings.LightStateGreen: /* It is green */
+							lightsEnum = LightsEnum.Green;
+							break;
+						case Strings.LightStateOff: /* It is off */
+							lightsEnum = LightsEnum.Off;
+							break;
+						case Strings.LightStateRed: /* It is red */
+							lightsEnum = LightsEnum.Red;
+							break;
+						case Strings.LightStateYellow: /* It is yellow */
+							lightsEnum = LightsEnum.Yellow;
+							break;
+					}
+
+					// Change the specified traffic light
+					_laneControl.ChangeTrafficLight(lightsEnum, strLight);
+				}
 			}
 
 			// Read messages in the background, so the UI stays responsive
@@ -859,19 +923,19 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <param name="e">Whether the user interfered as property cancelled</param>
 		private void RunWorkerCompletedWriting(object sender, RunWorkerCompletedEventArgs e)
 		{
-			// Enable buttons and textboxes
-			_tbAddress.Enabled = true;
-			_tbPort.Enabled = true;
-
 			// If the user interfered
 			if (e.Cancelled)
 			{
+				// Disable read only textboxes
+				_tbAddress.ReadOnly = false;
+				_tbPort.ReadOnly = false;
+
 				// Switch the text of button Start
 				SwitchTextButtonStart();
 			}
 			else /* Else if the user didn't interfere, display a success message */
 			{
-				// Disable button Start
+				// Disable start Button
 				_btnStart.Enabled = false;
 
 				// Display success message
@@ -880,16 +944,32 @@ namespace KruispuntGroep4.Simulator.Communication
 				// Wait for lane control
 				while (_laneControl == null) { }
 
-				// Initialize start time and multiplier
-				string time = DateTime.Now.ToString(Strings.DateTimeFormat);
-				string startTime = DynamicJson.Serialize(new object[] { new { starttime = time } });
-				string multiplier = DynamicJson.Serialize(new object[] { new { multiplier = 8 } });
+				// Create start time and multiplier messages
+				string startTime =
+				DynamicJson.Serialize(new object[]
+				{
+					new
+					{
+						starttime = DateTime.Now.ToShortTimeString()
+					}
+				});
+				string multiplier =
+				DynamicJson.Serialize(new object[]
+				{
+					new
+					{
+						multiplier = _multiplier
+					}
+				});
 
 				// Send start time
 				WriteMessage(startTime);
 
 				// Send multiplier
 				WriteMessage(multiplier);
+
+				// Enable speed up Button
+				_btnSpeedUp.Enabled = true;
 
 				// Spawn all vehicles from the JSON input file in the background
 				_bwInput.RunWorkerAsync();
@@ -901,16 +981,6 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// </summary>
 		private void SwitchTextButtonStart()
 		{
-			// If the caller comes from a different thread
-			if (InvokeRequired)
-			{
-				// Execute the associated delegate asynchronously
-				BeginInvoke(new SwitchTextButtonStartDelegate(SwitchTextButtonStart));
-
-				// Can't switch the text of button Start yet
-				return;
-			}
-
 			// If the button start text isn't 'Start simulatie'
 			if (!_btnStart.Text.Equals(Strings.StartView))
 			{
@@ -947,9 +1017,28 @@ namespace KruispuntGroep4.Simulator.Communication
 					writer.Flush();
 
 					// Display the message in the Console listbox
-					DisplayMessage(Strings.Sent + message);
+					DisplayMessage(Strings.Sent + Strings.Space + message);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Write a multiplier message to the host
+		/// </summary>
+		public void WriteMultiplierMessage()
+		{
+			// Create the multiplier message
+			string message =
+			DynamicJson.Serialize(new object[]
+			{
+				new
+				{
+					multiplier = _multiplier
+				}
+			});
+
+			// Write the message
+			WriteMessage(message);
 		}
 		#endregion
 	}

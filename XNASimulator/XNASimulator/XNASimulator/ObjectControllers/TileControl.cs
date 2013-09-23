@@ -67,13 +67,13 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                         VehicleTypeEnum vehicleType = VehicleTypeEnum.pedestrian;
                         switch (vehicleType)
                         {
-                            case VehicleTypeEnum.bus: newVehicle = new Vehicle(Textures.Bus, DEBUGvehicleID.ToString());
+                            case VehicleTypeEnum.bus: newVehicle = new Vehicle(Textures.Bus, DEBUGvehicleID.ToString(), VehicleTypeEnum.bus);
                                 break;
-                            case VehicleTypeEnum.car: newVehicle = new Vehicle(Textures.Car, DEBUGvehicleID.ToString());
+                            case VehicleTypeEnum.car: newVehicle = new Vehicle(Textures.Car, DEBUGvehicleID.ToString(), VehicleTypeEnum.car);
                                 break;
-                            case VehicleTypeEnum.truck: newVehicle = new Vehicle(Textures.Truck, DEBUGvehicleID.ToString());
+                            case VehicleTypeEnum.truck: newVehicle = new Vehicle(Textures.Truck, DEBUGvehicleID.ToString(), VehicleTypeEnum.truck);
                                 break;
-                            case VehicleTypeEnum.bicycle: newVehicle = new Vehicle(Textures.Bike, DEBUGvehicleID.ToString());
+                            case VehicleTypeEnum.bicycle: newVehicle = new Vehicle(Textures.Bike, DEBUGvehicleID.ToString(), VehicleTypeEnum.bicycle);
                                 break;
                         }
 
