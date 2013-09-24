@@ -8,7 +8,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
     class TileControl
     {
         private Lists lists;
-        private int DEBUGvehicleID = 0;
 
         private int LevelWidth
         {
@@ -57,68 +56,7 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             {
                 if (tile.CollisionRectangle.Contains(mouseArea))
                 {
-                    if (tile.isSpawn)
-                    {
-                        Lane lane;
-                        Vehicle newVehicle = new Vehicle(DEBUGvehicleID.ToString());
-
-                        lists.Lanes.TryGetValue(tile.laneIDs[0], out lane);
-
-                        VehicleTypeEnum vehicleType = VehicleTypeEnum.pedestrian;
-                        
-						switch (vehicleType)
-                        {
-                            case VehicleTypeEnum.bus: newVehicle = new Vehicle(Textures.Bus, DEBUGvehicleID.ToString(), VehicleTypeEnum.bus);
-                                break;
-                            case VehicleTypeEnum.car: newVehicle = new Vehicle(Textures.Car, DEBUGvehicleID.ToString(), VehicleTypeEnum.car);
-                                break;
-                            case VehicleTypeEnum.bicycle: newVehicle = new Vehicle(Textures.Bike, DEBUGvehicleID.ToString(), VehicleTypeEnum.bicycle);
-                                break;
-                        }
-
-                        newVehicle = lane.AddVehicle(newVehicle);
-
-                        string spawnLaneID = "N0";
-                        string destinationLaneID = "S7";
-
-                        switch (spawnLaneID[0].ToString() + destinationLaneID[0].ToString())
-                        {
-                            case "NE": newVehicle.path = PathsEnum.NorthToEast;
-                                break;
-                            case "NS": newVehicle.path = PathsEnum.NorthToSouth;
-                                break;
-                            case "NW": newVehicle.path = PathsEnum.NorthToWest;
-                                break;
-
-                            case "ES": newVehicle.path = PathsEnum.EastToSouth;
-                                break;
-                            case "EW": newVehicle.path = PathsEnum.EastToWest;
-                                break;
-                            case "EN": newVehicle.path = PathsEnum.EastToNorth;
-                                break;
-
-                            case "SW": newVehicle.path = PathsEnum.SouthToWest;
-                                break;
-                            case "SN": newVehicle.path = PathsEnum.SouthToNorth;
-                                break;
-                            case "SE": newVehicle.path = PathsEnum.SouthToEast;
-                                break;
-
-                            case "WN": newVehicle.path = PathsEnum.WestToNorth;
-                                break;
-                            case "WE": newVehicle.path = PathsEnum.WestToEast;
-                                break;
-                            case "WS": newVehicle.path = PathsEnum.WestToSouth;
-                                break;
-                        }
-
-                        newVehicle.destinationLaneID = destinationLaneID;
-
-                        lists.Vehicles.Add(newVehicle);
-
-                        DEBUGvehicleID++;
-                    }
-                    else
+                    if (!tile.isSpawn)
                     {
                         this.ChangeLights(tile);
                     }

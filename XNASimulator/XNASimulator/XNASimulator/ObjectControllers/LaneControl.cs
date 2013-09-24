@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using KruispuntGroep4.Simulator.Globals;
-using KruispuntGroep4.Simulator.Main;
 using KruispuntGroep4.Simulator.Objects;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
 
 namespace KruispuntGroep4.Simulator.ObjectControllers
 {
@@ -25,10 +23,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             {
                 SpawnQueuedVehicles(lane.Value);
             }
-        }
-
-        public void Draw(GameTime gametime, SpriteBatch spriteBatch)
-        {
         }
 
         public void ChangeTrafficLight(LightsEnum newValue, string laneID)
@@ -117,14 +111,14 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             #region vehicle creation
             switch (vehicleType)
             {
-                case VehicleTypeEnum.bus: newVehicle = new Vehicle(Textures.Bus, vehicleID, VehicleTypeEnum.bus);
+				case VehicleTypeEnum.pedestrian: newVehicle = new Vehicle(Textures.Pedestrian, vehicleID, VehicleTypeEnum.pedestrian, 1.1f);
+					break;
+				case VehicleTypeEnum.bicycle: newVehicle = new Vehicle(Textures.Bike, vehicleID, VehicleTypeEnum.bicycle, 1.4f);
+					break;
+                case VehicleTypeEnum.bus: newVehicle = new Vehicle(Textures.Bus, vehicleID, VehicleTypeEnum.bus, 1.7f);
                     break;
-                case VehicleTypeEnum.car: newVehicle = new Vehicle(Textures.Car, vehicleID, VehicleTypeEnum.car);
-                    break;
-                case VehicleTypeEnum.bicycle: newVehicle =  new Vehicle(Textures.Bike, vehicleID, VehicleTypeEnum.bicycle);
-                    break;
-                case VehicleTypeEnum.pedestrian: newVehicle = new Vehicle(Textures.Pedestrian, vehicleID, VehicleTypeEnum.pedestrian);
-                    break;
+                case VehicleTypeEnum.car: newVehicle = new Vehicle(Textures.Car, vehicleID, VehicleTypeEnum.car, 2f);
+                    break; 
             }
             #endregion
 
@@ -162,9 +156,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     break;
             }
             #endregion
-          
-
-
 
             //If the lane has space...
             if (!spawnLane.spawnTile.isOccupied)
@@ -193,16 +184,16 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 
         private void SpawnQueuedVehicles(Lane lane)
         {
-                if (lane.vehicleQueue.Count > 0)
+            if (lane.vehicleQueue.Count > 0)
+            {
+                if (!lane.spawnTile.isOccupied)
                 {
-                    if (!lane.spawnTile.isOccupied)
-                    {
-                        Vehicle vehicle = lane.vehicleQueue.Dequeue();
+                    Vehicle vehicle = lane.vehicleQueue.Dequeue();
 
-                        vehicle = lane.AddVehicle(vehicle); //Add to lane
-                        lists.Vehicles.Add(vehicle); //Add to master list
-                    }
-                }           
+                    vehicle = lane.AddVehicle(vehicle); //Add to lane
+                    lists.Vehicles.Add(vehicle); //Add to master list
+                }
+            }           
         }
 
     }

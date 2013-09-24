@@ -42,6 +42,10 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     //update rotation of the vehicle 
                     if (!vehicle.stopRedLight && !vehicle.stopCar)
                     {
+						// get multiplier
+						int multiplier = communicationForm.GetMultiplier();
+						vehicle.speed *= multiplier;
+
                         switch (vehicle.rotation)
                         {
                             case RotationEnum.North:
@@ -65,6 +69,8 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                                 vehicle.collission = new Rectangle((int)vehicle.position.X, (int)vehicle.position.Y, vehicle.sprite.Width, vehicle.sprite.Height);
                                 break;
                         }
+
+						vehicle.speed /= multiplier;
                     }
                 }
             }
@@ -96,8 +102,7 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             if (vehicle.alive)
             {
                 //If the vehicle is no longer on screen
-                if (!graphics.PresentationParameters.Bounds.Contains(new Point((int)vehicle.position.X,
-                    (int)vehicle.position.Y)) )
+                if (!graphics.Viewport.Bounds.Contains(new Point((int)vehicle.position.X,(int)vehicle.position.Y)))
                 {
                     vehicle.alive = false;
 
@@ -108,7 +113,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     //Remove the vehicle from the master list and the lane
                     lists.Vehicles.Remove(vehicle);
                     vehicle.currentLane.laneVehicles.Remove(vehicle);
-
                 }
             }
             else
@@ -258,7 +262,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 
         private void CheckTileOccupation(Vehicle vehicle, Tile tile)
         {
-            
             //first check if it's a red light ahead
             if (tile.Texture.Equals(Textures.RedLight) || tile.Texture.Equals(Textures.SidewalkLightRed))
             {
@@ -271,7 +274,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                 //check if occupied
                 if (tile.isOccupied)
                 {
-
                     //is it occupied by this vehicle?
                     if (tile.GridCoordinates.Equals(vehicle.occupyingtile))
                     {
@@ -284,6 +286,23 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                         if (!vehicle.type.Equals(VehicleTypeEnum.pedestrian)) //not pedestrian
                         {
                             vehicle.stopCar = true;
+
+							// TODO: remove this code when the pathfinding is completed
+							Rectangle cross = new Rectangle(9, 8, 6, 6);
+
+							if (cross.Contains(new Point((int)tile.GridCoordinates.X,(int)tile.GridCoordinates.Y)))
+							{
+								// remove vehicle, because it has made a collision
+								vehicle.alive = false;
+
+								//Free up the last tile it was on
+								lists.Tiles[(int)vehicle.occupyingtile.X, (int)vehicle.occupyingtile.Y].OccupiedID = string.Empty;
+								lists.Tiles[(int)vehicle.occupyingtile.X, (int)vehicle.occupyingtile.Y].isOccupied = false;
+
+								//Remove the vehicle from the master list and the lane
+								lists.Vehicles.Remove(vehicle);
+								vehicle.currentLane.laneVehicles.Remove(vehicle);
+							}
                         }
                         else //pedestrian
                         {

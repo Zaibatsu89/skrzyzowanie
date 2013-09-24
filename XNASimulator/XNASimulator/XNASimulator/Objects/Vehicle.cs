@@ -8,6 +8,7 @@ namespace KruispuntGroep4.Simulator.Objects
     {
 		public string ID {get; set;}
 		public VehicleTypeEnum type { get; set; }
+		public float speed { get; set; }
 		public RotationEnum rotation { get; set; }
 		public PathsEnum path { get; set; }
         public Vector2 position { get; set; }
@@ -15,7 +16,6 @@ namespace KruispuntGroep4.Simulator.Objects
 		public Texture2D sprite { get; set; }
         public Vector2 origin { get; private set; }
         public bool alive { get; set; }
-		public float speed { get; set; }
         public bool stopCar { get; set; }
         public bool stopRedLight { get; set; }
 		public Rectangle collission { get; set; }
@@ -25,18 +25,18 @@ namespace KruispuntGroep4.Simulator.Objects
 		public Lane currentLane { get; set; }
 		public Tile spawntile { get; set; }
 		
-        public Vehicle(Texture2D texture, string ID, VehicleTypeEnum type)
+        public Vehicle(Texture2D texture, string ID, VehicleTypeEnum type, float speed)
         {
             this.ID = ID;
 			this.type = type;
-            rotation = RotationEnum.North;
+			this.speed = speed;
+			rotation = RotationEnum.North;
 			path = PathsEnum.EastToNorth;
             position = Vector2.Zero;
             drawposition = Vector2.Zero;
             sprite = texture;
             origin = new Vector2(sprite.Width / 2, sprite.Height / 2);
             alive = false;
-            speed = 3f;
             stopCar = false;
             stopRedLight = false;
             collission = new Rectangle((int)position.X, (int)position.Y, sprite.Width, sprite.Height);
@@ -49,14 +49,14 @@ namespace KruispuntGroep4.Simulator.Objects
         {
             this.ID = ID;
 			this.type = VehicleTypeEnum.car;
-            rotation = RotationEnum.North;
+			this.speed = 1f;
+			rotation = RotationEnum.North;
 			path = PathsEnum.EastToNorth;
             position = Vector2.Zero;
             drawposition = Vector2.Zero;
             sprite = Textures.Default;
             origin = new Vector2(sprite.Width / 2, sprite.Height / 2);
 			alive = false;
-			speed = 1f;
             stopCar = false;
             stopRedLight = false;
             collission = new Rectangle((int)position.X, (int)position.Y, sprite.Width, sprite.Height);

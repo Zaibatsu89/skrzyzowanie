@@ -154,14 +154,10 @@ namespace KruispuntGroep4.Simulator.Main
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
-            
             MouseButtonPress();
 
+			laneControl.Update(gameTime);
             vehicleControl.Update(gameTime);
-            laneControl.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -172,12 +168,9 @@ namespace KruispuntGroep4.Simulator.Main
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
             spriteBatch.Begin();
             tileControl.Draw(gameTime, spriteBatch);
             vehicleControl.Draw(gameTime, spriteBatch);
-            laneControl.Draw(gameTime, spriteBatch);
             spriteBatch.End();
 
             base.Draw(gameTime);

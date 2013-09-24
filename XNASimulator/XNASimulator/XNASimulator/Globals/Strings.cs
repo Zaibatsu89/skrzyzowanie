@@ -23,6 +23,8 @@
 		public const string Null = "null";
 		public const string PortKey = "Poort:";
 		public const string PortValue = "1337";
+		public const string ProgressBarFile = "file";
+		public const string ProgressBarMessages = "messages";
 		public const string Received = "Ontvangen:";
 		public const string Sent = "Verzonden:";
 		public const string Space = " ";

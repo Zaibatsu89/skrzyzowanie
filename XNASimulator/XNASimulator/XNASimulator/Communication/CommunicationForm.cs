@@ -28,7 +28,7 @@ namespace KruispuntGroep4.Simulator.Communication
 	/// </copyright>
 	/// <author>Rinse Cramer</author>
 	/// <email>rinsecramer@gmail.com</email>
-	/// <date>23-09-2013</date>
+	/// <date>24-09-2013</date>
 	/// <summary>CommunicationForm is a form with
 	/// inputfields for host address/port & messages,
 	/// buttons for start/stop view & sending messages
@@ -47,6 +47,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			// Initialize backend
 			InitializeBackgroundWorkerInput();
 			InitializeBackgroundWorkerRead();
+			InitializeBackgroundWorkerSpawn();
 			InitializeBackgroundWorkerWrite();
 		}
 
@@ -56,6 +57,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		// Appoint private attributes
 		private BackgroundWorker _bwInput;
 		private BackgroundWorker _bwRead;
+		private BackgroundWorker _bwSpawn;
 		private BackgroundWorker _bwWrite;
 		private Button _btnInput, _btnSpeedDown,
 			_btnSpeedUp, _btnStart;
@@ -65,6 +67,8 @@ namespace KruispuntGroep4.Simulator.Communication
 		private LaneControl _laneControl;
 		private Label _lblSpeedValue;
 		private int _multiplier;
+		private ProgressBar _progressBarFile;
+		private ProgressBar _progressBarMessages;
 		private TableLayoutPanel _tableLayoutPanel1,
 			_tableLayoutPanel2, _tableLayoutPanel3,
 			_tableLayoutPanel4, _tableLayoutPanel5;
@@ -94,6 +98,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		private void InitializeBackgroundWorkerInput()
 		{
 			_bwInput.DoWork += new DoWorkEventHandler(DoWorkInput);
+			_bwInput.ProgressChanged += new ProgressChangedEventHandler(ProgressChangedInput);
 			_bwInput.RunWorkerCompleted += new RunWorkerCompletedEventHandler(RunWorkerCompletedInput);
 		}
 
@@ -104,6 +109,15 @@ namespace KruispuntGroep4.Simulator.Communication
 		{
 			_bwRead.DoWork += new DoWorkEventHandler(DoWorkReading);
 			_bwRead.RunWorkerCompleted += new RunWorkerCompletedEventHandler(RunWorkerCompletedReading);
+		}
+
+		/// <summary>
+		/// Initialize backend: background worker spawn
+		/// </summary>
+		private void InitializeBackgroundWorkerSpawn()
+		{
+			_bwSpawn.DoWork += new DoWorkEventHandler(DoWorkSpawning);
+			_bwSpawn.RunWorkerCompleted += new RunWorkerCompletedEventHandler(RunWorkerCompletedSpawning);
 		}
 
 		/// <summary>
@@ -124,7 +138,9 @@ namespace KruispuntGroep4.Simulator.Communication
 		{
 			// Initialize private attributes
 			_bwInput = new BackgroundWorker();
+			_bwInput.WorkerReportsProgress = true;
 			_bwRead = new BackgroundWorker();
+			_bwSpawn = new BackgroundWorker();
 			_bwWrite = new BackgroundWorker();
 			_bwWrite.WorkerReportsProgress = true;
 			_bwWrite.WorkerSupportsCancellation = true;
@@ -134,6 +150,8 @@ namespace KruispuntGroep4.Simulator.Communication
 			_btnStart = new Button();
 			_lblSpeedValue = new Label();
 			_multiplier = 1;
+			_progressBarFile = new ProgressBar();
+			_progressBarMessages = new ProgressBar();
 			_tableLayoutPanel1 = new TableLayoutPanel();
 			_tableLayoutPanel2 = new TableLayoutPanel();
 			_tableLayoutPanel3 = new TableLayoutPanel();
@@ -177,10 +195,6 @@ namespace KruispuntGroep4.Simulator.Communication
 			_tbPort.Text = Strings.PortValue;
 
  			// Set first table layout panel
-			_tableLayoutPanel1.Anchor =
-				((AnchorStyles)((((AnchorStyles.Top |
-				AnchorStyles.Bottom) | AnchorStyles.Left) |
-				AnchorStyles.Right)));
 			_tableLayoutPanel1.ColumnCount = 4;
 			_tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
 			_tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
@@ -191,7 +205,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			_tableLayoutPanel1.Controls.Add(lblPort, 2, 0);
 			_tableLayoutPanel1.Controls.Add(_tbPort, 3, 0);
 			_tableLayoutPanel1.Location = new Point(0, 0);
-			_tableLayoutPanel1.Size = new Size(315, 23);
+			_tableLayoutPanel1.Size = new Size(315, 28);
 
 			// Position this button to all directions
 			// in the table layout panel
@@ -199,16 +213,30 @@ namespace KruispuntGroep4.Simulator.Communication
 				(AnchorStyles)((((AnchorStyles.Top |
 				AnchorStyles.Bottom) | AnchorStyles.Left) |
 				AnchorStyles.Right));
-			_btnInput.Click += new EventHandler(_btnInput_Click);
+			_btnInput.Click += new EventHandler(ClickInput);
 			_btnInput.Text = Strings.Input;
 
+			// Position this progress bar to all directions
+			// in the table layout panel
+			_progressBarFile.Anchor =
+			(AnchorStyles)((((AnchorStyles.Top |
+			AnchorStyles.Bottom) | AnchorStyles.Left) |
+			AnchorStyles.Right));
+			_progressBarFile.ForeColor = Color.Black;
+			_progressBarFile.Style = ProgressBarStyle.Continuous;
+
+			// Position this progress bar to all directions
+			// in the table layout panel
+			_progressBarMessages.Anchor =
+			(AnchorStyles)((((AnchorStyles.Top |
+			AnchorStyles.Bottom) | AnchorStyles.Left) |
+			AnchorStyles.Right));
+			_progressBarMessages.ForeColor = Color.Black;
+			_progressBarMessages.Style = ProgressBarStyle.Continuous;
+
 			// Set second table layout panel
-			_tableLayoutPanel2.Anchor =
-				((AnchorStyles)((((AnchorStyles.Top |
-				AnchorStyles.Bottom) | AnchorStyles.Left) |
-				AnchorStyles.Right)));
 			_tableLayoutPanel2.Controls.Add(_btnInput, 0, 0);
-			_tableLayoutPanel2.Location = new Point(0, 23);
+			_tableLayoutPanel2.Location = new Point(0, 30);
 			_tableLayoutPanel2.Size = new Size(315, 30);
 
 			// Position this button to all directions
@@ -217,18 +245,14 @@ namespace KruispuntGroep4.Simulator.Communication
 				(AnchorStyles)((((AnchorStyles.Top |
 				AnchorStyles.Bottom) | AnchorStyles.Left) |
 				AnchorStyles.Right));
-			_btnStart.Click += new EventHandler(_btnStart_Click);
+			_btnStart.Click += new EventHandler(ClickStart);
 			_btnStart.Enabled = false;
 			// Switch the text of button Start
 			SwitchTextButtonStart();
 
 			// Set third table layout panel
-			_tableLayoutPanel3.Anchor =
-				(AnchorStyles)((((AnchorStyles.Top |
-				AnchorStyles.Bottom) | AnchorStyles.Left) |
-				AnchorStyles.Right));
 			_tableLayoutPanel3.Controls.Add(_btnStart, 0, 0);
-			_tableLayoutPanel3.Location = new Point(0, 53);
+			_tableLayoutPanel3.Location = new Point(0, 60);
 			_tableLayoutPanel3.Size = new Size(315, 30);
 
 			// Position this button to all directions
@@ -238,7 +262,7 @@ namespace KruispuntGroep4.Simulator.Communication
 				(AnchorStyles)((((AnchorStyles.Top |
 				AnchorStyles.Bottom) | AnchorStyles.Left) |
 				AnchorStyles.Right));
-			_btnSpeedDown.Click += new EventHandler(_btnSpeedDown_Click);
+			_btnSpeedDown.Click += new EventHandler(ClickSpeedDown);
 			_btnSpeedDown.Enabled = false;
 			_btnSpeedDown.Text = Strings.SpeedDown;
 
@@ -249,7 +273,7 @@ namespace KruispuntGroep4.Simulator.Communication
 				(AnchorStyles)((((AnchorStyles.Top |
 				AnchorStyles.Bottom) | AnchorStyles.Left) |
 				AnchorStyles.Right));
-			_btnSpeedUp.Click += new EventHandler(_btnSpeedUp_Click);
+			_btnSpeedUp.Click += new EventHandler(ClickSpeedUp);
 			_btnSpeedUp.Enabled = false;
 			_btnSpeedUp.Text = Strings.SpeedUp;
 
@@ -270,10 +294,6 @@ namespace KruispuntGroep4.Simulator.Communication
 			_lblSpeedValue.Text = Strings.SpeedValue;
 
 			// Set fourth table layout panel
-			_tableLayoutPanel4.Anchor =
-				(AnchorStyles)((((AnchorStyles.Top |
-				AnchorStyles.Bottom) | AnchorStyles.Left) |
-				AnchorStyles.Right));
 			_tableLayoutPanel4.ColumnCount = 4;
 			_tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
 			_tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
@@ -283,7 +303,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			_tableLayoutPanel4.Controls.Add(_lblSpeedValue, 1, 0);
 			_tableLayoutPanel4.Controls.Add(_btnSpeedDown, 2, 0);
 			_tableLayoutPanel4.Controls.Add(_btnSpeedUp, 3, 0);
-			_tableLayoutPanel4.Location = new Point(0, 83);
+			_tableLayoutPanel4.Location = new Point(0, 90);
 			_tableLayoutPanel4.Size = new Size(315, 30);
 
 			// Position this textbox to all directions
@@ -296,12 +316,8 @@ namespace KruispuntGroep4.Simulator.Communication
 			_tbConsole.ScrollBars = ScrollBars.Vertical;
 
 			// Set fifth table layout panel
-			_tableLayoutPanel5.Anchor =
-				(AnchorStyles)((((AnchorStyles.Top |
-				AnchorStyles.Bottom) | AnchorStyles.Left) |
-				AnchorStyles.Right));
 			_tableLayoutPanel5.Controls.Add(_tbConsole, 0, 0);
-			_tableLayoutPanel5.Location = new Point(0, 113);
+			_tableLayoutPanel5.Location = new Point(0, 120);
 			_tableLayoutPanel5.Size = new Size(315, 605);
 			
 			// Set other visual candy
@@ -327,147 +343,17 @@ namespace KruispuntGroep4.Simulator.Communication
 		}
 		#endregion
 
-		#region Events
-		/// <summary>
-		/// Button 'Laad invoerbestand',
-		/// to read JSON input file
-		/// </summary>
-		/// <param name="sender">Input Button</param>
-		/// <param name="e">Event args</param>
-		private void _btnInput_Click(object sender, EventArgs e)
-		{
-			// Create open file dialog
-			FileDialog dialog = new OpenFileDialog();
-			DialogResult result = dialog.ShowDialog();
-
-			// If the dialog result is OK
-			if (result.Equals(DialogResult.OK))
-			{
-				// Disable button Input
-				_btnInput.Enabled = false;
-
-				// Read JSON from selected file
-				_json = File.ReadAllLines(dialog.FileName);
-
-				if (_json[0].StartsWith(Strings.BraceOpen))
-				{
-					// Convert JSON object to message
-					_json[0] = JsonObjectToMessage();
-				}
-				else if (_json[0].StartsWith(Strings.BracketOpen))
-				{
-					// Convert JSON array to messages
-					_json = JsonArrayToMessages();
-				}
-
-				// Enable button Start
-				_btnStart.Enabled = true;
-			}
-		}
-
-		/// <summary>
-		/// Button to decrease multiplier times two and send multiplier
-		/// </summary>
-		/// <param name="sender">Speed down Button</param>
-		/// <param name="e">Event args</param>
-		private void _btnSpeedDown_Click(object sender, EventArgs e)
-		{
-			// Decrease the multiplier times two
-			_multiplier /= 2;
-
-			// Send multiplier to host
-			WriteMultiplierMessage();
-
-			// Speed value Label text is multiplier to string
-			_lblSpeedValue.Text = _multiplier.ToString();
-
-			// If the multiplier is less than 2
-			if (_multiplier < 2)
-			{
-				// Disable speed down Button
-				_btnSpeedDown.Enabled = false;
-			}
-			else /* Else if the multiplier equals or is greater than 2 */
-			{
-				// Enable speed up Button
-				_btnSpeedUp.Enabled = true;
-			}
-		}
-
-		/// <summary>
-		/// Button to increase multiplier times two and send multiplier
-		/// </summary>
-		/// <param name="sender">Speed up Button</param>
-		/// <param name="e">Event args</param>
-		private void _btnSpeedUp_Click(object sender, EventArgs e)
-		{
-			// Increase the multiplier times two
-			_multiplier *= 2;
-
-			// Send multiplier to host
-			WriteMultiplierMessage();
-
-			// Speed value Label text is multiplier to string
-			_lblSpeedValue.Text = _multiplier.ToString();
-
-			// If the multiplier equals or is greater than 512
-			if (_multiplier >= 512)
-			{
-				// Disable speed up Button
-				_btnSpeedUp.Enabled = false;
-			}
-			else /* Else if the multiplier is less than 512 */
-			{
-				// Enable speed down Button
-				_btnSpeedDown.Enabled = true;
-			}
-		}
-
-		/// <summary>
-		/// Button 'Start simulatie', to run new view and to
-		/// connect to the specified host address and port
-		/// </summary>
-		/// <param name="sender">Start Button</param>
-		/// <param name="e">Event args</param>
-		private void _btnStart_Click(object sender, EventArgs e)
-		{
-			// If the button reads 'Start simulatie'
-			if (_btnStart.Text.Equals(Strings.StartView))
-			{
-				// Disable buttons and enable read only textboxes
-				_btnInput.Enabled = false;
-				_tbAddress.ReadOnly = true;
-				_tbPort.ReadOnly = true;
-
-				// Switch the text of button Start
-				SwitchTextButtonStart();
-
-				// Start running a view
-				new Thread(() =>
-				{
-					new MainGame(this).Run();
-				}).Start();
-
-				// Collect host information from textboxes
-				string address = _tbAddress.Text;
-				int port = int.Parse(_tbPort.Text);
-				Tuple<string, int> host = new Tuple<string, int>(address, port);
-
-				// Connect in the background worker write,
-				// so the UI stays responsive
-				_bwWrite.RunWorkerAsync(host);
-			}
-			else /* Else if the button reads 'Stop simulatie' */
-			{
-				// User wants to cancel while connecting,
-				// so request cancellation of
-				// background worker write
-				_bwWrite.CancelAsync();
-			}
-		}
-		#endregion
-
 		#region Public methods
+		/// <summary>
+		/// Get multiplier, used by a view
+		/// </summary>
+		/// <returns></returns>
+		public int GetMultiplier()
+		{
+			// Return current multiplier value
+			return _multiplier;
+		}
+
 		/// <summary>
 		/// Set lane control, used by a view
 		/// </summary>
@@ -530,6 +416,144 @@ namespace KruispuntGroep4.Simulator.Communication
 		#endregion
 
 		#region Private methods
+		#region Events
+		/// <summary>
+		/// Button 'Laad invoerbestand',
+		/// to read JSON input file
+		/// </summary>
+		/// <param name="sender">Input Button</param>
+		/// <param name="e">Event args</param>
+		private void ClickInput(object sender, EventArgs e)
+		{
+			// Create open file dialog
+			FileDialog dialog = new OpenFileDialog();
+			DialogResult result = dialog.ShowDialog();
+
+			// If the dialog result is OK
+			if (result.Equals(DialogResult.OK))
+			{
+				// Hide button Input
+				_tableLayoutPanel2.Controls.Remove(_btnInput);
+
+				// Disable button Input
+				_btnInput.Enabled = false;
+
+				// Show progress bars
+				_tableLayoutPanel2.ColumnCount = 2;
+				_tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+				_tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+				_tableLayoutPanel2.Controls.Add(_progressBarFile, 0, 0);
+				_tableLayoutPanel2.Controls.Add(_progressBarMessages, 1, 0);
+				_tableLayoutPanel2.Height = 27;
+
+				// Read file in the background worker file,
+				// so the UI stays responsive
+				_bwInput.RunWorkerAsync(dialog.FileName);
+			}
+		}
+
+		/// <summary>
+		/// Button to decrease multiplier times two and send multiplier
+		/// </summary>
+		/// <param name="sender">Speed down Button</param>
+		/// <param name="e">Event args</param>
+		private void ClickSpeedDown(object sender, EventArgs e)
+		{
+			// Decrease the multiplier times two
+			_multiplier /= 2;
+
+			// Send multiplier to host
+			WriteMultiplierMessage();
+
+			// Speed value Label text is multiplier to string
+			_lblSpeedValue.Text = _multiplier.ToString();
+
+			// If the multiplier is less than 2
+			if (_multiplier < 2)
+			{
+				// Disable speed down Button
+				_btnSpeedDown.Enabled = false;
+			}
+			else /* Else if the multiplier equals or is greater than 2 */
+			{
+				// Enable speed up Button
+				_btnSpeedUp.Enabled = true;
+			}
+		}
+
+		/// <summary>
+		/// Button to increase multiplier times two and send multiplier
+		/// </summary>
+		/// <param name="sender">Speed up Button</param>
+		/// <param name="e">Event args</param>
+		private void ClickSpeedUp(object sender, EventArgs e)
+		{
+			// Increase the multiplier times two
+			_multiplier *= 2;
+
+			// Send multiplier to host
+			WriteMultiplierMessage();
+
+			// Speed value Label text is multiplier to string
+			_lblSpeedValue.Text = _multiplier.ToString();
+
+			// If the multiplier equals or is greater than 512
+			if (_multiplier >= 512)
+			{
+				// Disable speed up Button
+				_btnSpeedUp.Enabled = false;
+			}
+			else /* Else if the multiplier is less than 512 */
+			{
+				// Enable speed down Button
+				_btnSpeedDown.Enabled = true;
+			}
+		}
+
+		/// <summary>
+		/// Button 'Start simulatie', to run new view and to
+		/// connect to the specified host address and port
+		/// </summary>
+		/// <param name="sender">Start Button</param>
+		/// <param name="e">Event args</param>
+		private void ClickStart(object sender, EventArgs e)
+		{
+			// If the button reads 'Start simulatie'
+			if (_btnStart.Text.Equals(Strings.StartView))
+			{
+				// Disable buttons and enable read only textboxes
+				_btnInput.Enabled = false;
+				_tbAddress.ReadOnly = true;
+				_tbPort.ReadOnly = true;
+
+				// Switch the text of button Start
+				SwitchTextButtonStart();
+
+				// Start running a view
+				new Thread(() =>
+				{
+					new MainGame(this).Run();
+				}).Start();
+
+				// Collect host information from textboxes
+				string address = _tbAddress.Text;
+				int port = int.Parse(_tbPort.Text);
+				Tuple<string, int> host = new Tuple<string, int>(address, port);
+
+				// Connect in the background worker write,
+				// so the UI stays responsive
+				_bwWrite.RunWorkerAsync(host);
+			}
+			else /* Else if the button reads 'Stop simulatie' */
+			{
+				// User wants to cancel while connecting,
+				// so request cancellation of
+				// background worker write
+				_bwWrite.CancelAsync();
+			}
+		}
+		#endregion
+
 		/// <summary>
 		/// Display the specified message in the Console listbox
 		/// </summary>
@@ -555,11 +579,56 @@ namespace KruispuntGroep4.Simulator.Communication
 		}
 
 		/// <summary>
-		/// Read the JSON input file and spawn vehicles
+		/// Read the JSON input file
 		/// </summary>
 		/// <param name="sender">Background worker input</param>
 		/// <param name="e">Do work event args</param>
 		private void DoWorkInput(object sender, DoWorkEventArgs e)
+		{
+			BackgroundWorker backgroundWorkerInput = sender as BackgroundWorker;
+
+			// Read JSON from selected file
+			_json = File.ReadAllLines(e.Argument.ToString());
+			int count = _json.Length;
+
+			for (int i = 0; i < count; i++)
+			{
+				// Create percentage from i and count
+				float percentage = ((float)i / (float)_json.Length) * 100f;
+
+				// Report the user the progress of reading a file
+				backgroundWorkerInput.ReportProgress((int)percentage, Strings.ProgressBarFile);
+			}
+
+			if (_json[0].StartsWith(Strings.BraceOpen))
+			{
+				// Convert JSON object to message
+				_json[0] = JsonObjectToMessage();
+			}
+			else if (_json[0].StartsWith(Strings.BracketOpen))
+			{
+				// Convert JSON array to messages
+				_json = JsonArrayToMessages(backgroundWorkerInput);
+			}
+		}
+
+		/// <summary>
+		/// Read a message from the host
+		/// </summary>
+		/// <param name="sender">Background worker read</param>
+		/// <param name="e">Do work event args</param>
+		private void DoWorkReading(object sender, DoWorkEventArgs e)
+		{
+			// The result is the received message
+			e.Result = ReadMessage();
+		}
+
+		/// <summary>
+		/// Spawn vehicles
+		/// </summary>
+		/// <param name="sender">Background worker spawn</param>
+		/// <param name="e">Do work event args</param>
+		private void DoWorkSpawning(object sender, DoWorkEventArgs e)
 		{
 			// Initialize previous time
 			int previousTime = -1;
@@ -619,17 +688,6 @@ namespace KruispuntGroep4.Simulator.Communication
 				// The previous time is time
 				previousTime = time;
 			}
-		}
-
-		/// <summary>
-		/// Read a message from the host
-		/// </summary>
-		/// <param name="sender">Background worker read</param>
-		/// <param name="e">Do work event args</param>
-		private void DoWorkReading(object sender, DoWorkEventArgs e)
-		{
-			// The result is the received message
-			e.Result = ReadMessage();
 		}
 
 		/// <summary>
@@ -716,7 +774,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// Convert JSON array to messages
 		/// </summary>
 		/// <returns>Readable JSON messages</returns>
-		private string[] JsonArrayToMessages()
+		private string[] JsonArrayToMessages(BackgroundWorker backgroundWorkerInput)
 		{
 			// Initialize list of messages
 			List<string> messages = new List<string>();
@@ -754,6 +812,12 @@ namespace KruispuntGroep4.Simulator.Communication
 
 				// Add this message to the list of messages
 				messages.Add(message);
+
+				// Create percentage from i and count
+				float percentage = ((float)i / (float)count) * 100f;
+
+				// Report the user the progress of converting a JSON array to messages
+				backgroundWorkerInput.ReportProgress((int)percentage, Strings.ProgressBarMessages);
 			}
 
 			// Convert the list of messages to a string array,
@@ -795,6 +859,27 @@ namespace KruispuntGroep4.Simulator.Communication
 		}
 
 		/// <summary>
+		/// Display the progress in the specified progress bar
+		/// </summary>
+		/// <param name="sender">Background worker input</param>
+		/// <param name="e">Specified progress bar as property user state and progress percentage</param>
+		private void ProgressChangedInput(object sender, ProgressChangedEventArgs e)
+		{
+			// Which progress bar is it?
+			switch (e.UserState.ToString())
+			{
+				case Strings.ProgressBarFile: /* It is the file Progress bar */
+					// Display progress in the file Progress bar
+					_progressBarFile.Value = e.ProgressPercentage;
+					break;
+				case Strings.ProgressBarMessages: /* It is the messages Progress bar */
+					// Display progress in the messages Progress bar
+					_progressBarMessages.Value = e.ProgressPercentage;
+					break;
+			}
+		}
+
+		/// <summary>
 		/// Display an error message in case of socket exception while connecting
 		/// </summary>
 		/// <param name="sender">Background worker write</param>
@@ -802,7 +887,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		private void ProgressChangedWriting(object sender, ProgressChangedEventArgs e)
 		{
 			// Display error message
-			DisplayMessage(e.UserState as string);
+			DisplayMessage(e.UserState.ToString());
 		}
 
 		/// <summary>
@@ -847,18 +932,23 @@ namespace KruispuntGroep4.Simulator.Communication
 		}
 
 		/// <summary>
-		/// Display a message saying all input JSONs are sent
+		/// Enable button Start
 		/// </summary>
 		/// <param name="sender">Background worker input</param>
 		/// <param name="e">Run worker completed event args</param>
 		private void RunWorkerCompletedInput(object sender, RunWorkerCompletedEventArgs e)
 		{
-			// Disable speed down/up Buttons
-			_btnSpeedDown.Enabled = false;
-			_btnSpeedUp.Enabled = false;
+			// Hide progress bars
+			_tableLayoutPanel2.ColumnCount = 1;
+			_tableLayoutPanel2.Controls.Remove(_progressBarFile);
+			_tableLayoutPanel2.Controls.Remove(_progressBarMessages);
+			_tableLayoutPanel2.Height = 24;
 
-			// Display all input JSONs sent message
-			DisplayMessage(Strings.Sent + Strings.Space + Strings.AllInputJsons);
+			// Show button Input
+			_tableLayoutPanel2.Controls.Add(_btnInput);
+
+			// Enable button Start
+			_btnStart.Enabled = true;
 		}
 
 		/// <summary>
@@ -870,7 +960,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		private void RunWorkerCompletedReading(object sender, RunWorkerCompletedEventArgs e)
 		{
 			// Create the received message from the result
-			string message = e.Result as string;
+			string message = e.Result.ToString();
 
 			// If the message probably is valid JSON
 			if (message.StartsWith(Strings.BraceOpen) ||
@@ -924,6 +1014,21 @@ namespace KruispuntGroep4.Simulator.Communication
 		}
 
 		/// <summary>
+		/// Display a message saying all input JSONs are sent
+		/// </summary>
+		/// <param name="sender">Background worker spawn</param>
+		/// <param name="e">Run worker completed event args</param>
+		private void RunWorkerCompletedSpawning(object sender, RunWorkerCompletedEventArgs e)
+		{
+			// Disable speed down/up Buttons
+			_btnSpeedDown.Enabled = false;
+			_btnSpeedUp.Enabled = false;
+
+			// Display all input JSONs sent message
+			DisplayMessage(Strings.Sent + Strings.Space + Strings.AllInputJsons);
+		}
+
+		/// <summary>
 		/// When the background work is done, enables buttons and textboxes
 		/// When the user didn't interfere, a success message is displayed
 		/// </summary>
@@ -947,7 +1052,7 @@ namespace KruispuntGroep4.Simulator.Communication
 				_btnStart.Enabled = false;
 
 				// Display success message
-				DisplayMessage(e.Result as string);
+				DisplayMessage(e.Result.ToString());
 
 				// Wait for lane control
 				while (_laneControl == null) { }
@@ -980,7 +1085,7 @@ namespace KruispuntGroep4.Simulator.Communication
 				_btnSpeedUp.Enabled = true;
 
 				// Spawn all vehicles from the JSON input file in the background
-				_bwInput.RunWorkerAsync();
+				_bwSpawn.RunWorkerAsync();
 			}
 		}
 
