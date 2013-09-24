@@ -46,7 +46,7 @@ namespace KruispuntGroep4.Simulator.Main
                 {
                     lines.Add(line);
                     if (!Int32.Equals(line.Length, width))
-                        throw new Exception(string.Format(Strings.LineException, lines.Count));
+                        throw new Exception(string.Format(Strings.ExceptionLevelLine, lines.Count));
                     line = reader.ReadLine();
                 }
             }
@@ -226,7 +226,7 @@ namespace KruispuntGroep4.Simulator.Main
 
                 // Unknown tile type character
                 default:
-                    throw new NotSupportedException(string.Format("Unsupported tile type character '{0}' at position {1}, {2}.", tileType, x, y));
+                    throw new NotSupportedException(string.Format(Strings.ExceptionTileType, tileType, x, y));
             }
         }
 

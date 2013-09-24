@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using KruispuntGroep4.Globals;
 using KruispuntGroep4.Simulator.Globals;
 using KruispuntGroep4.Simulator.Objects;
 using Microsoft.Xna.Framework;
@@ -34,13 +35,13 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 
             switch (laneID[0])
             {
-                case 'N': opposite = "S";
+                case 'N': opposite = Strings.DirectionSouth;
                     break;
-                case 'E': opposite = "W";
+                case 'E': opposite = Strings.DirectionWest;
                     break;
-                case 'S': opposite = "N";
+                case 'S': opposite = Strings.DirectionNorth;
                     break;
-                case 'W': opposite = "E";
+                case 'W': opposite = Strings.DirectionEast;
                     break;               
             }
 
@@ -111,13 +112,13 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             #region vehicle creation
             switch (vehicleType)
             {
-				case VehicleTypeEnum.pedestrian: newVehicle = new Vehicle(Textures.Pedestrian, vehicleID, VehicleTypeEnum.pedestrian, 1.1f);
+				case VehicleTypeEnum.pedestrian: newVehicle = new Vehicle(Textures.Pedestrian, vehicleID, VehicleTypeEnum.pedestrian, 0.25f);
 					break;
-				case VehicleTypeEnum.bicycle: newVehicle = new Vehicle(Textures.Bike, vehicleID, VehicleTypeEnum.bicycle, 1.4f);
+				case VehicleTypeEnum.bicycle: newVehicle = new Vehicle(Textures.Bike, vehicleID, VehicleTypeEnum.bicycle, 1f);
 					break;
-                case VehicleTypeEnum.bus: newVehicle = new Vehicle(Textures.Bus, vehicleID, VehicleTypeEnum.bus, 1.7f);
+                case VehicleTypeEnum.bus: newVehicle = new Vehicle(Textures.Bus, vehicleID, VehicleTypeEnum.bus, 1.25f);
                     break;
-                case VehicleTypeEnum.car: newVehicle = new Vehicle(Textures.Car, vehicleID, VehicleTypeEnum.car, 2f);
+                case VehicleTypeEnum.car: newVehicle = new Vehicle(Textures.Car, vehicleID, VehicleTypeEnum.car, 1.5f);
                     break; 
             }
             #endregion
@@ -127,32 +128,32 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             #region vehicle route
             switch (spawnLaneID[0].ToString() + destinationLaneID[0].ToString())
             {
-                case "NE": newVehicle.path = PathsEnum.NorthToEast;
+                case Strings.PathNorthEast: newVehicle.path = PathsEnum.NorthToEast;
                     break;
-                case "NS": newVehicle.path = PathsEnum.NorthToSouth;
+                case Strings.PathNorthSouth: newVehicle.path = PathsEnum.NorthToSouth;
                     break;
-                case "NW": newVehicle.path = PathsEnum.NorthToWest;
-                    break;
-
-                case "ES": newVehicle.path = PathsEnum.EastToSouth;
-                    break;
-                case "EW": newVehicle.path = PathsEnum.EastToWest;
-                    break;
-                case "EN": newVehicle.path = PathsEnum.EastToNorth;
+                case Strings.PathNorthWest: newVehicle.path = PathsEnum.NorthToWest;
                     break;
 
-                case "SW": newVehicle.path = PathsEnum.SouthToWest;
+                case Strings.PathEastSouth: newVehicle.path = PathsEnum.EastToSouth;
                     break;
-                case "SN": newVehicle.path = PathsEnum.SouthToNorth;
+                case Strings.PathEastWest: newVehicle.path = PathsEnum.EastToWest;
                     break;
-                case "SE": newVehicle.path = PathsEnum.SouthToEast;
+                case Strings.PathEastNorth: newVehicle.path = PathsEnum.EastToNorth;
                     break;
 
-                case "WN": newVehicle.path = PathsEnum.WestToNorth;
+                case Strings.PathSouthWest: newVehicle.path = PathsEnum.SouthToWest;
                     break;
-                case "WE": newVehicle.path = PathsEnum.WestToEast;
+                case Strings.PathSouthNorth: newVehicle.path = PathsEnum.SouthToNorth;
                     break;
-                case "WS": newVehicle.path = PathsEnum.WestToSouth;
+                case Strings.PathSouthEast: newVehicle.path = PathsEnum.SouthToEast;
+                    break;
+
+                case Strings.PathWestNorth: newVehicle.path = PathsEnum.WestToNorth;
+                    break;
+                case Strings.PathWestEast: newVehicle.path = PathsEnum.WestToEast;
+                    break;
+                case Strings.PathWestSouth: newVehicle.path = PathsEnum.WestToSouth;
                     break;
             }
             #endregion

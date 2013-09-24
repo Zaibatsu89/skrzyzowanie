@@ -42,10 +42,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     //update rotation of the vehicle 
                     if (!vehicle.stopRedLight && !vehicle.stopCar)
                     {
-						// get multiplier
-						int multiplier = communicationForm.GetMultiplier();
-						vehicle.speed *= multiplier;
-
                         switch (vehicle.rotation)
                         {
                             case RotationEnum.North:
@@ -69,8 +65,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                                 vehicle.collission = new Rectangle((int)vehicle.position.X, (int)vehicle.position.Y, vehicle.sprite.Width, vehicle.sprite.Height);
                                 break;
                         }
-
-						vehicle.speed /= multiplier;
                     }
                 }
             }
@@ -229,7 +223,7 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             else
             {
                 nrOfTries = 0;
-                throw new Exception("Vehicle cannot find path");
+                throw new Exception(Strings.ExceptionPath);
             }
         }
 
@@ -321,6 +315,29 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                             }
                             vehicle.stopCar = false;
                             vehicle.occupyingtile += new Vector2(x, y);
+
+							// TODO: remove this code when the pathfinding is completed
+							Rectangle cross1 = new Rectangle(7, 6, 2, 2);
+							Rectangle cross2 = new Rectangle(7, 14, 2, 2);
+							Rectangle cross3 = new Rectangle(15, 6, 2, 2);
+							Rectangle cross4 = new Rectangle(15, 14, 2, 2);
+
+							if (cross1.Contains(new Point((int)tile.GridCoordinates.X, (int)tile.GridCoordinates.Y)) ||
+								cross2.Contains(new Point((int)tile.GridCoordinates.X, (int)tile.GridCoordinates.Y)) ||
+								cross3.Contains(new Point((int)tile.GridCoordinates.X, (int)tile.GridCoordinates.Y)) ||
+								cross4.Contains(new Point((int)tile.GridCoordinates.X, (int)tile.GridCoordinates.Y)))
+							{
+								// remove pedestrian, because it has made a collision
+								vehicle.alive = false;
+
+								//Free up the last tile it was on
+								lists.Tiles[(int)vehicle.occupyingtile.X, (int)vehicle.occupyingtile.Y].OccupiedID = string.Empty;
+								lists.Tiles[(int)vehicle.occupyingtile.X, (int)vehicle.occupyingtile.Y].isOccupied = false;
+
+								//Remove the vehicle from the master list and the lane
+								lists.Vehicles.Remove(vehicle);
+								vehicle.currentLane.laneVehicles.Remove(vehicle);
+							}
                         }
                     }
                 }

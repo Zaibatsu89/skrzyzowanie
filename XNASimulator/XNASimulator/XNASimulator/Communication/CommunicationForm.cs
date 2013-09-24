@@ -49,10 +49,18 @@ namespace KruispuntGroep4.Simulator.Communication
 			InitializeBackgroundWorkerRead();
 			InitializeBackgroundWorkerSpawn();
 			InitializeBackgroundWorkerWrite();
+
+			// Initialize attributes
+			_multiplier = 1;
+			_tbAddress.Text = CreateAddress();
+			_timeSpanSleep = new TimeSpan(100000000);
+			SwitchTextButtonStart();
 		}
 
+		/* UNDONE
 		// Appoint delegates
 		delegate void DisplayMessageDelegate(string message);
+		 */
 
 		// Appoint private attributes
 		private BackgroundWorker _bwInput;
@@ -65,15 +73,24 @@ namespace KruispuntGroep4.Simulator.Communication
 		private IContainer _components = null;
 		private string[] _json;
 		private LaneControl _laneControl;
+		private Label _lblAddress;
+		private Label _lblPort;
+		private Label _lblSpeedKey;
 		private Label _lblSpeedValue;
 		private int _multiplier;
 		private ProgressBar _progressBarFile;
 		private ProgressBar _progressBarMessages;
 		private TableLayoutPanel _tableLayoutPanel1,
 			_tableLayoutPanel2, _tableLayoutPanel3,
-			_tableLayoutPanel4, _tableLayoutPanel5;
-		private TextBox _tbAddress, _tbConsole,
-			_tbPort;
+			_tableLayoutPanel4;
+		/* UNDONE
+		private TableLayoutPanel _tableLayoutPanel5;
+		 */
+		private TextBox _tbAddress, _tbPort;
+		/* UNDONE
+		private TextBox _tbConsole;
+		 */
+		private TimeSpan _timeSpanSleep;
 
 		/// <summary>
 		/// Dispose the form
@@ -97,6 +114,11 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// </summary>
 		private void InitializeBackgroundWorkerInput()
 		{
+			// Appoint input Background worker
+			_bwInput = new BackgroundWorker();
+			_bwInput.WorkerReportsProgress = true;
+
+			// Appoint input Background worker events
 			_bwInput.DoWork += new DoWorkEventHandler(DoWorkInput);
 			_bwInput.ProgressChanged += new ProgressChangedEventHandler(ProgressChangedInput);
 			_bwInput.RunWorkerCompleted += new RunWorkerCompletedEventHandler(RunWorkerCompletedInput);
@@ -107,6 +129,10 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// </summary>
 		private void InitializeBackgroundWorkerRead()
 		{
+			// Appoint read Background worker
+			_bwRead = new BackgroundWorker();
+
+			// Appoint read Background worker events
 			_bwRead.DoWork += new DoWorkEventHandler(DoWorkReading);
 			_bwRead.RunWorkerCompleted += new RunWorkerCompletedEventHandler(RunWorkerCompletedReading);
 		}
@@ -116,6 +142,10 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// </summary>
 		private void InitializeBackgroundWorkerSpawn()
 		{
+			// Appoint spawn Background worker
+			_bwSpawn = new BackgroundWorker();
+
+			// Appoint spawn Background worker events
 			_bwSpawn.DoWork += new DoWorkEventHandler(DoWorkSpawning);
 			_bwSpawn.RunWorkerCompleted += new RunWorkerCompletedEventHandler(RunWorkerCompletedSpawning);
 		}
@@ -125,8 +155,18 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// </summary>
 		private void InitializeBackgroundWorkerWrite()
 		{
+			// Appoint write Background worker
+			_bwWrite = new BackgroundWorker();
+			/* UNDONE
+			_bwWrite.WorkerReportsProgress = true;
+			 */
+			_bwWrite.WorkerSupportsCancellation = true;
+
+			// Appoint write Background worker events
 			_bwWrite.DoWork += new DoWorkEventHandler(DoWorkWriting);
+			/* UNDONE
 			_bwWrite.ProgressChanged += new ProgressChangedEventHandler(ProgressChangedWriting);
+			 */
 			_bwWrite.RunWorkerCompleted += new RunWorkerCompletedEventHandler(RunWorkerCompletedWriting);
 		}
 
@@ -136,228 +176,287 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// </summary>
 		private void InitializeComponent()
 		{
-			// Initialize private attributes
-			_bwInput = new BackgroundWorker();
-			_bwInput.WorkerReportsProgress = true;
-			_bwRead = new BackgroundWorker();
-			_bwSpawn = new BackgroundWorker();
-			_bwWrite = new BackgroundWorker();
-			_bwWrite.WorkerReportsProgress = true;
-			_bwWrite.WorkerSupportsCancellation = true;
-			_btnInput = new Button();
-			_btnSpeedDown = new Button();
-			_btnSpeedUp = new Button();
-			_btnStart = new Button();
-			_lblSpeedValue = new Label();
-			_multiplier = 1;
-			_progressBarFile = new ProgressBar();
-			_progressBarMessages = new ProgressBar();
-			_tableLayoutPanel1 = new TableLayoutPanel();
-			_tableLayoutPanel2 = new TableLayoutPanel();
-			_tableLayoutPanel3 = new TableLayoutPanel();
-			_tableLayoutPanel4 = new TableLayoutPanel();
-			_tableLayoutPanel5 = new TableLayoutPanel();
-			_tbAddress = new TextBox();
-			_tbConsole = new TextBox();
-			_tbPort = new TextBox();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CommunicationForm));
+			this._btnInput = new System.Windows.Forms.Button();
+			this._btnSpeedDown = new System.Windows.Forms.Button();
+			this._btnSpeedUp = new System.Windows.Forms.Button();
+			this._btnStart = new System.Windows.Forms.Button();
+			this._lblSpeedValue = new System.Windows.Forms.Label();
+			this._progressBarFile = new System.Windows.Forms.ProgressBar();
+			this._progressBarMessages = new System.Windows.Forms.ProgressBar();
+			this._tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+			this._lblAddress = new System.Windows.Forms.Label();
+			this._tbAddress = new System.Windows.Forms.TextBox();
+			this._lblPort = new System.Windows.Forms.Label();
+			this._tbPort = new System.Windows.Forms.TextBox();
+			this._tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+			this._tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+			this._tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+			this._lblSpeedKey = new System.Windows.Forms.Label();
+			/* UNDONE
+			this._tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
+			this._tbConsole = new System.Windows.Forms.TextBox();
+			 */
+			this._tableLayoutPanel1.SuspendLayout();
+			this._tableLayoutPanel2.SuspendLayout();
+			this._tableLayoutPanel3.SuspendLayout();
+			this._tableLayoutPanel4.SuspendLayout();
+			/* UNDONE
+			this._tableLayoutPanel5.SuspendLayout();
+			 */
+			this.SuspendLayout();
+			// 
+			// _btnInput
+			// 
+			this._btnInput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this._btnInput.Location = new System.Drawing.Point(3, 3);
+			this._btnInput.Name = "_btnInput";
+			this._btnInput.Size = new System.Drawing.Size(309, 21);
+			this._btnInput.TabIndex = 0;
+			this._btnInput.Text = "Laad invoerbestand";
+			this._btnInput.Click += new System.EventHandler(this.ClickInput);
+			// 
+			// _btnSpeedDown
+			// 
+			this._btnSpeedDown.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this._btnSpeedDown.Enabled = false;
+			this._btnSpeedDown.Location = new System.Drawing.Point(159, 3);
+			this._btnSpeedDown.Name = "_btnSpeedDown";
+			this._btnSpeedDown.Size = new System.Drawing.Size(72, 21);
+			this._btnSpeedDown.TabIndex = 2;
+			this._btnSpeedDown.Text = "<";
+			this._btnSpeedDown.Click += new System.EventHandler(this.ClickSpeedDown);
+			// 
+			// _btnSpeedUp
+			// 
+			this._btnSpeedUp.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this._btnSpeedUp.Enabled = false;
+			this._btnSpeedUp.Location = new System.Drawing.Point(237, 3);
+			this._btnSpeedUp.Name = "_btnSpeedUp";
+			this._btnSpeedUp.Size = new System.Drawing.Size(75, 21);
+			this._btnSpeedUp.TabIndex = 3;
+			this._btnSpeedUp.Text = ">";
+			this._btnSpeedUp.Click += new System.EventHandler(this.ClickSpeedUp);
+			// 
+			// _btnStart
+			// 
+			this._btnStart.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this._btnStart.Enabled = false;
+			this._btnStart.Location = new System.Drawing.Point(3, 3);
+			this._btnStart.Name = "_btnStart";
+			this._btnStart.Size = new System.Drawing.Size(309, 21);
+			this._btnStart.TabIndex = 0;
+			this._btnStart.Click += new System.EventHandler(this.ClickStart);
+			// 
+			// _lblSpeedValue
+			// 
+			this._lblSpeedValue.Anchor = System.Windows.Forms.AnchorStyles.Left;
+			this._lblSpeedValue.AutoSize = true;
+			this._lblSpeedValue.Location = new System.Drawing.Point(81, 7);
+			this._lblSpeedValue.Name = "_lblSpeedValue";
+			this._lblSpeedValue.Size = new System.Drawing.Size(13, 13);
+			this._lblSpeedValue.TabIndex = 1;
+			this._lblSpeedValue.Text = "1";
+			// 
+			// _progressBarFile
+			// 
+			this._progressBarFile.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this._progressBarFile.ForeColor = System.Drawing.Color.Black;
+			this._progressBarFile.Location = new System.Drawing.Point(0, 0);
+			this._progressBarFile.Name = "_progressBarFile";
+			this._progressBarFile.Size = new System.Drawing.Size(100, 23);
+			this._progressBarFile.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+			this._progressBarFile.TabIndex = 0;
+			// 
+			// _progressBarMessages
+			// 
+			this._progressBarMessages.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this._progressBarMessages.ForeColor = System.Drawing.Color.Black;
+			this._progressBarMessages.Location = new System.Drawing.Point(0, 0);
+			this._progressBarMessages.Name = "_progressBarMessages";
+			this._progressBarMessages.Size = new System.Drawing.Size(100, 23);
+			this._progressBarMessages.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+			this._progressBarMessages.TabIndex = 0;
+			// 
+			// _tableLayoutPanel1
+			// 
+			this._tableLayoutPanel1.ColumnCount = 4;
+			this._tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10F));
+			this._tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 40F));
+			this._tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this._tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this._tableLayoutPanel1.Controls.Add(this._lblAddress, 0, 0);
+			this._tableLayoutPanel1.Controls.Add(this._tbAddress, 1, 0);
+			this._tableLayoutPanel1.Controls.Add(this._lblPort, 2, 0);
+			this._tableLayoutPanel1.Controls.Add(this._tbPort, 3, 0);
+			this._tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+			this._tableLayoutPanel1.Name = "_tableLayoutPanel1";
+			this._tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this._tableLayoutPanel1.Size = new System.Drawing.Size(315, 24);
+			this._tableLayoutPanel1.TabIndex = 0;
+			// 
+			// lblAddress
+			// 
+			this._lblAddress.Anchor = System.Windows.Forms.AnchorStyles.Right;
+			this._lblAddress.AutoSize = true;
+			this._lblAddress.Location = new System.Drawing.Point(8, 5);
+			this._lblAddress.Name = "lblAddress";
+			this._lblAddress.Size = new System.Drawing.Size(20, 13);
+			this._lblAddress.TabIndex = 0;
+			this._lblAddress.Text = "IP:";
+			// 
+			// _tbAddress
+			// 
+			this._tbAddress.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+			this._tbAddress.Location = new System.Drawing.Point(34, 3);
+			this._tbAddress.Name = "_tbAddress";
+			this._tbAddress.Size = new System.Drawing.Size(120, 20);
+			this._tbAddress.TabIndex = 1;
+			// 
+			// lblPort
+			// 
+			this._lblPort.Anchor = System.Windows.Forms.AnchorStyles.Right;
+			this._lblPort.AutoSize = true;
+			this._lblPort.Location = new System.Drawing.Point(197, 5);
+			this._lblPort.Name = "lblPort";
+			this._lblPort.Size = new System.Drawing.Size(35, 13);
+			this._lblPort.TabIndex = 2;
+			this._lblPort.Text = "Poort:";
+			// 
+			// _tbPort
+			// 
+			this._tbPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+			this._tbPort.Location = new System.Drawing.Point(238, 3);
+			this._tbPort.Name = "_tbPort";
+			this._tbPort.Size = new System.Drawing.Size(74, 20);
+			this._tbPort.TabIndex = 3;
+			this._tbPort.Text = "1337";
+			// 
+			// _tableLayoutPanel2
+			// 
+			this._tableLayoutPanel2.ColumnCount = 1;
+			this._tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this._tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this._tableLayoutPanel2.Controls.Add(this._btnInput, 0, 0);
+			this._tableLayoutPanel2.Location = new System.Drawing.Point(0, 22);
+			this._tableLayoutPanel2.Name = "_tableLayoutPanel2";
+			this._tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+			this._tableLayoutPanel2.Size = new System.Drawing.Size(315, 27);
+			this._tableLayoutPanel2.TabIndex = 1;
+			// 
+			// _tableLayoutPanel3
+			// 
+			this._tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this._tableLayoutPanel3.Controls.Add(this._btnStart, 0, 0);
+			this._tableLayoutPanel3.Location = new System.Drawing.Point(0, 45);
+			this._tableLayoutPanel3.Name = "_tableLayoutPanel3";
+			this._tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this._tableLayoutPanel3.Size = new System.Drawing.Size(315, 27);
+			this._tableLayoutPanel3.TabIndex = 2;
+			// 
+			// _tableLayoutPanel4
+			// 
+			this._tableLayoutPanel4.ColumnCount = 4;
+			this._tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this._tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this._tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this._tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+			this._tableLayoutPanel4.Controls.Add(this._lblSpeedKey, 0, 0);
+			this._tableLayoutPanel4.Controls.Add(this._lblSpeedValue, 1, 0);
+			this._tableLayoutPanel4.Controls.Add(this._btnSpeedDown, 2, 0);
+			this._tableLayoutPanel4.Controls.Add(this._btnSpeedUp, 3, 0);
+			this._tableLayoutPanel4.Location = new System.Drawing.Point(0, 68);
+			this._tableLayoutPanel4.Name = "_tableLayoutPanel4";
+			this._tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this._tableLayoutPanel4.Size = new System.Drawing.Size(315, 27);
+			this._tableLayoutPanel4.TabIndex = 3;
+			// 
+			// lblSpeedKey
+			// 
+			this._lblSpeedKey.Anchor = System.Windows.Forms.AnchorStyles.Right;
+			this._lblSpeedKey.AutoSize = true;
+			this._lblSpeedKey.Location = new System.Drawing.Point(24, 7);
+			this._lblSpeedKey.Name = "lblSpeedKey";
+			this._lblSpeedKey.Size = new System.Drawing.Size(51, 13);
+			this._lblSpeedKey.TabIndex = 0;
+			this._lblSpeedKey.Text = "Snelheid:";
+			/* UNDONE
+			// 
+			// _tableLayoutPanel5
+			// 
+			this._tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this._tableLayoutPanel5.Controls.Add(this._tbConsole, 0, 0);
+			this._tableLayoutPanel5.Location = new System.Drawing.Point(0, 92);
+			this._tableLayoutPanel5.Name = "_tableLayoutPanel5";
+			this._tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this._tableLayoutPanel5.Size = new System.Drawing.Size(315, 640);
+			this._tableLayoutPanel5.TabIndex = 4;
+			// 
+			// _tbConsole
+			// 
+			this._tbConsole.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this._tbConsole.Location = new System.Drawing.Point(3, 3);
+			this._tbConsole.Multiline = true;
+			this._tbConsole.Name = "_tbConsole";
+			this._tbConsole.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+			this._tbConsole.Size = new System.Drawing.Size(309, 634);
+			this._tbConsole.TabIndex = 0;
+			 */
+			// 
+			// CommunicationForm
+			// 
+			/* UNDONE
+			this.ClientSize = new System.Drawing.Size(315, 732);
+			 */
+			this.ClientSize = new System.Drawing.Size(315, 95);
+			this.Controls.Add(this._tableLayoutPanel1);
+			this.Controls.Add(this._tableLayoutPanel2);
+			this.Controls.Add(this._tableLayoutPanel3);
+			this.Controls.Add(this._tableLayoutPanel4);
+			/* UNDONE
+			this.Controls.Add(this._tableLayoutPanel5);
+			 */
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.Location = global::KruispuntGroep4.Simulator.Settings.Default.Location;
+			this.MaximizeBox = false;
+			this.Name = "CommunicationForm";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
+			this.Text = "Communicatie - SEN Groep 4";
+			this._tableLayoutPanel1.ResumeLayout(false);
+			this._tableLayoutPanel1.PerformLayout();
+			this._tableLayoutPanel2.ResumeLayout(false);
+			this._tableLayoutPanel3.ResumeLayout(false);
+			this._tableLayoutPanel4.ResumeLayout(false);
+			this._tableLayoutPanel4.PerformLayout();
+			/* UNDONE
+			this._tableLayoutPanel5.ResumeLayout(false);
+			this._tableLayoutPanel5.PerformLayout();
+			 */
+			this.ResumeLayout(false);
 
-			// Temporary suspend the layout logic for the form
-			SuspendLayout();
-
-			// Create address label
-			Label lblAddress = new Label();
-			// Position this label to the right
-			// in the table layout panel
-			lblAddress.Anchor = AnchorStyles.Right;
-			lblAddress.AutoSize = true;
-			lblAddress.Text = Strings.AddressKey;
-
-			// Create port label
-			Label lblPort = new Label();
-			// Position this label to the right
-			// in the table layout panel
-			lblPort.Anchor = AnchorStyles.Right;
-			lblPort.AutoSize = true;
-			lblPort.Text = Strings.PortKey;
-
-			// Position this label to the left and
-			// the right in the table layout panel
-			_tbAddress.Anchor =
-				(AnchorStyles)((AnchorStyles.Left |
-				AnchorStyles.Right));
-			_tbAddress.Text = GetAddress();
-
-			// Position this label to the left and
-			// the right in the table layout panel
-			_tbPort.Anchor =
-				(AnchorStyles)((AnchorStyles.Left |
-				AnchorStyles.Right));
-			_tbPort.Text = Strings.PortValue;
-
- 			// Set first table layout panel
-			_tableLayoutPanel1.ColumnCount = 4;
-			_tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10F));
-			_tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
-			_tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-			_tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-			_tableLayoutPanel1.Controls.Add(lblAddress, 0, 0);
-			_tableLayoutPanel1.Controls.Add(_tbAddress, 1, 0);
-			_tableLayoutPanel1.Controls.Add(lblPort, 2, 0);
-			_tableLayoutPanel1.Controls.Add(_tbPort, 3, 0);
-			_tableLayoutPanel1.Location = new Point(0, 0);
-			_tableLayoutPanel1.Size = new Size(315, 28);
-
-			// Position this button to all directions
-			// in the table layout panel
-			_btnInput.Anchor =
-				(AnchorStyles)((((AnchorStyles.Top |
-				AnchorStyles.Bottom) | AnchorStyles.Left) |
-				AnchorStyles.Right));
-			_btnInput.Click += new EventHandler(ClickInput);
-			_btnInput.Text = Strings.Input;
-
-			// Position this progress bar to all directions
-			// in the table layout panel
-			_progressBarFile.Anchor =
-			(AnchorStyles)((((AnchorStyles.Top |
-			AnchorStyles.Bottom) | AnchorStyles.Left) |
-			AnchorStyles.Right));
-			_progressBarFile.ForeColor = Color.Black;
-			_progressBarFile.Style = ProgressBarStyle.Continuous;
-
-			// Position this progress bar to all directions
-			// in the table layout panel
-			_progressBarMessages.Anchor =
-			(AnchorStyles)((((AnchorStyles.Top |
-			AnchorStyles.Bottom) | AnchorStyles.Left) |
-			AnchorStyles.Right));
-			_progressBarMessages.ForeColor = Color.Black;
-			_progressBarMessages.Style = ProgressBarStyle.Continuous;
-
-			// Set second table layout panel
-			_tableLayoutPanel2.Controls.Add(_btnInput, 0, 0);
-			_tableLayoutPanel2.Location = new Point(0, 30);
-			_tableLayoutPanel2.Size = new Size(315, 30);
-
-			// Position this button to all directions
-			// in the table layout panel
-			_btnStart.Anchor =
-				(AnchorStyles)((((AnchorStyles.Top |
-				AnchorStyles.Bottom) | AnchorStyles.Left) |
-				AnchorStyles.Right));
-			_btnStart.Click += new EventHandler(ClickStart);
-			_btnStart.Enabled = false;
-			// Switch the text of button Start
-			SwitchTextButtonStart();
-
-			// Set third table layout panel
-			_tableLayoutPanel3.Controls.Add(_btnStart, 0, 0);
-			_tableLayoutPanel3.Location = new Point(0, 60);
-			_tableLayoutPanel3.Size = new Size(315, 30);
-
-			// Position this button to all directions
-			// in the table layout panel
-			_btnSpeedDown = new Button();
-			_btnSpeedDown.Anchor =
-				(AnchorStyles)((((AnchorStyles.Top |
-				AnchorStyles.Bottom) | AnchorStyles.Left) |
-				AnchorStyles.Right));
-			_btnSpeedDown.Click += new EventHandler(ClickSpeedDown);
-			_btnSpeedDown.Enabled = false;
-			_btnSpeedDown.Text = Strings.SpeedDown;
-
-			// Position this button to all directions
-			// in the table layout panel
-			_btnSpeedUp = new Button();
-			_btnSpeedUp.Anchor =
-				(AnchorStyles)((((AnchorStyles.Top |
-				AnchorStyles.Bottom) | AnchorStyles.Left) |
-				AnchorStyles.Right));
-			_btnSpeedUp.Click += new EventHandler(ClickSpeedUp);
-			_btnSpeedUp.Enabled = false;
-			_btnSpeedUp.Text = Strings.SpeedUp;
-
-			// Create speed key label
-			Label lblSpeedKey = new Label();
-			// Position this label to the right
-			// in the table layout panel
-			lblSpeedKey.Anchor = AnchorStyles.Right;
-			lblSpeedKey.AutoSize = true;
-			lblSpeedKey.Text = Strings.SpeedKey;
-
-			// Create speed value label
-			_lblSpeedValue = new Label();
-			// Position this label to the left
-			// in the table layout panel
-			_lblSpeedValue.Anchor = AnchorStyles.Left;
-			_lblSpeedValue.AutoSize = true;
-			_lblSpeedValue.Text = Strings.SpeedValue;
-
-			// Set fourth table layout panel
-			_tableLayoutPanel4.ColumnCount = 4;
-			_tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-			_tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-			_tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-			_tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-			_tableLayoutPanel4.Controls.Add(lblSpeedKey, 0, 0);
-			_tableLayoutPanel4.Controls.Add(_lblSpeedValue, 1, 0);
-			_tableLayoutPanel4.Controls.Add(_btnSpeedDown, 2, 0);
-			_tableLayoutPanel4.Controls.Add(_btnSpeedUp, 3, 0);
-			_tableLayoutPanel4.Location = new Point(0, 90);
-			_tableLayoutPanel4.Size = new Size(315, 30);
-
-			// Position this textbox to all directions
-			// in the table layout panel
-			_tbConsole.Anchor =
-				(AnchorStyles)((((AnchorStyles.Top |
-				AnchorStyles.Bottom) | AnchorStyles.Left) |
-				AnchorStyles.Right));
-			_tbConsole.Multiline = true;
-			_tbConsole.ScrollBars = ScrollBars.Vertical;
-
-			// Set fifth table layout panel
-			_tableLayoutPanel5.Controls.Add(_tbConsole, 0, 0);
-			_tableLayoutPanel5.Location = new Point(0, 120);
-			_tableLayoutPanel5.Size = new Size(315, 605);
-			
-			// Set other visual candy
-			AutoScaleDimensions = new SizeF(120F, 120F);
-			AutoScaleMode = AutoScaleMode.Dpi;
-			ClientSize = new Size(new Point(315, 732));
-			ComponentResourceManager resources =
-				new ComponentResourceManager(typeof(CommunicationForm));
-			Controls.Add(_tableLayoutPanel1);
-			Controls.Add(_tableLayoutPanel2);
-			Controls.Add(_tableLayoutPanel3);
-			Controls.Add(_tableLayoutPanel4);
-			Controls.Add(_tableLayoutPanel5);
-			FormBorderStyle = FormBorderStyle.Fixed3D;
-			Icon = resources.GetObject(Strings.Icon) as Icon;
-			Location = Settings.Default.Location;
-			MaximizeBox = false;
-			StartPosition = FormStartPosition.Manual;
-			Text = Strings.TitleCommunication;
-
-			// Resume the layout logic for the form
-			ResumeLayout(false);
 		}
 		#endregion
 
 		#region Public methods
 		/// <summary>
-		/// Get multiplier, used by a view
-		/// </summary>
-		/// <returns></returns>
-		public int GetMultiplier()
-		{
-			// Return current multiplier value
-			return _multiplier;
-		}
-
-		/// <summary>
 		/// Set lane control, used by a view
 		/// </summary>
-		/// <param name="laneControl"></param>
+		/// <param name="laneControl">Lane control</param>
 		public void SetLaneControl(LaneControl laneControl)
 		{
 			// Private lane control is specified lane control
@@ -398,7 +497,7 @@ namespace KruispuntGroep4.Simulator.Communication
 
 		#region Protected methods
 		/// <summary>
-		/// Override OnFormClosed, so that all views are closed as well.
+		/// Override OnFormClosed, so that all views are closed as well
 		/// </summary>
 		/// <param name="e">Form closed event args</param>
 		protected override void OnFormClosed(FormClosedEventArgs e)
@@ -416,7 +515,6 @@ namespace KruispuntGroep4.Simulator.Communication
 		#endregion
 
 		#region Private methods
-		#region Events
 		/// <summary>
 		/// Button 'Laad invoerbestand',
 		/// to read JSON input file
@@ -432,19 +530,16 @@ namespace KruispuntGroep4.Simulator.Communication
 			// If the dialog result is OK
 			if (result.Equals(DialogResult.OK))
 			{
-				// Hide button Input
+				// Remove button Input
 				_tableLayoutPanel2.Controls.Remove(_btnInput);
+
+				// Add progress bars
+				_tableLayoutPanel2.ColumnCount = 2;
+				_tableLayoutPanel2.Controls.Add(_progressBarFile, 0, 0);
+				_tableLayoutPanel2.Controls.Add(_progressBarMessages, 1, 0);
 
 				// Disable button Input
 				_btnInput.Enabled = false;
-
-				// Show progress bars
-				_tableLayoutPanel2.ColumnCount = 2;
-				_tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-				_tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-				_tableLayoutPanel2.Controls.Add(_progressBarFile, 0, 0);
-				_tableLayoutPanel2.Controls.Add(_progressBarMessages, 1, 0);
-				_tableLayoutPanel2.Height = 27;
 
 				// Read file in the background worker file,
 				// so the UI stays responsive
@@ -464,6 +559,10 @@ namespace KruispuntGroep4.Simulator.Communication
 
 			// Send multiplier to host
 			WriteMultiplierMessage();
+
+			// Create sleep TimeSpan from multiplier
+			long sleep = 100000000 / _multiplier;
+			_timeSpanSleep = new TimeSpan(sleep);
 
 			// Speed value Label text is multiplier to string
 			_lblSpeedValue.Text = _multiplier.ToString();
@@ -494,6 +593,10 @@ namespace KruispuntGroep4.Simulator.Communication
 			// Send multiplier to host
 			WriteMultiplierMessage();
 
+			// Create sleep TimeSpan from multiplier
+			long sleep = 100000000 / _multiplier;
+			_timeSpanSleep = new TimeSpan(sleep);
+
 			// Speed value Label text is multiplier to string
 			_lblSpeedValue.Text = _multiplier.ToString();
 
@@ -519,7 +622,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		private void ClickStart(object sender, EventArgs e)
 		{
 			// If the button reads 'Start simulatie'
-			if (_btnStart.Text.Equals(Strings.StartView))
+			if (_btnStart.Text.Equals(Strings.ViewStart))
 			{
 				// Disable buttons and enable read only textboxes
 				_btnInput.Enabled = false;
@@ -548,12 +651,37 @@ namespace KruispuntGroep4.Simulator.Communication
 			{
 				// User wants to cancel while connecting,
 				// so request cancellation of
-				// background worker write
+				// background worker write,
+				// so the UI stays responsive
 				_bwWrite.CancelAsync();
 			}
 		}
-		#endregion
 
+		/// <summary>
+		/// Create an IP address
+		/// </summary>
+		private string CreateAddress()
+		{
+			// Initialize IP address and create host;
+			string address = Strings.Address;
+			IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
+
+			// For each IP address, check if it's an inter network address
+			foreach (IPAddress ip in host.AddressList)
+			{
+				// If the address family equals 'InterNetwork'
+				if (ip.AddressFamily.ToString().Equals(Strings.Network))
+				{
+					// Set the address
+					address = ip.ToString();
+				}
+			}
+
+			// Return the address
+			return address;
+		}
+
+		/* UNDONE
 		/// <summary>
 		/// Display the specified message in the Console listbox
 		/// </summary>
@@ -570,13 +698,19 @@ namespace KruispuntGroep4.Simulator.Communication
 				return;
 			}
 
-			// Append the message to the Console listbox,
-			// ending with a new line
-			_tbConsole.AppendText(
-				message +
-				Environment.NewLine
-			);
+			// Try to append the message to the console Textbox
+			try
+			{
+				// Append the message to the console Textbox,
+				// ending with a new line
+				_tbConsole.AppendText(
+					message +
+					Environment.NewLine
+				);
+			}
+			catch (ObjectDisposedException) { } // Catch object disposed exception
 		}
+		*/
 
 		/// <summary>
 		/// Read the JSON input file
@@ -585,8 +719,6 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <param name="e">Do work event args</param>
 		private void DoWorkInput(object sender, DoWorkEventArgs e)
 		{
-			BackgroundWorker backgroundWorkerInput = sender as BackgroundWorker;
-
 			// Read JSON from selected file
 			_json = File.ReadAllLines(e.Argument.ToString());
 			int count = _json.Length;
@@ -597,8 +729,11 @@ namespace KruispuntGroep4.Simulator.Communication
 				float percentage = ((float)i / (float)_json.Length) * 100f;
 
 				// Report the user the progress of reading a file
-				backgroundWorkerInput.ReportProgress((int)percentage, Strings.ProgressBarFile);
+				_bwInput.ReportProgress((int)percentage, Strings.ProgressBarFile);
 			}
+
+			// Report the user the maximum progress of reading a file
+			_bwInput.ReportProgress(_progressBarFile.Maximum, Strings.ProgressBarFile);
 
 			if (_json[0].StartsWith(Strings.BraceOpen))
 			{
@@ -608,8 +743,11 @@ namespace KruispuntGroep4.Simulator.Communication
 			else if (_json[0].StartsWith(Strings.BracketOpen))
 			{
 				// Convert JSON array to messages
-				_json = JsonArrayToMessages(backgroundWorkerInput);
+				_json = JsonArrayToMessages();
 			}
+
+			// Report the user the maximum progress of converting a JSON array to messages
+			_bwInput.ReportProgress(_progressBarMessages.Maximum, Strings.ProgressBarMessages);
 		}
 
 		/// <summary>
@@ -647,16 +785,16 @@ namespace KruispuntGroep4.Simulator.Communication
 				// What type is it?
 				switch (type)
 				{
-					case Strings.VehicleTypeBicycle: /* It is a bicycle */
+					case Strings.VehicleBicycle: /* It is a bicycle */
 						vehicleType = VehicleTypeEnum.bicycle;
 						break;
-					case Strings.VehicleTypeBus: /* It is a bus */
+					case Strings.VehicleBus: /* It is a bus */
 						vehicleType = VehicleTypeEnum.bus;
 						break;
-					case Strings.VehicleTypeCar: /* It is a car */
+					case Strings.VehicleCar: /* It is a car */
 						vehicleType = VehicleTypeEnum.car;
 						break;
-					case Strings.VehicleTypePedestrian: /* It is a pedestrian */
+					case Strings.VehiclePedestrian: /* It is a pedestrian */
 						vehicleType = VehicleTypeEnum.pedestrian;
 						break;
 					default: /* It is a Godzilla */
@@ -673,6 +811,15 @@ namespace KruispuntGroep4.Simulator.Communication
 
 					// Spawn the vehicle
 					_laneControl.SpawnVehicle(vehicleType, from, to);
+
+					/* UNDONE
+					// Display spawned message
+					DisplayMessage(
+						Strings.Spawned + Strings.Space + vehicleType.ToString() +
+						Strings.Comma + Strings.Space + Strings.From + Strings.Space + from +
+						Strings.Comma + Strings.Space + Strings.To + Strings.Space + to
+					);
+					 */
 				}
 
 				// Create time parameter value from JSON string
@@ -681,8 +828,9 @@ namespace KruispuntGroep4.Simulator.Communication
 				// If the time is after the previous time
 				if (time > previousTime)
 				{
-					// Sleep for a second
-					Thread.Sleep(1000);
+					// Sleep for a maximum of 10 seconds,
+					// depending on multiplier value
+					Thread.Sleep(_timeSpanSleep);
 				}
 
 				// The previous time is time
@@ -697,8 +845,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <param name="e">Tuple with address string and port int</param>
 		private void DoWorkWriting(object sender, DoWorkEventArgs e)
 		{
-			// Create background worker write and host tuple
-			BackgroundWorker backgroundWorkerWrite = sender as BackgroundWorker;
+			// Create host tuple
 			Tuple<string, int> host = e.Argument as Tuple<string, int>;
 
 			// Connect while there is no TCP client created
@@ -709,7 +856,7 @@ namespace KruispuntGroep4.Simulator.Communication
 				{
 					// If the user requested cancellation,
 					// set Cancel property and break
-					if (backgroundWorkerWrite.CancellationPending)
+					if (_bwWrite.CancellationPending)
 					{
 						e.Cancel = true;
 						break;
@@ -720,8 +867,10 @@ namespace KruispuntGroep4.Simulator.Communication
 				}
 				catch (SocketException) /* When there is no connection possible */
 				{
+					/* UNDONE
 					// Report the user that there is an error while connecting
-					backgroundWorkerWrite.ReportProgress(0, Strings.Error);
+					_bwWrite.ReportProgress(0, Strings.Error);
+					 */
 
 					// Sleep for a second, so the error spam is limited
 					Thread.Sleep(1000);
@@ -734,47 +883,19 @@ namespace KruispuntGroep4.Simulator.Communication
 				// Read messages in the background, so the UI stays responsive
 				_bwRead.RunWorkerAsync();
 
+				/* UNDONE
 				// When there is a TCP client created,
 				// give the user a connected result
 				e.Result = Strings.Connected;
+				 */
 			}
-		}
-
-		/// <summary>
-		/// Get the IP address
-		/// </summary>
-		private string GetAddress()
-		{
-			// Initialize IP address and create host;
-			string address = string.Empty;
-			IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
-
-			// For each IP address, check if it's an inter network address
-			foreach (IPAddress ip in host.AddressList)
-			{
-				if (ip.AddressFamily.ToString().Equals(Strings.AddressType))
-				{
-					// Set address
-					address = ip.ToString();
-				}
-			}
-
-			// If there is no internet, use localhost
-			if (address.Equals(string.Empty))
-			{
-				// Set address as localhost
-				address = Strings.AddressValue;
-			}
-
-			// Return address
-			return address;
 		}
 
 		/// <summary>
 		/// Convert JSON array to messages
 		/// </summary>
 		/// <returns>Readable JSON messages</returns>
-		private string[] JsonArrayToMessages(BackgroundWorker backgroundWorkerInput)
+		private string[] JsonArrayToMessages()
 		{
 			// Initialize list of messages
 			List<string> messages = new List<string>();
@@ -817,7 +938,7 @@ namespace KruispuntGroep4.Simulator.Communication
 				float percentage = ((float)i / (float)count) * 100f;
 
 				// Report the user the progress of converting a JSON array to messages
-				backgroundWorkerInput.ReportProgress((int)percentage, Strings.ProgressBarMessages);
+				_bwInput.ReportProgress((int)percentage, Strings.ProgressBarMessages);
 			}
 
 			// Convert the list of messages to a string array,
@@ -879,6 +1000,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			}
 		}
 
+		/* UNDONE
 		/// <summary>
 		/// Display an error message in case of socket exception while connecting
 		/// </summary>
@@ -889,6 +1011,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			// Display error message
 			DisplayMessage(e.UserState.ToString());
 		}
+		 */
 
 		/// <summary>
 		/// Read a message from the host,
@@ -922,8 +1045,10 @@ namespace KruispuntGroep4.Simulator.Communication
 						message = e.Message;
 					}
 
+					/* UNDONE
 					// Display the message
 					DisplayMessage(Strings.Received + Strings.Space + message);
+					 */
 				}
 			}
 
@@ -938,13 +1063,12 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <param name="e">Run worker completed event args</param>
 		private void RunWorkerCompletedInput(object sender, RunWorkerCompletedEventArgs e)
 		{
-			// Hide progress bars
+			// Remove progress bars
 			_tableLayoutPanel2.ColumnCount = 1;
 			_tableLayoutPanel2.Controls.Remove(_progressBarFile);
 			_tableLayoutPanel2.Controls.Remove(_progressBarMessages);
-			_tableLayoutPanel2.Height = 24;
 
-			// Show button Input
+			// Add button Input
 			_tableLayoutPanel2.Controls.Add(_btnInput);
 
 			// Enable button Start
@@ -1024,8 +1148,10 @@ namespace KruispuntGroep4.Simulator.Communication
 			_btnSpeedDown.Enabled = false;
 			_btnSpeedUp.Enabled = false;
 
+			/* UNDONE
 			// Display all input JSONs sent message
 			DisplayMessage(Strings.Sent + Strings.Space + Strings.AllInputJsons);
+			 */
 		}
 
 		/// <summary>
@@ -1051,8 +1177,10 @@ namespace KruispuntGroep4.Simulator.Communication
 				// Disable start Button
 				_btnStart.Enabled = false;
 
+				/* UNDONE
 				// Display success message
 				DisplayMessage(e.Result.ToString());
+				 */
 
 				// Wait for lane control
 				while (_laneControl == null) { }
@@ -1084,7 +1212,9 @@ namespace KruispuntGroep4.Simulator.Communication
 				// Enable speed up Button
 				_btnSpeedUp.Enabled = true;
 
-				// Spawn all vehicles from the JSON input file in the background
+				// Spawn all vehicles from the JSON input file
+				// in the background worker spawn,
+				// so the UI stays responsive
 				_bwSpawn.RunWorkerAsync();
 			}
 		}
@@ -1095,15 +1225,15 @@ namespace KruispuntGroep4.Simulator.Communication
 		private void SwitchTextButtonStart()
 		{
 			// If the button start text isn't 'Start simulatie'
-			if (!_btnStart.Text.Equals(Strings.StartView))
+			if (!_btnStart.Text.Equals(Strings.ViewStart))
 			{
 				// The button start text is 'Start simulatie'
-				_btnStart.Text = Strings.StartView;
+				_btnStart.Text = Strings.ViewStart;
 			}
 			else /* Else if the button start text is 'Start simulatie' */
 			{
 				// The button start text is 'Stop simulatie'
-				_btnStart.Text = Strings.StopView;
+				_btnStart.Text = Strings.ViewStop;
 			}
 		}
 
@@ -1129,8 +1259,10 @@ namespace KruispuntGroep4.Simulator.Communication
 					// Ensure that the buffer is empty
 					writer.Flush();
 
+					/* UNDONE
 					// Display the message in the Console listbox
 					DisplayMessage(Strings.Sent + Strings.Space + message);
+					 */
 				}
 			}
 		}

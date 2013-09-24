@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using KruispuntGroep4.Globals;
 using KruispuntGroep4.Simulator.Globals;
 using KruispuntGroep4.Simulator.Main;
 using KruispuntGroep4.Simulator.Objects;
@@ -25,10 +26,10 @@ namespace KruispuntGroep4.Main
         {
             for (int i = 0; i < MainGame.NrOfLanes; i++)
             {
-                laneIDs.Add("N" + i);
-                laneIDs.Add("E" + i);
-                laneIDs.Add("S" + i);
-                laneIDs.Add("W" + i);
+                laneIDs.Add(Strings.DirectionNorth + i);
+                laneIDs.Add(Strings.DirectionEast + i);
+                laneIDs.Add(Strings.DirectionSouth + i);
+                laneIDs.Add(Strings.DirectionWest + i);
             }
 
             #region pathfinding lanes
@@ -89,13 +90,12 @@ namespace KruispuntGroep4.Main
             Tile removeTile;
             Lane endLane;
 
-
             #region create pathing lanes
             switch (lane.pathLaneID)
             {
                 case PathsEnum.NorthToEast:                   
-                    lists.Lanes.TryGetValue("N1", out startLane);
-                    lists.Lanes.TryGetValue("E6", out endLane);
+                    lists.Lanes.TryGetValue(Strings.LaneNorthOne, out startLane);
+                    lists.Lanes.TryGetValue(Strings.LaneEastSix, out endLane);
 
                     //Go East first
                     startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
@@ -115,8 +115,8 @@ namespace KruispuntGroep4.Main
                     LoadPathLane(startTile, endLane, RotationEnum.East, lane);
                     break;
                 case PathsEnum.NorthToSouth:
-                    lists.Lanes.TryGetValue("N4", out startLane);
-                    lists.Lanes.TryGetValue("S6", out endLane);
+                    lists.Lanes.TryGetValue(Strings.LaneNorthFour, out startLane);
+                    lists.Lanes.TryGetValue(Strings.LaneSouthSix, out endLane);
 
                     //Go West first
                     startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
@@ -127,8 +127,8 @@ namespace KruispuntGroep4.Main
                     LoadPathLane(startTile, endLane, RotationEnum.South, lane);
                     break;
                 case PathsEnum.NorthToWest:
-                    lists.Lanes.TryGetValue("N3", out startLane);
-                    lists.Lanes.TryGetValue("W6", out endLane);
+                    lists.Lanes.TryGetValue(Strings.LaneNorthThree, out startLane);
+                    lists.Lanes.TryGetValue(Strings.LaneWestSix, out endLane);
 
                     //West
                     startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
@@ -136,8 +136,8 @@ namespace KruispuntGroep4.Main
                     break;
 
                 case PathsEnum.EastToSouth:                 
-                    lists.Lanes.TryGetValue("E1", out startLane);
-                    lists.Lanes.TryGetValue("S6", out endLane);
+                    lists.Lanes.TryGetValue(Strings.LaneEastOne, out startLane);
+                    lists.Lanes.TryGetValue(Strings.LaneSouthSix, out endLane);
 
                     //South
                     startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.West, out startTile);
@@ -148,8 +148,8 @@ namespace KruispuntGroep4.Main
                     LoadPathLane(startTile, endLane, RotationEnum.West, lane);
                     break;
                 case PathsEnum.EastToWest:
-                    lists.Lanes.TryGetValue("E4", out startLane);
-                    lists.Lanes.TryGetValue("W6", out endLane);
+                    lists.Lanes.TryGetValue(Strings.LaneEastFour, out startLane);
+                    lists.Lanes.TryGetValue(Strings.LaneWestSix, out endLane);
 
                     //North
                     startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.West, out startTile);
@@ -160,8 +160,8 @@ namespace KruispuntGroep4.Main
                     LoadPathLane(startTile, endLane, RotationEnum.West, lane);
                     break;
                 case PathsEnum.EastToNorth:
-                    lists.Lanes.TryGetValue("E3", out startLane);
-                    lists.Lanes.TryGetValue("N6", out endLane);
+                    lists.Lanes.TryGetValue(Strings.LaneEastThree, out startLane);
+                    lists.Lanes.TryGetValue(Strings.LaneNorthSix, out endLane);
 
                     //North
                     startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.West, out startTile);
@@ -169,16 +169,16 @@ namespace KruispuntGroep4.Main
                     break;
 
                 case PathsEnum.SouthToEast:
-                    lists.Lanes.TryGetValue("S3", out startLane);
-                    lists.Lanes.TryGetValue("E6", out endLane);
+                    lists.Lanes.TryGetValue(Strings.LaneSouthThree, out startLane);
+                    lists.Lanes.TryGetValue(Strings.LaneEastSix, out endLane);
 
                     //East
                     startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.North, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.East, lane);
                     break;
                 case PathsEnum.SouthToWest:
-                    lists.Lanes.TryGetValue("S1", out startLane);
-                    lists.Lanes.TryGetValue("W6", out endLane);
+                    lists.Lanes.TryGetValue(Strings.LaneSouthOne, out startLane);
+                    lists.Lanes.TryGetValue(Strings.LaneWestSix, out endLane);
 
                     //West
                     startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.North, out startTile);
@@ -189,8 +189,8 @@ namespace KruispuntGroep4.Main
                     LoadPathLane(startTile, endLane, RotationEnum.North, lane);
                     break;
                 case PathsEnum.SouthToNorth:
-                    lists.Lanes.TryGetValue("S4", out startLane);
-                    lists.Lanes.TryGetValue("N6", out endLane);
+                    lists.Lanes.TryGetValue(Strings.LaneSouthFour, out startLane);
+                    lists.Lanes.TryGetValue(Strings.LaneNorthSix, out endLane);
 
                     //East
                     startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.North, out startTile);
@@ -202,8 +202,8 @@ namespace KruispuntGroep4.Main
                     break;
 
                 case PathsEnum.WestToNorth:
-                    lists.Lanes.TryGetValue("W1", out startLane);
-                    lists.Lanes.TryGetValue("N6", out endLane);
+                    lists.Lanes.TryGetValue(Strings.LaneWestOne, out startLane);
+                    lists.Lanes.TryGetValue(Strings.LaneNorthSix, out endLane);
 
                     //North
                     startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
@@ -214,8 +214,8 @@ namespace KruispuntGroep4.Main
                     LoadPathLane(startTile, endLane, RotationEnum.East, lane);
                     break;
                 case PathsEnum.WestToEast:
-                    lists.Lanes.TryGetValue("W4", out startLane);
-                    lists.Lanes.TryGetValue("E6", out endLane);
+                    lists.Lanes.TryGetValue(Strings.LaneWestFour, out startLane);
+                    lists.Lanes.TryGetValue(Strings.LaneEastSix, out endLane);
 
                     //South
                     startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
@@ -226,8 +226,8 @@ namespace KruispuntGroep4.Main
                     LoadPathLane(startTile, endLane, RotationEnum.East, lane);
                     break;
                 case PathsEnum.WestToSouth:
-                    lists.Lanes.TryGetValue("W3", out startLane);
-                    lists.Lanes.TryGetValue("S6", out endLane);
+                    lists.Lanes.TryGetValue(Strings.LaneWestThree, out startLane);
+                    lists.Lanes.TryGetValue(Strings.LaneSouthSix, out endLane);
 
                     //South
                     startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
@@ -300,72 +300,72 @@ namespace KruispuntGroep4.Main
             //Build all the lanes starting from the location of the stoplights and going outwards
             switch (lane.laneID)
             {
-                case "N0": LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer - 1), lane); //Northwest vertical sidewalk
+                case Strings.LaneNorthZero: LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer - 1), lane); //Northwest vertical sidewalk
                     break;
-                case "N1": LoadLane(new Vector2(MainGame.LaneLengthHor, MainGame.LaneLengthVer - 1), lane);
+                case Strings.LaneNorthOne: LoadLane(new Vector2(MainGame.LaneLengthHor, MainGame.LaneLengthVer - 1), lane);
                     break;
-                case "N2": LoadLane(new Vector2(MainGame.LaneLengthHor + 1, MainGame.LaneLengthVer - 1), lane);
+                case Strings.LaneNorthTwo: LoadLane(new Vector2(MainGame.LaneLengthHor + 1, MainGame.LaneLengthVer - 1), lane);
                     break;
-                case "N3": LoadLane(new Vector2(MainGame.LaneLengthHor + 2, MainGame.LaneLengthVer - 1), lane);
+                case Strings.LaneNorthThree: LoadLane(new Vector2(MainGame.LaneLengthHor + 2, MainGame.LaneLengthVer - 1), lane);
                     break;
-                case "N4": LoadLane(new Vector2(MainGame.LaneLengthHor + 3, MainGame.LaneLengthVer - 1), lane);
+                case Strings.LaneNorthFour: LoadLane(new Vector2(MainGame.LaneLengthHor + 3, MainGame.LaneLengthVer - 1), lane);
                     break;
-                case "N5": LoadLane(new Vector2(MainGame.LaneLengthHor + 4, MainGame.LaneLengthVer - 1), lane);
+                case Strings.LaneNorthFive: LoadLane(new Vector2(MainGame.LaneLengthHor + 4, MainGame.LaneLengthVer - 1), lane);
                     break;
-                case "N6": LoadLane(new Vector2(MainGame.LaneLengthHor + 5, MainGame.LaneLengthVer - 1), lane);
+                case Strings.LaneNorthSix: LoadLane(new Vector2(MainGame.LaneLengthHor + 5, MainGame.LaneLengthVer - 1), lane);
                     break;
-                case "N7": LoadLane(new Vector2(MainGame.LaneLengthHor + 6, MainGame.LaneLengthVer - 1), lane); //Northeast vertical sidewalk
-                    break;
-
-                case "E0": LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer - 1), lane); //Northeast horizontal sidewalk
-                    break;
-                case "E1": LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer), lane);
-                    break;
-                case "E2": LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer + 1), lane);
-                    break;
-                case "E3": LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer + 2), lane);
-                    break;
-                case "E4": LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer + 3), lane);
-                    break;
-                case "E5": LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer + 4), lane);
-                    break;
-                case "E6": LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer + 5), lane);
-                    break;
-                case "E7": LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer + 6), lane); //Southeast horizontal sidewalk
+                case Strings.LaneNorthSeven: LoadLane(new Vector2(MainGame.LaneLengthHor + 6, MainGame.LaneLengthVer - 1), lane); //Northeast vertical sidewalk
                     break;
 
-                case "W0": LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer + MainGame.MiddleSize), lane); //Southwest horizontal sidewalk
+                case Strings.LaneEastZero: LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer - 1), lane); //Northeast horizontal sidewalk
                     break;
-                case "W1": LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer + MainGame.MiddleSize - 1), lane);
+                case Strings.LaneEastOne: LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer), lane);
                     break;
-                case "W2": LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer + MainGame.MiddleSize - 2), lane);
+                case Strings.LaneEastTwo: LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer + 1), lane);
                     break;
-                case "W3": LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer + MainGame.MiddleSize - 3), lane);
+                case Strings.LaneEastThree: LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer + 2), lane);
                     break;
-                case "W4": LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer + MainGame.MiddleSize - 4), lane);
+                case Strings.LaneEastFour: LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer + 3), lane);
                     break;
-                case "W5": LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer + MainGame.MiddleSize - 5), lane);
+                case Strings.LaneEastFive: LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer + 4), lane);
                     break;
-                case "W6": LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer + MainGame.MiddleSize - 6), lane);
+                case Strings.LaneEastSix: LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer + 5), lane);
                     break;
-                case "W7": LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer + MainGame.MiddleSize - 7), lane); //Northwest horizontal sidewalk
+                case Strings.LaneEastSeven: LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer + 6), lane); //Southeast horizontal sidewalk
                     break;
 
-                case "S0": LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer + MainGame.MiddleSize), lane); //Southeast vertical sidewalk
+                case Strings.LaneWestZero: LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer + MainGame.MiddleSize), lane); //Southwest horizontal sidewalk
                     break;
-                case "S1": LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize - 1, MainGame.LaneLengthVer + MainGame.MiddleSize), lane);
+                case Strings.LaneWestOne: LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer + MainGame.MiddleSize - 1), lane);
                     break;
-                case "S2": LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize - 2, MainGame.LaneLengthVer + MainGame.MiddleSize), lane);
+                case Strings.LaneWestTwo: LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer + MainGame.MiddleSize - 2), lane);
                     break;
-                case "S3": LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize - 3, MainGame.LaneLengthVer + MainGame.MiddleSize), lane);
+                case Strings.LaneWestThree: LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer + MainGame.MiddleSize - 3), lane);
                     break;
-                case "S4": LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize - 4, MainGame.LaneLengthVer + MainGame.MiddleSize), lane);
+                case Strings.LaneWestFour: LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer + MainGame.MiddleSize - 4), lane);
                     break;
-                case "S5": LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize - 5, MainGame.LaneLengthVer + MainGame.MiddleSize), lane);
+                case Strings.LaneWestFive: LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer + MainGame.MiddleSize - 5), lane);
                     break;
-                case "S6": LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize - 6, MainGame.LaneLengthVer + MainGame.MiddleSize), lane);
+                case Strings.LaneWestSix: LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer + MainGame.MiddleSize - 6), lane);
                     break;
-                case "S7": LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize - 7, MainGame.LaneLengthVer + MainGame.MiddleSize), lane); //Southwest vertical sidewalk
+                case Strings.LaneWestSeven: LoadLane(new Vector2(MainGame.LaneLengthHor - 1, MainGame.LaneLengthVer + MainGame.MiddleSize - 7), lane); //Northwest horizontal sidewalk
+                    break;
+
+                case Strings.LaneSouthZero: LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize, MainGame.LaneLengthVer + MainGame.MiddleSize), lane); //Southeast vertical sidewalk
+                    break;
+                case Strings.LaneSouthOne: LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize - 1, MainGame.LaneLengthVer + MainGame.MiddleSize), lane);
+                    break;
+                case Strings.LaneSouthTwo: LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize - 2, MainGame.LaneLengthVer + MainGame.MiddleSize), lane);
+                    break;
+                case Strings.LaneSouthThree: LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize - 3, MainGame.LaneLengthVer + MainGame.MiddleSize), lane);
+                    break;
+                case Strings.LaneSouthFour: LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize - 4, MainGame.LaneLengthVer + MainGame.MiddleSize), lane);
+                    break;
+                case Strings.LaneSouthFive: LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize - 5, MainGame.LaneLengthVer + MainGame.MiddleSize), lane);
+                    break;
+                case Strings.LaneSouthSix: LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize - 6, MainGame.LaneLengthVer + MainGame.MiddleSize), lane);
+                    break;
+                case Strings.LaneSouthSeven: LoadLane(new Vector2(MainGame.LaneLengthHor + MainGame.MiddleSize - 7, MainGame.LaneLengthVer + MainGame.MiddleSize), lane); //Southwest vertical sidewalk
                     break;
             }
         }
