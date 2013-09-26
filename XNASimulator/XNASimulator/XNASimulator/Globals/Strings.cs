@@ -3,31 +3,19 @@
 	class Strings
 	{
 		public const string Address = "127.0.0.1";
-		/* UNDONE
-		public const string AllInputJsons = "alle invoerberichten";
-		 */
 		public const string BraceOpen = "{";
 		public const string BracketClose = "]";
 		public const string BracketOpen = "[";
 		public const string Comma = ",";
-		/* UNDONE
-		public const string Connected = "Verbonden.";
-		 */
 		public const string Content = "Content";
 		public const string DirectionNorth = "N";
 		public const string DirectionEast = "E";
 		public const string DirectionSouth = "S";
 		public const string DirectionWest = "W";
-		/* UNDONE
-		public const string Error = "Fout tijdens verbinden.";
-		 */
 		public const string ExceptionCrossroad = "No Level Detected";
 		public const string ExceptionLevelLine = "The length of line {0} is different from all preceeding lines.";
 		public const string ExceptionPath = "Vehicle cannot find path";
 		public const string ExceptionTileType = "Unsupported tile type character '{0}' at position {1}, {2}.";
-		/* UNDONE
-		public const string From = "van:";
-		 */
 		public const string Grid = "Content/Grids/Crossroad.txt";
 		public const string Icon = "$this.Icon";
 		public const string LaneEastFive = "E5";
@@ -83,12 +71,6 @@
 		public const string PathSouthWest = "SW";
 		public const string ProgressBarFile = "file";
 		public const string ProgressBarMessages = "messages";
-		/* UNDONE
-		public const string Received = "Ontvangen:";
-		public const string Sent = "Verzonden:";
-		public const string Space = " ";
-		public const string Spawned = "Gespawned:";
-		 */
 		public const string SpriteBike = "Sprites/Bike32x32";
 		public const string SpriteBus = "Sprites/Bus32x32";
 		public const string SpriteCar = "Sprites/Car32x32";
@@ -117,9 +99,6 @@
 		public const string TileSidewalkLightRed = "Tiles/SidewalkLightRed32x32";
 		public const string TileSidewalkRightRed = "Tiles/SidewalkRightRed32x32";
 		public const string Title = "Weergave - SEN Groep 4";
-		/* UNDONE
-		public const string To = "naar:";
-		 */
 		public const string VehicleBicycle = "bicycle";
 		public const string VehicleBus = "bus";
 		public const string VehicleCar = "car";

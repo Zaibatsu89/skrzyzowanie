@@ -57,11 +57,6 @@ namespace KruispuntGroep4.Simulator.Communication
 			SwitchTextButtonStart();
 		}
 
-		/* UNDONE
-		// Appoint delegates
-		delegate void DisplayMessageDelegate(string message);
-		 */
-
 		// Appoint private attributes
 		private BackgroundWorker _bwInput;
 		private BackgroundWorker _bwRead;
@@ -83,13 +78,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		private TableLayoutPanel _tableLayoutPanel1,
 			_tableLayoutPanel2, _tableLayoutPanel3,
 			_tableLayoutPanel4;
-		/* UNDONE
-		private TableLayoutPanel _tableLayoutPanel5;
-		 */
 		private TextBox _tbAddress, _tbPort;
-		/* UNDONE
-		private TextBox _tbConsole;
-		 */
 		private TimeSpan _timeSpanSleep;
 
 		/// <summary>
@@ -157,16 +146,10 @@ namespace KruispuntGroep4.Simulator.Communication
 		{
 			// Appoint write Background worker
 			_bwWrite = new BackgroundWorker();
-			/* UNDONE
-			_bwWrite.WorkerReportsProgress = true;
-			 */
 			_bwWrite.WorkerSupportsCancellation = true;
 
 			// Appoint write Background worker events
 			_bwWrite.DoWork += new DoWorkEventHandler(DoWorkWriting);
-			/* UNDONE
-			_bwWrite.ProgressChanged += new ProgressChangedEventHandler(ProgressChangedWriting);
-			 */
 			_bwWrite.RunWorkerCompleted += new RunWorkerCompletedEventHandler(RunWorkerCompletedWriting);
 		}
 
@@ -193,17 +176,10 @@ namespace KruispuntGroep4.Simulator.Communication
 			this._tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
 			this._tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
 			this._lblSpeedKey = new System.Windows.Forms.Label();
-			/* UNDONE
-			this._tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
-			this._tbConsole = new System.Windows.Forms.TextBox();
-			 */
 			this._tableLayoutPanel1.SuspendLayout();
 			this._tableLayoutPanel2.SuspendLayout();
 			this._tableLayoutPanel3.SuspendLayout();
 			this._tableLayoutPanel4.SuspendLayout();
-			/* UNDONE
-			this._tableLayoutPanel5.SuspendLayout();
-			 */
 			this.SuspendLayout();
 			// 
 			// _btnInput
@@ -307,12 +283,12 @@ namespace KruispuntGroep4.Simulator.Communication
 			this._tableLayoutPanel1.Size = new System.Drawing.Size(315, 24);
 			this._tableLayoutPanel1.TabIndex = 0;
 			// 
-			// lblAddress
+			// _lblAddress
 			// 
 			this._lblAddress.Anchor = System.Windows.Forms.AnchorStyles.Right;
 			this._lblAddress.AutoSize = true;
 			this._lblAddress.Location = new System.Drawing.Point(8, 5);
-			this._lblAddress.Name = "lblAddress";
+			this._lblAddress.Name = "_lblAddress";
 			this._lblAddress.Size = new System.Drawing.Size(20, 13);
 			this._lblAddress.TabIndex = 0;
 			this._lblAddress.Text = "IP:";
@@ -325,12 +301,12 @@ namespace KruispuntGroep4.Simulator.Communication
 			this._tbAddress.Size = new System.Drawing.Size(120, 20);
 			this._tbAddress.TabIndex = 1;
 			// 
-			// lblPort
+			// _lblPort
 			// 
 			this._lblPort.Anchor = System.Windows.Forms.AnchorStyles.Right;
 			this._lblPort.AutoSize = true;
 			this._lblPort.Location = new System.Drawing.Point(197, 5);
-			this._lblPort.Name = "lblPort";
+			this._lblPort.Name = "_lblPort";
 			this._lblPort.Size = new System.Drawing.Size(35, 13);
 			this._lblPort.TabIndex = 2;
 			this._lblPort.Text = "Poort:";
@@ -383,54 +359,24 @@ namespace KruispuntGroep4.Simulator.Communication
 			this._tableLayoutPanel4.Size = new System.Drawing.Size(315, 27);
 			this._tableLayoutPanel4.TabIndex = 3;
 			// 
-			// lblSpeedKey
+			// _lblSpeedKey
 			// 
 			this._lblSpeedKey.Anchor = System.Windows.Forms.AnchorStyles.Right;
 			this._lblSpeedKey.AutoSize = true;
 			this._lblSpeedKey.Location = new System.Drawing.Point(24, 7);
-			this._lblSpeedKey.Name = "lblSpeedKey";
+			this._lblSpeedKey.Name = "_lblSpeedKey";
 			this._lblSpeedKey.Size = new System.Drawing.Size(51, 13);
 			this._lblSpeedKey.TabIndex = 0;
 			this._lblSpeedKey.Text = "Snelheid:";
-			/* UNDONE
-			// 
-			// _tableLayoutPanel5
-			// 
-			this._tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-			this._tableLayoutPanel5.Controls.Add(this._tbConsole, 0, 0);
-			this._tableLayoutPanel5.Location = new System.Drawing.Point(0, 92);
-			this._tableLayoutPanel5.Name = "_tableLayoutPanel5";
-			this._tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-			this._tableLayoutPanel5.Size = new System.Drawing.Size(315, 640);
-			this._tableLayoutPanel5.TabIndex = 4;
-			// 
-			// _tbConsole
-			// 
-			this._tbConsole.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this._tbConsole.Location = new System.Drawing.Point(3, 3);
-			this._tbConsole.Multiline = true;
-			this._tbConsole.Name = "_tbConsole";
-			this._tbConsole.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this._tbConsole.Size = new System.Drawing.Size(309, 634);
-			this._tbConsole.TabIndex = 0;
-			 */
 			// 
 			// CommunicationForm
 			// 
-			/* UNDONE
-			this.ClientSize = new System.Drawing.Size(315, 732);
-			 */
 			this.ClientSize = new System.Drawing.Size(315, 95);
 			this.Controls.Add(this._tableLayoutPanel1);
 			this.Controls.Add(this._tableLayoutPanel2);
 			this.Controls.Add(this._tableLayoutPanel3);
 			this.Controls.Add(this._tableLayoutPanel4);
-			/* UNDONE
-			this.Controls.Add(this._tableLayoutPanel5);
-			 */
-			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Location = global::KruispuntGroep4.Simulator.Settings.Default.Location;
 			this.MaximizeBox = false;
@@ -443,10 +389,6 @@ namespace KruispuntGroep4.Simulator.Communication
 			this._tableLayoutPanel3.ResumeLayout(false);
 			this._tableLayoutPanel4.ResumeLayout(false);
 			this._tableLayoutPanel4.PerformLayout();
-			/* UNDONE
-			this._tableLayoutPanel5.ResumeLayout(false);
-			this._tableLayoutPanel5.PerformLayout();
-			 */
 			this.ResumeLayout(false);
 
 		}
@@ -681,37 +623,6 @@ namespace KruispuntGroep4.Simulator.Communication
 			return address;
 		}
 
-		/* UNDONE
-		/// <summary>
-		/// Display the specified message in the Console listbox
-		/// </summary>
-		/// <param name="message">Message</param>
-		private void DisplayMessage(string message)
-		{
-			// If the caller comes from a different thread
-			if (InvokeRequired)
-			{
-				// Execute the associated delegate asynchronously
-				BeginInvoke(new DisplayMessageDelegate(DisplayMessage), message);
-
-				// Can't display the message yet
-				return;
-			}
-
-			// Try to append the message to the console Textbox
-			try
-			{
-				// Append the message to the console Textbox,
-				// ending with a new line
-				_tbConsole.AppendText(
-					message +
-					Environment.NewLine
-				);
-			}
-			catch (ObjectDisposedException) { } // Catch object disposed exception
-		}
-		*/
-
 		/// <summary>
 		/// Read the JSON input file
 		/// </summary>
@@ -811,15 +722,6 @@ namespace KruispuntGroep4.Simulator.Communication
 
 					// Spawn the vehicle
 					_laneControl.SpawnVehicle(vehicleType, from, to);
-
-					/* UNDONE
-					// Display spawned message
-					DisplayMessage(
-						Strings.Spawned + Strings.Space + vehicleType.ToString() +
-						Strings.Comma + Strings.Space + Strings.From + Strings.Space + from +
-						Strings.Comma + Strings.Space + Strings.To + Strings.Space + to
-					);
-					 */
 				}
 
 				// Create time parameter value from JSON string
@@ -867,11 +769,6 @@ namespace KruispuntGroep4.Simulator.Communication
 				}
 				catch (SocketException) /* When there is no connection possible */
 				{
-					/* UNDONE
-					// Report the user that there is an error while connecting
-					_bwWrite.ReportProgress(0, Strings.Error);
-					 */
-
 					// Sleep for a second, so the error spam is limited
 					Thread.Sleep(1000);
 				}
@@ -882,12 +779,6 @@ namespace KruispuntGroep4.Simulator.Communication
 			{
 				// Read messages in the background, so the UI stays responsive
 				_bwRead.RunWorkerAsync();
-
-				/* UNDONE
-				// When there is a TCP client created,
-				// give the user a connected result
-				e.Result = Strings.Connected;
-				 */
 			}
 		}
 
@@ -1000,19 +891,6 @@ namespace KruispuntGroep4.Simulator.Communication
 			}
 		}
 
-		/* UNDONE
-		/// <summary>
-		/// Display an error message in case of socket exception while connecting
-		/// </summary>
-		/// <param name="sender">Background worker write</param>
-		/// <param name="e">Error message as property user state</param>
-		private void ProgressChangedWriting(object sender, ProgressChangedEventArgs e)
-		{
-			// Display error message
-			DisplayMessage(e.UserState.ToString());
-		}
-		 */
-
 		/// <summary>
 		/// Read a message from the host,
 		/// if the TCP client is connected,
@@ -1044,11 +922,6 @@ namespace KruispuntGroep4.Simulator.Communication
 						// The message is the exception message
 						message = e.Message;
 					}
-
-					/* UNDONE
-					// Display the message
-					DisplayMessage(Strings.Received + Strings.Space + message);
-					 */
 				}
 			}
 
@@ -1147,11 +1020,6 @@ namespace KruispuntGroep4.Simulator.Communication
 			// Disable speed down/up Buttons
 			_btnSpeedDown.Enabled = false;
 			_btnSpeedUp.Enabled = false;
-
-			/* UNDONE
-			// Display all input JSONs sent message
-			DisplayMessage(Strings.Sent + Strings.Space + Strings.AllInputJsons);
-			 */
 		}
 
 		/// <summary>
@@ -1176,11 +1044,6 @@ namespace KruispuntGroep4.Simulator.Communication
 			{
 				// Disable start Button
 				_btnStart.Enabled = false;
-
-				/* UNDONE
-				// Display success message
-				DisplayMessage(e.Result.ToString());
-				 */
 
 				// Wait for lane control
 				while (_laneControl == null) { }
@@ -1258,11 +1121,6 @@ namespace KruispuntGroep4.Simulator.Communication
 
 					// Ensure that the buffer is empty
 					writer.Flush();
-
-					/* UNDONE
-					// Display the message in the Console listbox
-					DisplayMessage(Strings.Sent + Strings.Space + message);
-					 */
 				}
 			}
 		}
