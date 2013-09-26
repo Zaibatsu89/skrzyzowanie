@@ -28,7 +28,7 @@ namespace KruispuntGroep4.Simulator.Communication
 	/// </copyright>
 	/// <author>Rinse Cramer</author>
 	/// <email>rinsecramer@gmail.com</email>
-	/// <date>24-09-2013</date>
+	/// <date>2013</date>
 	/// <summary>CommunicationForm is a form with
 	/// inputfields for host address/port & messages,
 	/// buttons for start/stop view & sending messages
