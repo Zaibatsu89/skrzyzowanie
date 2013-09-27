@@ -125,24 +125,28 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 
             switch (destinationLaneID[0])
             {
-                case 'N':   if (spawnLaneID[0].Equals('W'))
+                case 'N':
+					if (spawnLaneID[0].Equals('W'))
                         newVehicle.enterInnerLane = true;
-                            if (newVehicle.type.Equals(VehicleTypeEnum.bus))
+                    if (newVehicle.type.Equals(VehicleTypeEnum.bus))
                         newVehicle.innerLaneTurns = 1;
                     break;
-                case 'E':   if (spawnLaneID[0].Equals('N'))
+                case 'E':
+					if (spawnLaneID[0].Equals('N'))
                         newVehicle.enterInnerLane = true;
-                            if (newVehicle.type.Equals(VehicleTypeEnum.bus))
+					if (newVehicle.type.Equals(VehicleTypeEnum.bus))
                         newVehicle.innerLaneTurns = 1;
                     break;
-                case 'S':   if (spawnLaneID[0].Equals('E'))
+                case 'S':
+					if (spawnLaneID[0].Equals('E'))
                         newVehicle.enterInnerLane = true;
-                            if (newVehicle.type.Equals(VehicleTypeEnum.bus))
+                    if (newVehicle.type.Equals(VehicleTypeEnum.bus))
                         newVehicle.innerLaneTurns = 1;
                     break;
-                case 'W':   if (spawnLaneID[0].Equals('S'))
+                case 'W':
+					if (spawnLaneID[0].Equals('S'))
                         newVehicle.enterInnerLane = true;
-                            if (newVehicle.type.Equals(VehicleTypeEnum.bus))
+                    if (newVehicle.type.Equals(VehicleTypeEnum.bus))
                         newVehicle.innerLaneTurns = 1;
                     break;
             }
@@ -171,7 +175,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                 //If the lane is full, add the empty vehicle object to the lane's queue
                 spawnLane.vehicleQueue.Enqueue(newVehicle);
             }
-                    
         }
 
         private void SpawnQueuedVehicles(Lane lane)

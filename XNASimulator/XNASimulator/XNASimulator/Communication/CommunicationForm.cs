@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -51,11 +50,16 @@ namespace KruispuntGroep4.Simulator.Communication
 			InitializeBackgroundWorkerWrite();
 
 			// Initialize attributes
+			j = 0;
 			_multiplier = 1;
 			_tbAddress.Text = CreateAddress();
 			_timeSpanSleep = new TimeSpan(100000000);
 			SwitchTextButtonStart();
 		}
+
+		// Appoint public attributes
+		private delegate void SpawnBeginDelegate();
+		private delegate void SpawnEndDelegate();
 
 		// Appoint private attributes
 		private BackgroundWorker _bwInput;
@@ -72,6 +76,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		private Label _lblPort;
 		private Label _lblSpeedKey;
 		private Label _lblSpeedValue;
+		private int j;
 		private int _multiplier;
 		private ProgressBar _progressBarFile;
 		private ProgressBar _progressBarMessages;
@@ -120,6 +125,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		{
 			// Appoint read Background worker
 			_bwRead = new BackgroundWorker();
+			_bwRead.WorkerSupportsCancellation = true;
 
 			// Appoint read Background worker events
 			_bwRead.DoWork += new DoWorkEventHandler(DoWorkReading);
@@ -133,6 +139,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		{
 			// Appoint spawn Background worker
 			_bwSpawn = new BackgroundWorker();
+			_bwSpawn.WorkerSupportsCancellation = true;
 
 			// Appoint spawn Background worker events
 			_bwSpawn.DoWork += new DoWorkEventHandler(DoWorkSpawning);
@@ -390,7 +397,6 @@ namespace KruispuntGroep4.Simulator.Communication
 			this._tableLayoutPanel4.ResumeLayout(false);
 			this._tableLayoutPanel4.PerformLayout();
 			this.ResumeLayout(false);
-
 		}
 		#endregion
 
@@ -467,6 +473,11 @@ namespace KruispuntGroep4.Simulator.Communication
 		{
 			// Create open file dialog
 			FileDialog dialog = new OpenFileDialog();
+
+			// Create JSON filter
+			dialog.Filter = "Invoerbestanden (*.json)|*.json";
+
+			// Create dialog result
 			DialogResult result = dialog.ShowDialog();
 
 			// If the dialog result is OK
@@ -670,6 +681,16 @@ namespace KruispuntGroep4.Simulator.Communication
 		{
 			// The result is the received message
 			e.Result = ReadMessage();
+
+			if (_bwRead != null)
+			{
+				// If the user requested cancellation,
+				// set Cancel property
+				if (_bwRead.CancellationPending)
+				{
+					e.Cancel = true;
+				}
+			}
 		}
 
 		/// <summary>
@@ -683,8 +704,11 @@ namespace KruispuntGroep4.Simulator.Communication
 			int previousTime = -1;
 
 			// For each JSON string in JSON array
-			foreach (string json in _json)
+			for (int i = j; i < _json.Length; i++)
 			{
+				// Create JSON string from JSON array
+				string json = _json[i];
+
 				// Initialize whether Godzilla exists
 				// and create vehicle type
 				bool isGodzilla = false;
@@ -737,6 +761,16 @@ namespace KruispuntGroep4.Simulator.Communication
 
 				// The previous time is time
 				previousTime = time;
+
+				// If the user requested cancellation,
+				// set Cancel property, break and
+				// previous number is number
+				if (_bwSpawn.CancellationPending)
+				{
+					e.Cancel = true;
+					j = i;
+					break;
+				}
 			}
 		}
 
@@ -777,8 +811,12 @@ namespace KruispuntGroep4.Simulator.Communication
 			// If the cancel property is false
 			if (!e.Cancel)
 			{
-				// Read messages in the background, so the UI stays responsive
-				_bwRead.RunWorkerAsync();
+				// If the background worker read isn't busy
+				if (!_bwRead.IsBusy)
+				{
+					// Read messages in the background, so the UI stays responsive
+					_bwRead.RunWorkerAsync();
+				}
 			}
 		}
 
@@ -917,11 +955,27 @@ namespace KruispuntGroep4.Simulator.Communication
 						// The message is received from the host
 						message = reader.ReadLine();
 					}
-					catch (IOException e) /* Catch IO exception */
-					{
-						// The message is the exception message
-						message = e.Message;
-					}
+					catch (IOException) { } /* Catch IO exception */
+				}
+				else
+				{
+					// User wants to cancel while reading,
+					// so request cancellation of
+					// background worker write,
+					// so the UI stays responsive
+					_bwRead.CancelAsync();
+
+					// User wants to cancel while reading,
+					// so request cancellation of
+					// background worker write,
+					// so the UI stays responsive
+					_bwSpawn.CancelAsync();
+
+					// Reset client
+					_client = null;
+
+					// Return the message
+					return message;
 				}
 			}
 
@@ -956,58 +1010,76 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <param name="e">Whether the connection with the host was lost</param>
 		private void RunWorkerCompletedReading(object sender, RunWorkerCompletedEventArgs e)
 		{
-			// Create the received message from the result
-			string message = e.Result.ToString();
-
-			// If the message probably is valid JSON
-			if (message.StartsWith(Strings.BraceOpen) ||
-				message.StartsWith(Strings.BracketOpen))
+			// If the user interfered
+			if (e.Cancelled)
 			{
-				// Parse JSON string
-				var json = DynamicJson.Parse(message);
+				// Collect host information from textboxes
+				string address = _tbAddress.Text;
+				int port = int.Parse(_tbPort.Text);
+				Tuple<string, int> host = new Tuple<string, int>(address, port);
 
-				// Extract parameter values in dynamic JSON format
-				var count = ((dynamic[])json).Count();
-				var light = ((dynamic[])json).Select(d => d.light);
-				var state = ((dynamic[])json).Select(d => d.state);
+				// Reconnect in the background worker write,
+				// so the UI stays responsive
+				_bwWrite.RunWorkerAsync(host);
+			}
+			else
+			{
+				// Create the received message from the result
+				string message = e.Result.ToString();
 
-				// For every JSON object
-				for (int i = 0; i < count; i++)
+				// If the message probably is valid JSON
+				if (message.StartsWith(Strings.BraceOpen) ||
+					message.StartsWith(Strings.BracketOpen))
 				{
-					// Create strings from parameter values
-					string strLight = light.ElementAt(i);
-					string strState = state.ElementAt(i).ToLower();
+					// Parse JSON string
+					var json = DynamicJson.Parse(message);
 
-					// Initialize lights enum
-					LightsEnum lightsEnum = LightsEnum.Off;
+					// Extract parameter values in dynamic JSON format
+					var count = ((dynamic[])json).Count();
+					var light = ((dynamic[])json).Select(d => d.light);
+					var state = ((dynamic[])json).Select(d => d.state);
 
-					// What state is it?
-					switch (strState)
+					// For every JSON object
+					for (int i = 0; i < count; i++)
 					{
-						case Strings.LightStateBlink: /* It is blinking */
-							lightsEnum = LightsEnum.Blink;
-							break;
-						case Strings.LightStateGreen: /* It is green */
-							lightsEnum = LightsEnum.Green;
-							break;
-						case Strings.LightStateOff: /* It is off */
-							lightsEnum = LightsEnum.Off;
-							break;
-						case Strings.LightStateRed: /* It is red */
-							lightsEnum = LightsEnum.Red;
-							break;
-						case Strings.LightStateYellow: /* It is yellow */
-							lightsEnum = LightsEnum.Yellow;
-							break;
-					}
+						// Create strings from parameter values
+						string strLight = light.ElementAt(i);
+						string strState = state.ElementAt(i).ToLower();
 
-					// Change the specified traffic light
-					_laneControl.ChangeTrafficLight(lightsEnum, strLight);
+						// Initialize lights enum
+						LightsEnum lightsEnum = LightsEnum.Off;
+
+						// What state is it?
+						switch (strState)
+						{
+							case Strings.LightStateBlink: /* It is blinking */
+								lightsEnum = LightsEnum.Blink;
+								break;
+							case Strings.LightStateGreen: /* It is green */
+								lightsEnum = LightsEnum.Green;
+								break;
+							case Strings.LightStateOff: /* It is off */
+								lightsEnum = LightsEnum.Off;
+								break;
+							case Strings.LightStateRed: /* It is red */
+								lightsEnum = LightsEnum.Red;
+								break;
+							case Strings.LightStateYellow: /* It is yellow */
+								lightsEnum = LightsEnum.Yellow;
+								break;
+						}
+
+						// Change the specified traffic light
+						_laneControl.ChangeTrafficLight(lightsEnum, strLight);
+					}
+				}
+
+				if (_bwRead != null)
+				{
+					// Read messages in the background, so the UI stays responsive
+					_bwRead.RunWorkerAsync();
 				}
 			}
-
-			// Read messages in the background, so the UI stays responsive
-			_bwRead.RunWorkerAsync();
 		}
 
 		/// <summary>
@@ -1017,9 +1089,11 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <param name="e">Run worker completed event args</param>
 		private void RunWorkerCompletedSpawning(object sender, RunWorkerCompletedEventArgs e)
 		{
-			// Disable speed down/up Buttons
-			_btnSpeedDown.Enabled = false;
-			_btnSpeedUp.Enabled = false;
+			// If the user didn't interfere
+			if (!e.Cancelled)
+			{
+				SpawnEnd();
+			}
 		}
 
 		/// <summary>
@@ -1040,10 +1114,10 @@ namespace KruispuntGroep4.Simulator.Communication
 				// Switch the text of button Start
 				SwitchTextButtonStart();
 			}
-			else /* Else if the user didn't interfere, display a success message */
+			else /* Else if the user didn't interfere */
 			{
-				// Disable start Button
-				_btnStart.Enabled = false;
+				// SpawnBegin
+				SpawnBegin();
 
 				// Wait for lane control
 				while (_laneControl == null) { }
@@ -1072,14 +1146,83 @@ namespace KruispuntGroep4.Simulator.Communication
 				// Send multiplier
 				WriteMessage(multiplier);
 
-				// Enable speed up Button
-				_btnSpeedUp.Enabled = true;
-
-				// Spawn all vehicles from the JSON input file
-				// in the background worker spawn,
-				// so the UI stays responsive
-				_bwSpawn.RunWorkerAsync();
+				if (!_bwSpawn.CancellationPending)
+				{
+					// Spawn all vehicles from the JSON input file
+					// in the background worker spawn,
+					// so the UI stays responsive
+					_bwSpawn.RunWorkerAsync();
+				}
 			}
+		}
+		
+		/// <summary>
+		/// When the spawning begins,
+		/// update the UI
+		/// </summary>
+		private void SpawnBegin()
+		{
+			// If the caller comes from a different thread
+			if (InvokeRequired)
+			{
+				// Execute the associated delegate asynchronously
+				BeginInvoke(new SpawnBeginDelegate(SpawnBegin));
+
+				// Can't update the UI yet
+				return;
+			}
+
+			// Enable speed up Button
+			_btnSpeedUp.Enabled = true;
+
+			// Disable start Button
+			_btnStart.Enabled = false;
+		}
+
+		/// <summary>
+		/// When the spawning ends,
+		/// update the UI
+		/// </summary>
+		private void SpawnEnd()
+		{
+			// If the caller comes from a different thread
+			if (InvokeRequired)
+			{
+				// Execute the associated delegate asynchronously
+				BeginInvoke(new SpawnEndDelegate(SpawnEnd));
+
+				// Can't update the UI yet
+				return;
+			}
+
+			_client.Close();
+			_client = null;
+
+			j = 0;
+
+			_tbAddress.ReadOnly = false;
+			_tbPort.ReadOnly = false;
+			_btnInput.Enabled = true;
+			SwitchTextButtonStart();
+
+			_multiplier = 1;
+			_lblSpeedValue.Text = _multiplier.ToString();
+
+			_btnSpeedDown.Enabled = false;
+			_btnSpeedUp.Enabled = false;
+
+			_laneControl = null;
+			_timeSpanSleep = new TimeSpan(100000000);
+
+			_bwInput = null;
+			_bwRead = null;
+			_bwSpawn = null;
+			_bwWrite = null;
+
+			InitializeBackgroundWorkerInput();
+			InitializeBackgroundWorkerRead();
+			InitializeBackgroundWorkerSpawn();
+			InitializeBackgroundWorkerWrite();
 		}
 
 		/// <summary>

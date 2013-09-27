@@ -149,7 +149,8 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                                     }
                                     else
                                     {   //on entering inner lane turn left
-                                        nextTile = vehicle.turnVehicleTile(TurnEnum.Left, nextTile);
+										if(vehicle.type.Equals(VehicleTypeEnum.bus))
+											nextTile = vehicle.turnVehicleTile(TurnEnum.Left, nextTile);
                                     }
                                 }
                                 //if he otherwise cannot continue straight in the outer lane
@@ -191,12 +192,12 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                                 }
                             }
                         }
-                        else if (nextTile.laneID.Equals(PathsEnum.OuterPathLane.ToString()) &&
-                                currentTile.laneID.Equals(vehicle.spawntile.laneID))
-                        {
-                            vehicle.turnVehicleTile(TurnEnum.Right, nextTile);
-                        }
-
+						else if (nextTile.laneID.Equals(PathsEnum.OuterPathLane.ToString()) &&
+								currentTile.laneID.Equals(vehicle.spawntile.laneID) &&
+								vehicle.type.Equals(VehicleTypeEnum.bicycle))
+						{
+							vehicle.turnVehicleTile(TurnEnum.Right, nextTile);
+						}
                     }
                     CheckTileOccupation(vehicle, nextTile);
                 }

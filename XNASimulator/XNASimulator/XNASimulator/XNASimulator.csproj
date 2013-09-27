@@ -130,6 +130,7 @@
     <Compile Include="Globals\Rotation.cs" />
     <Compile Include="Globals\Strings.cs" />
     <Compile Include="Globals\Textures.cs" />
+    <Compile Include="Globals\TurnEnum.cs" />
     <Compile Include="Globals\VehicleTypeEnum.cs" />
     <Compile Include="Main\LaneBuilder.cs" />
     <Compile Include="Main\LevelBuilder.cs" />
