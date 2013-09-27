@@ -167,7 +167,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                                     nextTile = vehicle.turnVehicleTile(TurnEnum.Left, currentTile); //Turn left
                                 }
                             }
-
                             /*
                             //Find the correct tile
 
@@ -192,6 +191,12 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                                 }
                             }
                         }
+                        else if (nextTile.laneID.Equals(PathsEnum.OuterPathLane.ToString()) &&
+                                currentTile.laneID.Equals(vehicle.spawntile.laneID))
+                        {
+                            vehicle.turnVehicleTile(TurnEnum.Right, nextTile);
+                        }
+
                     }
                     CheckTileOccupation(vehicle, nextTile);
                 }
