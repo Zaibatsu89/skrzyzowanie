@@ -807,17 +807,6 @@ namespace KruispuntGroep4.Simulator.Communication
 					Thread.Sleep(1000);
 				}
 			}
-
-			// If the cancel property is false
-			if (!e.Cancel)
-			{
-				// If the background worker read isn't busy
-				if (!_bwRead.IsBusy)
-				{
-					// Read messages in the background, so the UI stays responsive
-					_bwRead.RunWorkerAsync();
-				}
-			}
 		}
 
 		/// <summary>
@@ -1121,6 +1110,13 @@ namespace KruispuntGroep4.Simulator.Communication
 
 				// Wait for lane control
 				while (_laneControl == null) { }
+
+				// If the background worker read isn't busy
+				if (!_bwRead.IsBusy)
+				{
+					// Read messages in the background, so the UI stays responsive
+					_bwRead.RunWorkerAsync();
+				}
 
 				// Create start time and multiplier messages
 				string startTime =
