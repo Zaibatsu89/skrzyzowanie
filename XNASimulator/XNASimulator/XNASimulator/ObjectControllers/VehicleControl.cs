@@ -166,13 +166,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                                 {
                                     nextTile = vehicle.turnVehicleTile(TurnEnum.Left, currentTile); //Turn left
                                 }
-                                else if (nextTile.laneID.Equals(PathsEnum.OuterPathLane.ToString())) //runs into outer path lane
-                                {
-                                    if (vehicle.innerLaneTurns > 0) //is still he allowed to make turns in the inner lane?
-                                    {
-                                        nextTile = vehicle.turnVehicleTile(TurnEnum.Right, currentTile); //yes, then turn right
-                                    }
-                                }
                             }
 
                             /*
@@ -186,6 +179,18 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 
                             //Pick the correct path
                             nextTile = ChooseCorrectPath(vehicle, nextTile, enumerator);*/
+                        }
+                        else if (currentTile.laneID.Equals(PathsEnum.InnerPathLane.ToString()) &&
+                                 nextTile.laneID.Equals(PathsEnum.OuterPathLane.ToString()))
+                        {
+                            if (nextTile.laneID.Equals(PathsEnum.OuterPathLane.ToString())) //runs into outer path lane
+                            {
+                                if (vehicle.innerLaneTurns > 0) //is still he allowed to make turns in the inner lane?
+                                {
+                                    nextTile = vehicle.turnVehicleTile(TurnEnum.Right, currentTile); //yes, then turn right
+                                    vehicle.innerLaneTurns--;
+                                }
+                            }
                         }
                     }
                     CheckTileOccupation(vehicle, nextTile);
