@@ -1118,7 +1118,7 @@ namespace KruispuntGroep4.Simulator.Communication
 					_bwRead.RunWorkerAsync();
 				}
 
-				// Create start time and multiplier messages
+				// Create start time message
 				string startTime =
 				DynamicJson.Serialize(new object[]
 				{
@@ -1127,6 +1127,8 @@ namespace KruispuntGroep4.Simulator.Communication
 						starttime = DateTime.Now.ToShortTimeString()
 					}
 				});
+
+				// Create multiplier message
 				string multiplier =
 				DynamicJson.Serialize(new object[]
 				{
