@@ -18,7 +18,6 @@ namespace KruispuntGroep4.Simulator.Objects
         public Tile spawnTile { get; set; }
 
         public bool isPathLane { get; set; }
-        public List<RotationEnum> pathDirections { get; set; }
         public RotationEnum laneDirection { get; set; }
 
         public Lane(string ID)
@@ -28,7 +27,6 @@ namespace KruispuntGroep4.Simulator.Objects
             this.laneTiles = new List<Tile>();
             this.laneVehicles = new List<Vehicle>();
             this.vehicleQueue = new Queue<Vehicle>();
-            this.pathDirections = new List<RotationEnum>();
         }
 
         public Lane(PathsEnum ID)
@@ -39,7 +37,6 @@ namespace KruispuntGroep4.Simulator.Objects
             this.laneTiles = new List<Tile>();
             this.laneVehicles = new List<Vehicle>();
             this.vehicleQueue = new Queue<Vehicle>();
-            this.pathDirections = new List<RotationEnum>();
         }
 
         public Vehicle AddVehicle(Vehicle vehicle)

@@ -132,10 +132,46 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     //Check if this tile is part of his path
                     if (!vehicle.sprite.Equals(Textures.Pedestrian))
                     {
-                        if (!nextTile.laneIDs.Contains(vehicle.destinationLaneID) && //If it's not his destination lane
-                            !nextTile.laneIDs.Contains(vehicle.path.ToString()) && //...and not his directional lane
-                            !nextTile.laneIDs.Contains(vehicle.spawntile.laneIDs[0])) //...and also not his starting lane
+                        if (!nextTile.laneID.Equals(vehicle.destinationLaneID) && //If it's not his destination lane
+                            !nextTile.laneID.Equals(vehicle.spawntile.laneID) && //...and also not his starting lane
+                            !nextTile.laneID.Equals(PathsEnum.OuterPathLane.ToString())) //..and not the outer path lane
                         {
+                            //Check which pathing lane the vehicle is in
+                            if (currentTile.laneID.Equals(PathsEnum.OuterPathLane.ToString()))
+                            {
+                                //if he runs into the inner lane while on the outer lane
+                                if (nextTile.laneID.Equals(PathsEnum.InnerPathLane.ToString())) 
+                                {
+                                    if (!vehicle.enterInnerLane)
+                                    {
+                                        //Continue on outer lane by turning right (from spawn)
+                                        nextTile = vehicle.turnVehicleTile(TurnEnum.Right, currentTile);
+                                    }
+                                }
+                                //if he otherwise cannot continue straight in the outer lane
+                                else if (!nextTile.laneID.Equals(PathsEnum.OuterPathLane.ToString())) 
+                                {
+                                    //Continue on outer lane by turning left
+                                    nextTile = vehicle.turnVehicleTile(TurnEnum.Left, currentTile);
+                                }
+                            }
+                            //Vehicle is on the inner path lane
+                            else if (currentTile.laneID.Equals(PathsEnum.InnerPathLane.ToString()))
+                            {
+                                if(nextTile.laneID.Equals(string.Empty)) //runs into one of the center tiles with no lanes
+                                {
+                                    nextTile = vehicle.turnVehicleTile(TurnEnum.Left, currentTile); //Turn left
+                                }
+                                else if (nextTile.laneID.Equals(PathsEnum.OuterPathLane.ToString())) //runs into outer path lane
+                                {
+                                    if (vehicle.innerLaneTurns > 0) //is still he allowed to make turns in the inner lane?
+                                    {
+                                        nextTile = vehicle.turnVehicleTile(TurnEnum.Right, currentTile); //yes, then turn right
+                                    }
+                                }
+                            }
+
+                            /*
                             //Find the correct tile
 
                             //The 'index' for the adjacent tiles library
@@ -145,7 +181,7 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                             nextTile = enumerator.Current.Value;
 
                             //Pick the correct path
-                            nextTile = ChooseCorrectPath(vehicle, nextTile, enumerator);
+                            nextTile = ChooseCorrectPath(vehicle, nextTile, enumerator);*/
                         }
                     }
                     CheckTileOccupation(vehicle, nextTile);
@@ -162,34 +198,27 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             if (!(nrOfTries > 4))
             {
                 //First check if this tile exists
-                if (enumerator.Current.Value != null && enumerator.Current.Value.laneIDs.Count > 0)
+                if (enumerator.Current.Value != null && enumerator.Current.Value.laneID.Length > 0)
                 {
                     nextTile = enumerator.Current.Value;
                     bool correctPath = false;
 
-                    //Go through the lanes it's part of
-                    foreach (string laneID in nextTile.laneIDs)
-                    {
                         Lane tileLane;
-                        lists.Lanes.TryGetValue(laneID, out tileLane);
+                        lists.Lanes.TryGetValue(nextTile.laneID, out tileLane);
 
                         //Check if this is the tile the vehicle should go on
-                        if ((laneID.Equals(vehicle.destinationLaneID) || //His destination lane is a valid path
-                            laneID.Equals(vehicle.path.ToString()) || //The lane corresponding to his direction is a valid path
-                            laneID.Equals(vehicle.spawntile.laneIDs[0])) //His starting lane is a valid path
+                        if ((nextTile.laneID.Equals(vehicle.destinationLaneID) || //His destination lane is a valid path
+                            nextTile.laneID.Equals(vehicle.spawntile.laneID)) //His starting lane is a valid path
                             &&
-                            !isOppositeDirection(vehicle.rotation, enumerator.Current.Key) //He is not allowed to go in the opposite direction
-                            &&
-                            tileLane.pathDirections.Contains(enumerator.Current.Key)) //He is only allowed to go into the direction the pathlane is going
+                            !isOppositeDirection(vehicle.rotation, enumerator.Current.Key)) //He is not allowed to go in the opposite direction
                         {
                             correctPath = true;
-                            break;
                         }
                         else
                         {
                             correctPath = false;
                         }
-                    }
+                    
 
                     if (correctPath)
                     {
@@ -350,23 +379,14 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                     tile.OccupiedID = vehicle.ID;
 
                     //update vehicle's lane, if the next tile is part of a new lane
-                    if (tile.laneIDs.Count > 0 && !tile.laneIDs.Contains(vehicle.currentLane.laneID))
+                    if (tile.laneID.Length > 0 && !tile.laneID.Equals(vehicle.currentLane.laneID))
                     {
                         //Remove the vehicle from the previous lane
                         Lane lane = vehicle.currentLane;
                         lane.laneVehicles.Remove(vehicle);
 
-                        int i = 0;
-
-                        //if the new lane is the direction that needs to be followed
-                        if (tile.laneIDs.Contains(vehicle.path.ToString()))
-                        {
-                            //get the correct index
-                            i = tile.laneIDs.IndexOf(vehicle.path.ToString());
-                        }
-
                         //Add it to the current lane
-                        lists.Lanes.TryGetValue(tile.laneIDs[i], out lane); 
+                        lists.Lanes.TryGetValue(tile.laneID, out lane); 
                         vehicle.currentLane = lane;
                         lane.laneVehicles.Add(vehicle);
                     }
@@ -383,12 +403,12 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 						if (!vehicle.currentLane.laneID[1].Equals(0) && !vehicle.currentLane.laneID[1].Equals(1) && !vehicle.currentLane.laneID[1].Equals(7))
 						{
 							// Send a detection message to the host
-							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, (!previousTile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, (!previousTile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneID, vehicle.destinationLaneID);
 						}
 						else
 						{
 							// Send a detection message to the host
-							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, Strings.Null, vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, Strings.Null, vehicle.spawntile.laneID, vehicle.destinationLaneID);
 						}
                     }
 					else if (previousTile.Equals(vehicle.currentLane.detectionFar))
@@ -396,12 +416,12 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 						if (!vehicle.currentLane.laneID[1].Equals(0) && !vehicle.currentLane.laneID[1].Equals(1) && !vehicle.currentLane.laneID[1].Equals(7))
 						{
 							// Send a detection message to the host
-							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.far, (!previousTile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.far, (!previousTile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneID, vehicle.destinationLaneID);
 						}
 						else
 						{
 							// Send a detection message to the host
-							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.far, Strings.Null, vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.far, Strings.Null, vehicle.spawntile.laneID, vehicle.destinationLaneID);
 						}
 					}
 
@@ -411,12 +431,12 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 						if (!vehicle.currentLane.laneID[1].Equals(0) && !vehicle.currentLane.laneID[1].Equals(1) && !vehicle.currentLane.laneID[1].Equals(7))
 						{
 							// Send a detection message to the host
-							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, (!tile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, (!tile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneID, vehicle.destinationLaneID);
 						}
 						else
 						{
 							// Send a detection message to the host
-							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, Strings.Null, vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.close, Strings.Null, vehicle.spawntile.laneID, vehicle.destinationLaneID);
 						}
                     }
 					else if (tile.Equals(vehicle.currentLane.detectionFar))
@@ -424,12 +444,12 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 						if (!vehicle.currentLane.laneID[1].Equals(0) && !vehicle.currentLane.laneID[1].Equals(1) && !vehicle.currentLane.laneID[1].Equals(7))
 						{
 							// Send a detection message to the host
-							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.far, (!tile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.far, (!tile.isOccupied).ToString().ToLower(), vehicle.spawntile.laneID, vehicle.destinationLaneID);
 						}
 						else
 						{
 							// Send a detection message to the host
-							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.far, Strings.Null, vehicle.spawntile.laneIDs[0], vehicle.destinationLaneID);
+							communicationForm.WriteDetectionMessage(vehicle.type, LoopEnum.far, Strings.Null, vehicle.spawntile.laneID, vehicle.destinationLaneID);
 						}
 					}
 

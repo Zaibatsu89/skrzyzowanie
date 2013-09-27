@@ -10,7 +10,6 @@ namespace KruispuntGroep4.Simulator.Objects
 		public VehicleTypeEnum type { get; set; }
 		public float speed { get; set; }
 		public RotationEnum rotation { get; set; }
-		public PathsEnum path { get; set; }
         public Vector2 position { get; set; }
         public Vector2 drawposition { get; set; }
 		public Texture2D sprite { get; set; }
@@ -24,6 +23,8 @@ namespace KruispuntGroep4.Simulator.Objects
 
 		public Lane currentLane { get; set; }
 		public Tile spawntile { get; set; }
+        public bool enterInnerLane { get; set; }
+        public int innerLaneTurns { get; set; }
 		
         public Vehicle(Texture2D texture, string ID, VehicleTypeEnum type, float speed)
         {
@@ -31,7 +32,6 @@ namespace KruispuntGroep4.Simulator.Objects
 			this.type = type;
 			this.speed = speed;
 			rotation = RotationEnum.North;
-			path = PathsEnum.EastToNorth;
             position = Vector2.Zero;
             drawposition = Vector2.Zero;
             sprite = texture;
@@ -42,6 +42,8 @@ namespace KruispuntGroep4.Simulator.Objects
             collission = new Rectangle((int)position.X, (int)position.Y, sprite.Width, sprite.Height);
             occupyingtile = Vector2.Zero;
             destinationLaneID = string.Empty;
+            enterInnerLane = false;
+            innerLaneTurns = 0;
         }
 
         //An 'empty' vehicle
@@ -51,7 +53,6 @@ namespace KruispuntGroep4.Simulator.Objects
 			this.type = VehicleTypeEnum.car;
 			this.speed = 1f;
 			rotation = RotationEnum.North;
-			path = PathsEnum.EastToNorth;
             position = Vector2.Zero;
             drawposition = Vector2.Zero;
             sprite = Textures.Default;
@@ -62,6 +63,64 @@ namespace KruispuntGroep4.Simulator.Objects
             collission = new Rectangle((int)position.X, (int)position.Y, sprite.Width, sprite.Height);
 			occupyingtile = Vector2.Zero;
             destinationLaneID = string.Empty;
+            enterInnerLane = false;
+            innerLaneTurns = 0;
+        }
+
+        public Tile turnVehicleTile(TurnEnum direction, Tile currentTile)
+        {
+            Tile tile = currentTile;
+
+            switch (direction)
+            {
+                case TurnEnum.Left:
+                    switch (this.rotation)
+                    {
+                        case RotationEnum.North:
+                            currentTile.adjacentTiles.TryGetValue(RotationEnum.West, out tile);
+                            this.rotation = RotationEnum.West;
+                            break;
+                        case RotationEnum.East:
+                            currentTile.adjacentTiles.TryGetValue(RotationEnum.North, out tile);
+                            this.rotation = RotationEnum.North;
+                            break;
+                        case RotationEnum.South:
+                            currentTile.adjacentTiles.TryGetValue(RotationEnum.East, out tile);
+                            this.rotation = RotationEnum.East;
+                            break;
+                        case RotationEnum.West:
+                            currentTile.adjacentTiles.TryGetValue(RotationEnum.South, out tile);
+                            this.rotation = RotationEnum.South;
+                            break;
+                    }
+                    break;
+                case TurnEnum.Right:
+                    switch (this.rotation)
+                    {
+                        case RotationEnum.North:
+                            currentTile.adjacentTiles.TryGetValue(RotationEnum.East, out tile);
+                            this.rotation = RotationEnum.East;
+                            break;
+                        case RotationEnum.East:
+                            currentTile.adjacentTiles.TryGetValue(RotationEnum.South, out tile);
+                            this.rotation = RotationEnum.South;
+                            break;
+                        case RotationEnum.South:
+                            currentTile.adjacentTiles.TryGetValue(RotationEnum.West, out tile);
+                            this.rotation = RotationEnum.West;
+                            break;
+                        case RotationEnum.West:
+                            currentTile.adjacentTiles.TryGetValue(RotationEnum.North, out tile);
+                            this.rotation = RotationEnum.North;
+                            break;
+                    }
+                    break;
+            }
+
+            this.drawposition = tile.DrawPosition;
+            this.position = tile.Position;
+            this.collission = tile.CollisionRectangle;
+            return tile;
         }
     }
 }

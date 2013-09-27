@@ -125,39 +125,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 
             newVehicle.destinationLaneID = destinationLaneID;
 
-            #region vehicle route
-            switch (spawnLaneID[0].ToString() + destinationLaneID[0].ToString())
-            {
-                case Strings.PathNorthEast: newVehicle.path = PathsEnum.NorthToEast;
-                    break;
-                case Strings.PathNorthSouth: newVehicle.path = PathsEnum.NorthToSouth;
-                    break;
-                case Strings.PathNorthWest: newVehicle.path = PathsEnum.NorthToWest;
-                    break;
-
-                case Strings.PathEastSouth: newVehicle.path = PathsEnum.EastToSouth;
-                    break;
-                case Strings.PathEastWest: newVehicle.path = PathsEnum.EastToWest;
-                    break;
-                case Strings.PathEastNorth: newVehicle.path = PathsEnum.EastToNorth;
-                    break;
-
-                case Strings.PathSouthWest: newVehicle.path = PathsEnum.SouthToWest;
-                    break;
-                case Strings.PathSouthNorth: newVehicle.path = PathsEnum.SouthToNorth;
-                    break;
-                case Strings.PathSouthEast: newVehicle.path = PathsEnum.SouthToEast;
-                    break;
-
-                case Strings.PathWestNorth: newVehicle.path = PathsEnum.WestToNorth;
-                    break;
-                case Strings.PathWestEast: newVehicle.path = PathsEnum.WestToEast;
-                    break;
-                case Strings.PathWestSouth: newVehicle.path = PathsEnum.WestToSouth;
-                    break;
-            }
-            #endregion
-
             //If the lane has space...
             if (!spawnLane.spawnTile.isOccupied)
             {

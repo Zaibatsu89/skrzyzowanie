@@ -34,21 +34,8 @@ namespace KruispuntGroep4.Main
 
             #region pathfinding lanes
 
-            pathlaneIDs.Add(PathsEnum.NorthToEast);
-            pathlaneIDs.Add(PathsEnum.NorthToSouth);
-            pathlaneIDs.Add(PathsEnum.NorthToWest);
-
-            pathlaneIDs.Add(PathsEnum.EastToSouth);
-            pathlaneIDs.Add(PathsEnum.EastToWest);
-            pathlaneIDs.Add(PathsEnum.EastToNorth);
-
-            pathlaneIDs.Add(PathsEnum.SouthToWest);
-            pathlaneIDs.Add(PathsEnum.SouthToNorth);
-            pathlaneIDs.Add(PathsEnum.SouthToEast);
-
-            pathlaneIDs.Add(PathsEnum.WestToNorth);
-            pathlaneIDs.Add(PathsEnum.WestToEast);
-            pathlaneIDs.Add(PathsEnum.WestToSouth);
+            pathlaneIDs.Add(PathsEnum.InnerPathLane);
+            pathlaneIDs.Add(PathsEnum.OuterPathLane);
 
             #endregion
 
@@ -74,173 +61,70 @@ namespace KruispuntGroep4.Main
             }
 
             //Then all the pathing lanes
-            foreach (KeyValuePair<string, Lane> lane in lists.Lanes)
-            {
-                if (lane.Value.isPathLane)
-                {
-                    LoadPathLane(lane.Value);
-                }
-            }
+            Lane pathLane;
+
+            lists.Lanes.TryGetValue(PathsEnum.OuterPathLane.ToString(), out pathLane); //Outer first since inner needs it
+            LoadPathLane(pathLane);
+
+            lists.Lanes.TryGetValue(PathsEnum.InnerPathLane.ToString(), out pathLane);
+            LoadPathLane(pathLane);
         }
 
         private void LoadPathLane(Lane lane)
         {
             Tile startTile;
             Lane startLane;
-            Tile removeTile;
             Lane endLane;
 
-            #region create pathing lanes
             switch (lane.pathLaneID)
             {
-                case PathsEnum.NorthToEast:                   
+                case PathsEnum.InnerPathLane:
+                    lists.Lanes.TryGetValue(Strings.LaneNorthTwo, out startLane);
+                    lists.Lanes.TryGetValue(Strings.LaneWestFive, out endLane);
+
+                    //Go South first
+                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
+                    startTile.adjacentTiles.TryGetValue(RotationEnum.South, out startTile); //2nd tile south
+                    LoadPathLane(startTile, endLane, RotationEnum.South, lane);
+
+                    //Then East
+                    lane.laneTiles[lane.laneTiles.Count - 1].adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
+                    LoadPathLane(startTile, endLane, RotationEnum.East, lane);
+
+                    //North
+                    lane.laneTiles[lane.laneTiles.Count - 1].adjacentTiles.TryGetValue(RotationEnum.North, out startTile);
+                    LoadPathLane(startTile, endLane, RotationEnum.North, lane);
+
+                    //West
+                    lane.laneTiles[lane.laneTiles.Count - 1].adjacentTiles.TryGetValue(RotationEnum.West, out startTile);
+                    LoadPathLane(startTile, endLane, RotationEnum.West, lane);
+
+                    break;
+                case PathsEnum.OuterPathLane:
                     lists.Lanes.TryGetValue(Strings.LaneNorthOne, out startLane);
-                    lists.Lanes.TryGetValue(Strings.LaneEastSix, out endLane);
+                    lists.Lanes.TryGetValue(Strings.LaneWestSix, out endLane);
 
-                    //Go East first
+                    //Go South first
                     startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.East, lane);
-                   
-                    //Remove the last tile
-                    removeTile = lane.laneTiles[lane.laneTiles.Count - 1];
-                    removeTile.laneIDs.Remove(PathsEnum.NorthToEast.ToString());
-                    lane.laneTiles.Remove(removeTile);
-
-                    //Then go South
-                    lane.laneTiles[lane.laneTiles.Count - 1].adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.South, lane);
 
-                    //And one tile to the East again
+                    //Then East
                     lane.laneTiles[lane.laneTiles.Count - 1].adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.East, lane);
-                    break;
-                case PathsEnum.NorthToSouth:
-                    lists.Lanes.TryGetValue(Strings.LaneNorthFour, out startLane);
-                    lists.Lanes.TryGetValue(Strings.LaneSouthSix, out endLane);
-
-                    //Go West first
-                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.West, lane);
-
-                    //Then South
-                    lane.laneTiles[lane.laneTiles.Count - 1].adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.South, lane);
-                    break;
-                case PathsEnum.NorthToWest:
-                    lists.Lanes.TryGetValue(Strings.LaneNorthThree, out startLane);
-                    lists.Lanes.TryGetValue(Strings.LaneWestSix, out endLane);
-
-                    //West
-                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.South, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.West, lane);
-                    break;
-
-                case PathsEnum.EastToSouth:                 
-                    lists.Lanes.TryGetValue(Strings.LaneEastOne, out startLane);
-                    lists.Lanes.TryGetValue(Strings.LaneSouthSix, out endLane);
-
-                    //South
-                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.West, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.South, lane);
-
-                    //West
-                    lane.laneTiles[lane.laneTiles.Count - 1].adjacentTiles.TryGetValue(RotationEnum.West, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.West, lane);
-                    break;
-                case PathsEnum.EastToWest:
-                    lists.Lanes.TryGetValue(Strings.LaneEastFour, out startLane);
-                    lists.Lanes.TryGetValue(Strings.LaneWestSix, out endLane);
-
-                    //North
-                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.West, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.North, lane);
-
-                    //West
-                    lane.laneTiles[lane.laneTiles.Count - 1].adjacentTiles.TryGetValue(RotationEnum.West, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.West, lane);
-                    break;
-                case PathsEnum.EastToNorth:
-                    lists.Lanes.TryGetValue(Strings.LaneEastThree, out startLane);
-                    lists.Lanes.TryGetValue(Strings.LaneNorthSix, out endLane);
-
-                    //North
-                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.West, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.North, lane);
-                    break;
-
-                case PathsEnum.SouthToEast:
-                    lists.Lanes.TryGetValue(Strings.LaneSouthThree, out startLane);
-                    lists.Lanes.TryGetValue(Strings.LaneEastSix, out endLane);
-
-                    //East
-                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.North, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.East, lane);
-                    break;
-                case PathsEnum.SouthToWest:
-                    lists.Lanes.TryGetValue(Strings.LaneSouthOne, out startLane);
-                    lists.Lanes.TryGetValue(Strings.LaneWestSix, out endLane);
-
-                    //West
-                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.North, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.West, lane);
-
-                    //North
-                    lane.laneTiles[lane.laneTiles.Count - 1].adjacentTiles.TryGetValue(RotationEnum.North, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.North, lane);
-                    break;
-                case PathsEnum.SouthToNorth:
-                    lists.Lanes.TryGetValue(Strings.LaneSouthFour, out startLane);
-                    lists.Lanes.TryGetValue(Strings.LaneNorthSix, out endLane);
-
-                    //East
-                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.North, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.East, lane);
 
                     //North
                     lane.laneTiles[lane.laneTiles.Count - 1].adjacentTiles.TryGetValue(RotationEnum.North, out startTile);
                     LoadPathLane(startTile, endLane, RotationEnum.North, lane);
-                    break;
 
-                case PathsEnum.WestToNorth:
-                    lists.Lanes.TryGetValue(Strings.LaneWestOne, out startLane);
-                    lists.Lanes.TryGetValue(Strings.LaneNorthSix, out endLane);
-
-                    //North
-                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.North, lane);
-
-                    //East
-                    lane.laneTiles[lane.laneTiles.Count - 1].adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.East, lane);
-                    break;
-                case PathsEnum.WestToEast:
-                    lists.Lanes.TryGetValue(Strings.LaneWestFour, out startLane);
-                    lists.Lanes.TryGetValue(Strings.LaneEastSix, out endLane);
-
-                    //South
-                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.South, lane);
-
-                    //East
-                    lane.laneTiles[lane.laneTiles.Count - 1].adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.East, lane);
-                    break;
-                case PathsEnum.WestToSouth:
-                    lists.Lanes.TryGetValue(Strings.LaneWestThree, out startLane);
-                    lists.Lanes.TryGetValue(Strings.LaneSouthSix, out endLane);
-
-                    //South
-                    startLane.sidewalkCrossing.adjacentTiles.TryGetValue(RotationEnum.East, out startTile);
-                    LoadPathLane(startTile, endLane, RotationEnum.South, lane);
+                    //West
+                    lane.laneTiles[lane.laneTiles.Count - 1].adjacentTiles.TryGetValue(RotationEnum.West, out startTile);
+                    LoadPathLane(startTile, endLane, RotationEnum.West, lane);
                     break;
             }
-            #endregion
         }
 
         private void LoadPathLane(Tile startTile, Lane endLane, RotationEnum direction, Lane pathLane)
         {
-            pathLane.pathDirections.Add(direction);
-
             //Add the first tile
             pathLane.laneTiles.Add(startTile);
 
@@ -252,31 +136,11 @@ namespace KruispuntGroep4.Main
                 newTile.adjacentTiles.TryGetValue(direction, out newTile);
 
                 //When you reach an existing lane...
-                if (newTile.laneIDs.Count > 0)
+                if (newTile.laneID.Length > 0)
                 {
-                    //Check the lane IDs
-                    foreach (string ID in newTile.laneIDs)
-                    {
-                        //See if it's the end lane
-                        if (ID.Equals(endLane.laneID))
-                        {
-                            //End building
-                            endBuild = true;
-                        }
-                        else //Not the end lane
-                        {
-                            //Check if it's a non-pathing lane 
-                            if (newTile.laneIDs.Count == 1 && this.laneIDs.Contains(ID))
-                            {
-                                //Stop building (in this direction)
-                                endBuild = true;
-                            }
-                            else //So it's a pathing lane, keep building
-                            {
-                                pathLane.laneTiles.Add(newTile);
-                            }
-                        }
-                    }
+                    //Stop building in this direction
+                    endBuild = true;
+                    
                 }
                 else //Tile has no lane, so add it
                 {
@@ -287,9 +151,9 @@ namespace KruispuntGroep4.Main
             //Let the tiles know they're in this lane
             foreach (Tile tile in pathLane.laneTiles)
             {
-                if (!tile.laneIDs.Contains(pathLane.laneID))
+                if (!tile.laneID.Equals(pathLane.laneID))
                 {
-                    tile.laneIDs.Add(pathLane.laneID);
+                    tile.laneID = pathLane.laneID;
                 }
             }
 
@@ -383,29 +247,21 @@ namespace KruispuntGroep4.Main
             switch (lane.laneID[0])
             {
                 case 'N':
-                    if (lane.laneID[1].Equals('6')) //6 is the exit lane, this is to help pathing
-                        lane.pathDirections.Add(RotationEnum.North);
                     laneDirection = RotationEnum.North;
                     laneSize = MainGame.LaneLengthVer;
                     lane.laneDirection = RotationEnum.South;
                     break;
                 case 'E':
-                    if (lane.laneID[1].Equals('6'))
-                        lane.pathDirections.Add(RotationEnum.East);
                     laneDirection = RotationEnum.East;
                     laneSize = MainGame.LaneLengthHor;
                     lane.laneDirection = RotationEnum.West;
                     break;
                 case 'S':
-                    if (lane.laneID[1].Equals('6'))
-                        lane.pathDirections.Add(RotationEnum.South);
                     laneDirection = RotationEnum.South;
                     laneSize = MainGame.LaneLengthVer;
                     lane.laneDirection = RotationEnum.North;
                     break;
                 case 'W':
-                    if (lane.laneID[1].Equals('6'))
-                        lane.pathDirections.Add(RotationEnum.West);
                     laneDirection = RotationEnum.West;
                     laneSize = MainGame.LaneLengthHor;
                     lane.laneDirection = RotationEnum.East;
@@ -431,7 +287,7 @@ namespace KruispuntGroep4.Main
             foreach (Tile tile in lane.laneTiles)
             {
                 //Make each lane tile know it's part of this new lane
-                tile.laneIDs.Add(lane.laneID);
+                tile.laneID = lane.laneID;
 
                 if (tile.Texture.Equals(Textures.RedLight) || tile.Texture.Equals(Textures.SidewalkLightRed))
                 {

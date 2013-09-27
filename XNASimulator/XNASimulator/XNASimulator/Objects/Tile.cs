@@ -22,7 +22,7 @@ namespace KruispuntGroep4.Simulator.Objects
         public Dictionary<RotationEnum, Tile> adjacentTiles {get; set; }
 
         public string OccupiedID { get; set; }
-        public List<string> laneIDs { get; set; } //The lane(s) this tile is a part of, if any
+        public string laneID { get; set; } //The lane this tile is a part of, if any
 
         //Bools
         public bool isOccupied = false;
@@ -43,7 +43,7 @@ namespace KruispuntGroep4.Simulator.Objects
             this.Rotation = rotation;
 
             this.OccupiedID = string.Empty;
-            this.laneIDs = new List<string>();
+            this.laneID = string.Empty;
             this.adjacentTiles = new Dictionary<RotationEnum, Tile>();
         }
     }
