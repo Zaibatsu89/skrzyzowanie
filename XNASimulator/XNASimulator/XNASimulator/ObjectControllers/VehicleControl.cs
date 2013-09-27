@@ -147,6 +147,10 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                                         //Continue on outer lane by turning right (from spawn)
                                         nextTile = vehicle.turnVehicleTile(TurnEnum.Right, currentTile);
                                     }
+                                    else
+                                    {   //on entering inner lane turn left
+                                        nextTile = vehicle.turnVehicleTile(TurnEnum.Left, nextTile);
+                                    }
                                 }
                                 //if he otherwise cannot continue straight in the outer lane
                                 else if (!nextTile.laneID.Equals(PathsEnum.OuterPathLane.ToString())) 

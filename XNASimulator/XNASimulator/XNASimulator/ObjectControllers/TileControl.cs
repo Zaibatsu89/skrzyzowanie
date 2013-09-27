@@ -82,7 +82,7 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                         string destinationLaneID = "S6";
 
                         newVehicle.destinationLaneID = destinationLaneID;
-                        newVehicle.enterInnerLane = false;
+                        newVehicle.enterInnerLane = true;
 
                         lists.Vehicles.Add(newVehicle);
 

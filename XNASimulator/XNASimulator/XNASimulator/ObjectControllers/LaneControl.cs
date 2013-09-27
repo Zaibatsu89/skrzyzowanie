@@ -123,6 +123,30 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             }
             #endregion
 
+            switch (destinationLaneID[0])
+            {
+                case 'N':   if (spawnLaneID[0].Equals('W'))
+                        newVehicle.enterInnerLane = true;
+                            if (newVehicle.type.Equals(VehicleTypeEnum.bus))
+                        newVehicle.innerLaneTurns = 1;
+                    break;
+                case 'E':   if (spawnLaneID[0].Equals('N'))
+                        newVehicle.enterInnerLane = true;
+                            if (newVehicle.type.Equals(VehicleTypeEnum.bus))
+                        newVehicle.innerLaneTurns = 1;
+                    break;
+                case 'S':   if (spawnLaneID[0].Equals('E'))
+                        newVehicle.enterInnerLane = true;
+                            if (newVehicle.type.Equals(VehicleTypeEnum.bus))
+                        newVehicle.innerLaneTurns = 1;
+                    break;
+                case 'W':   if (spawnLaneID[0].Equals('S'))
+                        newVehicle.enterInnerLane = true;
+                            if (newVehicle.type.Equals(VehicleTypeEnum.bus))
+                        newVehicle.innerLaneTurns = 1;
+                    break;
+            }
+
             newVehicle.destinationLaneID = destinationLaneID;
 
             //If the lane has space...
