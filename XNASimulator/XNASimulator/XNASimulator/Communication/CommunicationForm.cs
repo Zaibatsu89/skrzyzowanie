@@ -50,7 +50,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			InitializeBackgroundWorkerWrite();
 
 			// Initialize attributes
-			j = 0;
+			_jsonNr = 0;
 			_multiplier = 1;
 			_tbAddress.Text = CreateAddress();
 			_timeSpanSleep = new TimeSpan(100000000);
@@ -76,7 +76,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		private Label _lblPort;
 		private Label _lblSpeedKey;
 		private Label _lblSpeedValue;
-		private int j;
+		private int _jsonNr;
 		private int _multiplier;
 		private ProgressBar _progressBarFile;
 		private ProgressBar _progressBarMessages;
@@ -704,7 +704,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			int previousTime = -1;
 
 			// For each JSON string in JSON array
-			for (int i = j; i < _json.Length; i++)
+			for (int i = _jsonNr; i < _json.Length; i++)
 			{
 				// Create JSON string from JSON array
 				string json = _json[i];
@@ -768,7 +768,7 @@ namespace KruispuntGroep4.Simulator.Communication
 				if (_bwSpawn.CancellationPending)
 				{
 					e.Cancel = true;
-					j = i;
+					_jsonNr = i;
 					break;
 				}
 			}
@@ -1181,7 +1181,7 @@ namespace KruispuntGroep4.Simulator.Communication
 
 		/// <summary>
 		/// When the spawning ends,
-		/// update the UI
+		/// reset the UI
 		/// </summary>
 		private void SpawnEnd()
 		{
@@ -1195,34 +1195,37 @@ namespace KruispuntGroep4.Simulator.Communication
 				return;
 			}
 
-			_client.Close();
-			_client = null;
-
-			j = 0;
-
-			_tbAddress.ReadOnly = false;
-			_tbPort.ReadOnly = false;
+			// Reset controls, background workers and
+			// other private attributes
 			_btnInput.Enabled = true;
-			SwitchTextButtonStart();
-
-			_multiplier = 1;
-			_lblSpeedValue.Text = _multiplier.ToString();
-
 			_btnSpeedDown.Enabled = false;
 			_btnSpeedUp.Enabled = false;
-
-			_laneControl = null;
-			_timeSpanSleep = new TimeSpan(100000000);
-
 			_bwInput = null;
 			_bwRead = null;
 			_bwSpawn = null;
 			_bwWrite = null;
+			_client.Close();
+			_client = null;
+			_jsonNr = 0;
+			_laneControl = null;
+			_multiplier = 1;
+			_tbAddress.ReadOnly = false;
+			_tbPort.ReadOnly = false;
+			_timeSpanSleep = new TimeSpan(100000000);
 
+			// Reset control values
+			_lblSpeedValue.Text = _multiplier.ToString();
+			SwitchTextButtonStart();
+			
+			// Initialize background workers
 			InitializeBackgroundWorkerInput();
 			InitializeBackgroundWorkerRead();
 			InitializeBackgroundWorkerSpawn();
 			InitializeBackgroundWorkerWrite();
+
+			// Show a message box with instructions
+			MessageBox.Show(Strings.InstructionsText, Strings.InstructionsCaption,
+				MessageBoxButtons.OK, MessageBoxIcon.Information);
 		}
 
 		/// <summary>
