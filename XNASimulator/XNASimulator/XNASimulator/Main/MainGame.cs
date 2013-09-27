@@ -12,8 +12,6 @@ using Microsoft.Xna.Framework.Input;
 namespace KruispuntGroep4.Simulator.Main
 {
     //TODO: 
-    //Better Pathing
-    //Pedestrian lights
 
     //Bugs:
 
