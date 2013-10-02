@@ -57,42 +57,7 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             {
                 if (tile.CollisionRectangle.Contains(mouseArea))
                 {
-                    if (tile.isSpawn)
-                    {
-                        Lane lane;
-                        Vehicle newVehicle = new Vehicle(DEBUGvehicleID.ToString());
-
-                        lists.Lanes.TryGetValue(tile.laneID, out lane);
-
-                        VehicleTypeEnum vehicleType = VehicleTypeEnum.car;
-                        
-						switch (vehicleType)
-                        {
-                            case VehicleTypeEnum.bus: newVehicle = new Vehicle(Textures.Bus, DEBUGvehicleID.ToString(), VehicleTypeEnum.bus, 3f);
-                                break;
-                            case VehicleTypeEnum.car: newVehicle = new Vehicle(Textures.Car, DEBUGvehicleID.ToString(), VehicleTypeEnum.car, 3f);
-                                break;
-                            case VehicleTypeEnum.bicycle: newVehicle = new Vehicle(Textures.Bike, DEBUGvehicleID.ToString(), VehicleTypeEnum.bicycle, 3f);
-                                break;
-                        }
-
-                        newVehicle = lane.AddVehicle(newVehicle);
-
-                        string spawnLaneID = "N4";
-                        string destinationLaneID = "S6";
-
-                        newVehicle.destinationLaneID = destinationLaneID;
-                        newVehicle.enterInnerLane = false ;
-                        newVehicle.innerLaneTurns = 1;
-
-                        lists.Vehicles.Add(newVehicle);
-
-                        DEBUGvehicleID++;
-                    }
-                    else
-                    {
-                        this.ChangeLights(tile);
-                    }
+					this.ChangeLights(tile);
                 }
             }
         }

@@ -27,7 +27,7 @@ namespace KruispuntGroep4.Simulator.Communication
 	/// </copyright>
 	/// <author>Rinse Cramer</author>
 	/// <email>rinsecramer@gmail.com</email>
-	/// <date>2013</date>
+	/// <date>02-10-2013</date>
 	/// <summary>CommunicationForm is a form with
 	/// inputfields for address/port of host,
 	/// buttons for start/stop view & changing speed</summary>
@@ -250,9 +250,9 @@ namespace KruispuntGroep4.Simulator.Communication
 			// 
 			this._lblSpeedValue.Anchor = System.Windows.Forms.AnchorStyles.Left;
 			this._lblSpeedValue.AutoSize = true;
-			this._lblSpeedValue.Location = new System.Drawing.Point(81, 7);
+			this._lblSpeedValue.Location = new System.Drawing.Point(81, 5);
 			this._lblSpeedValue.Name = "_lblSpeedValue";
-			this._lblSpeedValue.Size = new System.Drawing.Size(13, 13);
+			this._lblSpeedValue.Size = new System.Drawing.Size(16, 17);
 			this._lblSpeedValue.TabIndex = 1;
 			this._lblSpeedValue.Text = "1";
 			// 
@@ -301,9 +301,9 @@ namespace KruispuntGroep4.Simulator.Communication
 			// 
 			this._lblAddress.Anchor = System.Windows.Forms.AnchorStyles.Right;
 			this._lblAddress.AutoSize = true;
-			this._lblAddress.Location = new System.Drawing.Point(8, 5);
+			this._lblAddress.Location = new System.Drawing.Point(4, 3);
 			this._lblAddress.Name = "_lblAddress";
-			this._lblAddress.Size = new System.Drawing.Size(20, 13);
+			this._lblAddress.Size = new System.Drawing.Size(24, 17);
 			this._lblAddress.TabIndex = 0;
 			this._lblAddress.Text = "IP:";
 			// 
@@ -312,16 +312,16 @@ namespace KruispuntGroep4.Simulator.Communication
 			this._tbAddress.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
 			this._tbAddress.Location = new System.Drawing.Point(34, 3);
 			this._tbAddress.Name = "_tbAddress";
-			this._tbAddress.Size = new System.Drawing.Size(120, 20);
+			this._tbAddress.Size = new System.Drawing.Size(120, 22);
 			this._tbAddress.TabIndex = 1;
 			// 
 			// _lblPort
 			// 
 			this._lblPort.Anchor = System.Windows.Forms.AnchorStyles.Right;
 			this._lblPort.AutoSize = true;
-			this._lblPort.Location = new System.Drawing.Point(197, 5);
+			this._lblPort.Location = new System.Drawing.Point(186, 3);
 			this._lblPort.Name = "_lblPort";
-			this._lblPort.Size = new System.Drawing.Size(35, 13);
+			this._lblPort.Size = new System.Drawing.Size(46, 17);
 			this._lblPort.TabIndex = 2;
 			this._lblPort.Text = "Poort:";
 			// 
@@ -330,7 +330,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			this._tbPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
 			this._tbPort.Location = new System.Drawing.Point(238, 3);
 			this._tbPort.Name = "_tbPort";
-			this._tbPort.Size = new System.Drawing.Size(74, 20);
+			this._tbPort.Size = new System.Drawing.Size(74, 22);
 			this._tbPort.TabIndex = 3;
 			this._tbPort.Text = "1337";
 			// 
@@ -377,9 +377,9 @@ namespace KruispuntGroep4.Simulator.Communication
 			// 
 			this._lblSpeedKey.Anchor = System.Windows.Forms.AnchorStyles.Right;
 			this._lblSpeedKey.AutoSize = true;
-			this._lblSpeedKey.Location = new System.Drawing.Point(24, 7);
+			this._lblSpeedKey.Location = new System.Drawing.Point(8, 5);
 			this._lblSpeedKey.Name = "_lblSpeedKey";
-			this._lblSpeedKey.Size = new System.Drawing.Size(51, 13);
+			this._lblSpeedKey.Size = new System.Drawing.Size(67, 17);
 			this._lblSpeedKey.TabIndex = 0;
 			this._lblSpeedKey.Text = "Snelheid:";
 			// 
@@ -404,6 +404,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			this._tableLayoutPanel4.ResumeLayout(false);
 			this._tableLayoutPanel4.PerformLayout();
 			this.ResumeLayout(false);
+
 		}
 		#endregion
 
