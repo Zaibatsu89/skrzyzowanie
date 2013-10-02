@@ -16,10 +16,9 @@
 		public const string ExceptionLevelLine = "The length of line {0} is different from all preceeding lines.";
 		public const string ExceptionPath = "Vehicle cannot find path";
 		public const string ExceptionTileType = "Unsupported tile type character '{0}' at position {1}, {2}.";
+		public const string Filter = "Invoerbestanden (*.json)|*.json";
 		public const string Grid = "Content/Grids/Crossroad.txt";
 		public const string Icon = "$this.Icon";
-		public const string InstructionsCaption = "Instructies";
-		public const string InstructionsText = "Alle voertuigen en voetgangers zijn gespawned. Herstart de controller en sluit de Weergave voordat je deze opnieuw start.";
 		public const string LaneEastFive = "E5";
 		public const string LaneEastFour = "E4";
 		public const string LaneEastOne = "E1";

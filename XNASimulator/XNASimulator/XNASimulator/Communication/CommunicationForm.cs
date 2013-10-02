@@ -29,9 +29,8 @@ namespace KruispuntGroep4.Simulator.Communication
 	/// <email>rinsecramer@gmail.com</email>
 	/// <date>2013</date>
 	/// <summary>CommunicationForm is a form with
-	/// inputfields for host address/port & messages,
-	/// buttons for start/stop view & sending messages
-	/// and a console for displaying messages</summary>
+	/// inputfields for address/port of host,
+	/// buttons for start/stop view & changing speed</summary>
 	class CommunicationForm : Form
 	{
 		#region Constructor, private attributes, dispose and initializing methods
@@ -43,23 +42,18 @@ namespace KruispuntGroep4.Simulator.Communication
 			// Initialize frontend
 			InitializeComponent();
 			
+			// Initialize attributes
+			InitializeAttributes();
+
 			// Initialize backend
 			InitializeBackgroundWorkerInput();
 			InitializeBackgroundWorkerRead();
 			InitializeBackgroundWorkerSpawn();
 			InitializeBackgroundWorkerWrite();
 
-			// Initialize attributes
-			_jsonNr = 0;
-			_multiplier = 1;
-			_tbAddress.Text = CreateAddress();
-			_timeSpanSleep = new TimeSpan(100000000);
+			// Switch the text of button Start
 			SwitchTextButtonStart();
 		}
-
-		// Appoint public attributes
-		private delegate void SpawnBeginDelegate();
-		private delegate void SpawnEndDelegate();
 
 		// Appoint private attributes
 		private BackgroundWorker _bwInput;
@@ -85,6 +79,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			_tableLayoutPanel4;
 		private TextBox _tbAddress, _tbPort;
 		private TimeSpan _timeSpanSleep;
+		private delegate void UpdateUI();
 
 		/// <summary>
 		/// Dispose the form
@@ -101,6 +96,18 @@ namespace KruispuntGroep4.Simulator.Communication
 
 			// Let my father execute the same function
 			base.Dispose(disposing);
+		}
+
+		/// <summary>
+		/// Initialize the private attributes
+		/// </summary>
+		private void InitializeAttributes()
+		{
+			// Initialize attributes
+			_jsonNr = 0;
+			_multiplier = 1;
+			_tbAddress.Text = CreateAddress();
+			_timeSpanSleep = new TimeSpan(100000000);
 		}
 
 		/// <summary>
@@ -402,6 +409,30 @@ namespace KruispuntGroep4.Simulator.Communication
 
 		#region Public methods
 		/// <summary>
+		/// Close the TCP client and update the UI
+		/// </summary>
+		public void CloseClient()
+		{
+			// If the TCP client exists
+			if (_client != null)
+			{
+				// Close TCP client
+				_client.Close();
+			}
+			else /* If the TCP client is null */
+			{
+				// User wants to cancel while connecting,
+				// so request cancellation of
+				// background worker write,
+				// so the UI stays responsive
+				_bwWrite.CancelAsync();
+			}
+
+			// Update the UI
+			SpawnEnd();
+		}
+
+		/// <summary>
 		/// Set lane control, used by a view
 		/// </summary>
 		/// <param name="laneControl">Lane control</param>
@@ -467,7 +498,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// Button 'Laad invoerbestand',
 		/// to read JSON input file
 		/// </summary>
-		/// <param name="sender">Input Button</param>
+		/// <param name="sender">Button Input</param>
 		/// <param name="e">Event args</param>
 		private void ClickInput(object sender, EventArgs e)
 		{
@@ -475,7 +506,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			FileDialog dialog = new OpenFileDialog();
 
 			// Create JSON filter
-			dialog.Filter = "Invoerbestanden (*.json)|*.json";
+			dialog.Filter = Strings.Filter;
 
 			// Create dialog result
 			DialogResult result = dialog.ShowDialog();
@@ -503,7 +534,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <summary>
 		/// Button to decrease multiplier times two and send multiplier
 		/// </summary>
-		/// <param name="sender">Speed down Button</param>
+		/// <param name="sender">Button SpeedDown</param>
 		/// <param name="e">Event args</param>
 		private void ClickSpeedDown(object sender, EventArgs e)
 		{
@@ -523,12 +554,12 @@ namespace KruispuntGroep4.Simulator.Communication
 			// If the multiplier is less than 2
 			if (_multiplier < 2)
 			{
-				// Disable speed down Button
+				// Disable button SpeedDown
 				_btnSpeedDown.Enabled = false;
 			}
 			else /* Else if the multiplier equals or is greater than 2 */
 			{
-				// Enable speed up Button
+				// Enable button SpeedUp
 				_btnSpeedUp.Enabled = true;
 			}
 		}
@@ -536,7 +567,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <summary>
 		/// Button to increase multiplier times two and send multiplier
 		/// </summary>
-		/// <param name="sender">Speed up Button</param>
+		/// <param name="sender">Button SpeedUp</param>
 		/// <param name="e">Event args</param>
 		private void ClickSpeedUp(object sender, EventArgs e)
 		{
@@ -556,12 +587,12 @@ namespace KruispuntGroep4.Simulator.Communication
 			// If the multiplier equals or is greater than 512
 			if (_multiplier >= 512)
 			{
-				// Disable speed up Button
+				// Disable button SpeedUp
 				_btnSpeedUp.Enabled = false;
 			}
 			else /* Else if the multiplier is less than 512 */
 			{
-				// Enable speed down Button
+				// Enable button SpeedDown
 				_btnSpeedDown.Enabled = true;
 			}
 		}
@@ -570,7 +601,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// Button 'Start simulatie', to run new view and to
 		/// connect to the specified host address and port
 		/// </summary>
-		/// <param name="sender">Start Button</param>
+		/// <param name="sender">Button Start</param>
 		/// <param name="e">Event args</param>
 		private void ClickStart(object sender, EventArgs e)
 		{
@@ -585,20 +616,33 @@ namespace KruispuntGroep4.Simulator.Communication
 				// Switch the text of button Start
 				SwitchTextButtonStart();
 
-				// Start running a view
-				new Thread(() =>
+				// If the TCP client exists
+				if (_client != null)
 				{
-					new MainGame(this).Run();
-				}).Start();
+					// Update the UI
+					SpawnBegin();
 
-				// Collect host information from textboxes
-				string address = _tbAddress.Text;
-				int port = int.Parse(_tbPort.Text);
-				Tuple<string, int> host = new Tuple<string, int>(address, port);
+					// Spawn vehicles in the background worker spawn,
+					// so the UI stays responsive
+					_bwSpawn.RunWorkerAsync();
+				}
+				else /* Else if the TCP client is null */
+				{
+					// Start running a view
+					new Thread(() =>
+					{
+						new MainGame(this).Run();
+					}).Start();
 
-				// Connect in the background worker write,
-				// so the UI stays responsive
-				_bwWrite.RunWorkerAsync(host);
+					// Collect host information from textboxes
+					string address = _tbAddress.Text;
+					int port = int.Parse(_tbPort.Text);
+					Tuple<string, int> host = new Tuple<string, int>(address, port);
+
+					// Connect in the background worker write,
+					// so the UI stays responsive
+					_bwWrite.RunWorkerAsync(host);
+				}
 			}
 			else /* Else if the button reads 'Stop simulatie' */
 			{
@@ -607,6 +651,16 @@ namespace KruispuntGroep4.Simulator.Communication
 				// background worker write,
 				// so the UI stays responsive
 				_bwWrite.CancelAsync();
+
+				// If the background worker spawn is busy
+				if (_bwSpawn.IsBusy)
+				{
+					// Busy spawning,
+					// so request cancellation of
+					// background worker spawn,
+					// so the UI stays responsive
+					_bwSpawn.CancelAsync();
+				}
 			}
 		}
 
@@ -682,14 +736,11 @@ namespace KruispuntGroep4.Simulator.Communication
 			// The result is the received message
 			e.Result = ReadMessage();
 
-			if (_bwRead != null)
+			// If the user requested cancellation,
+			// set Cancel property
+			if (_bwRead.CancellationPending)
 			{
-				// If the user requested cancellation,
-				// set Cancel property
-				if (_bwRead.CancellationPending)
-				{
-					e.Cancel = true;
-				}
+				e.Cancel = true;
 			}
 		}
 
@@ -706,6 +757,16 @@ namespace KruispuntGroep4.Simulator.Communication
 			// For each JSON string in JSON array
 			for (int i = _jsonNr; i < _json.Length; i++)
 			{
+				// If the user requested cancellation,
+				// set Cancel property, break and
+				// previous number is number
+				if (_bwSpawn.CancellationPending)
+				{
+					e.Cancel = true;
+					_jsonNr = i;
+					break;
+				}
+
 				// Create JSON string from JSON array
 				string json = _json[i];
 
@@ -761,16 +822,6 @@ namespace KruispuntGroep4.Simulator.Communication
 
 				// The previous time is time
 				previousTime = time;
-
-				// If the user requested cancellation,
-				// set Cancel property, break and
-				// previous number is number
-				if (_bwSpawn.CancellationPending)
-				{
-					e.Cancel = true;
-					_jsonNr = i;
-					break;
-				}
 			}
 		}
 
@@ -944,21 +995,15 @@ namespace KruispuntGroep4.Simulator.Communication
 						// The message is received from the host
 						message = reader.ReadLine();
 					}
-					catch (IOException) { } /* Catch IO exception */
+					catch (IOException) { } /* When there is no reading possible */
 				}
 				else
 				{
-					// User wants to cancel while reading,
+					// The TCP client isn't connected,
 					// so request cancellation of
-					// background worker write,
+					// background worker read,
 					// so the UI stays responsive
 					_bwRead.CancelAsync();
-
-					// User wants to cancel while reading,
-					// so request cancellation of
-					// background worker write,
-					// so the UI stays responsive
-					_bwSpawn.CancelAsync();
 
 					// Reset client
 					_client = null;
@@ -999,19 +1044,8 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// <param name="e">Whether the connection with the host was lost</param>
 		private void RunWorkerCompletedReading(object sender, RunWorkerCompletedEventArgs e)
 		{
-			// If the user interfered
-			if (e.Cancelled)
-			{
-				// Collect host information from textboxes
-				string address = _tbAddress.Text;
-				int port = int.Parse(_tbPort.Text);
-				Tuple<string, int> host = new Tuple<string, int>(address, port);
-
-				// Reconnect in the background worker write,
-				// so the UI stays responsive
-				_bwWrite.RunWorkerAsync(host);
-			}
-			else
+			// If the user didn't interfere
+			if (!e.Cancelled)
 			{
 				// Create the received message from the result
 				string message = e.Result.ToString();
@@ -1063,25 +1097,62 @@ namespace KruispuntGroep4.Simulator.Communication
 					}
 				}
 
-				if (_bwRead != null)
-				{
-					// Read messages in the background, so the UI stays responsive
-					_bwRead.RunWorkerAsync();
-				}
+				// Read messages in the background, so the UI stays responsive
+				_bwRead.RunWorkerAsync();
+			}
+			else /* Else if the connection is lost */
+			{
+				// Connection lost,
+				// so request cancellation of
+				// background worker spawn,
+				// so the UI stays responsive
+				_bwSpawn.CancelAsync();
+
+				// Collect host information from textboxes
+				string address = _tbAddress.Text;
+				int port = int.Parse(_tbPort.Text);
+				Tuple<string, int> host = new Tuple<string, int>(address, port);
+
+				// Reconnect in the background worker write,
+				// so the UI stays responsive
+				_bwWrite.RunWorkerAsync(host);
 			}
 		}
 
 		/// <summary>
-		/// Display a message saying all input JSONs are sent
+		/// Disable button SpeedDown and button SpeedUp
 		/// </summary>
 		/// <param name="sender">Background worker spawn</param>
-		/// <param name="e">Run worker completed event args</param>
+		/// <param name="e">Whether the user interfered as property Cancelled</param>
 		private void RunWorkerCompletedSpawning(object sender, RunWorkerCompletedEventArgs e)
 		{
 			// If the user didn't interfere
 			if (!e.Cancelled)
 			{
-				SpawnEnd();
+				// Enable button Input
+				_btnInput.Enabled = true;
+
+				// Reset private attributes
+				InitializeAttributes();
+				
+				// Reset speed value
+				_lblSpeedValue.Text = _multiplier.ToString();
+			}
+			else /* Else if the user interfered */
+			{
+				// Disable button SpeedDown and button SpeedUp
+				_btnSpeedDown.Enabled = false;
+				_btnSpeedUp.Enabled = false;
+
+				// Enable button Start
+				_btnStart.Enabled = true;
+			}
+
+			// If there is a reconnection
+			if (!_bwWrite.IsBusy)
+			{
+				// Switch the text of button Start
+				SwitchTextButtonStart();
 			}
 		}
 
@@ -1090,7 +1161,7 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// When the user didn't interfere, a success message is displayed
 		/// </summary>
 		/// <param name="sender">Background worker write</param>
-		/// <param name="e">Whether the user interfered as property cancelled</param>
+		/// <param name="e">Whether the user interfered as property Cancelled</param>
 		private void RunWorkerCompletedWriting(object sender, RunWorkerCompletedEventArgs e)
 		{
 			// If the user interfered
@@ -1105,7 +1176,7 @@ namespace KruispuntGroep4.Simulator.Communication
 			}
 			else /* Else if the user didn't interfere */
 			{
-				// SpawnBegin
+				// Update the UI
 				SpawnBegin();
 
 				// Wait for lane control
@@ -1164,17 +1235,25 @@ namespace KruispuntGroep4.Simulator.Communication
 			if (InvokeRequired)
 			{
 				// Execute the associated delegate asynchronously
-				BeginInvoke(new SpawnBeginDelegate(SpawnBegin));
+				BeginInvoke(new UpdateUI(SpawnBegin));
 
 				// Can't update the UI yet
 				return;
 			}
 
-			// Enable speed up Button
-			_btnSpeedUp.Enabled = true;
+			// If the multiplier can go down
+			if (_multiplier > 1)
+			{
+				// Enable button SpeedDown
+				_btnSpeedDown.Enabled = true;
+			}
 
-			// Disable start Button
-			_btnStart.Enabled = false;
+			// If the multiplier can go up
+			if (_multiplier < 512)
+			{
+				// Enable button SpeedUp
+				_btnSpeedUp.Enabled = true;
+			}
 		}
 
 		/// <summary>
@@ -1183,47 +1262,40 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// </summary>
 		private void SpawnEnd()
 		{
+			// Spawning ended,
+			// so request cancellation of
+			// background worker spawn,
+			// so the UI stays responsive
+			_bwSpawn.CancelAsync();
+
 			// If the caller comes from a different thread
 			if (InvokeRequired)
 			{
 				// Execute the associated delegate asynchronously
-				BeginInvoke(new SpawnEndDelegate(SpawnEnd));
+				BeginInvoke(new UpdateUI(SpawnEnd));
 
 				// Can't update the UI yet
 				return;
 			}
 
-			// Reset controls, background workers and
-			// other private attributes
-			_btnInput.Enabled = true;
-			_btnSpeedDown.Enabled = false;
-			_btnSpeedUp.Enabled = false;
-			_bwInput = null;
-			_bwRead = null;
-			_bwSpawn = null;
-			_bwWrite = null;
-			_client.Close();
-			_client = null;
-			_jsonNr = 0;
+			try
+			{
+				// Reset controls
+				_btnSpeedDown.Enabled = false;
+				_btnSpeedUp.Enabled = false;
+				_tbAddress.ReadOnly = false;
+				_tbPort.ReadOnly = false;
+			}
+			catch (ObjectDisposedException) { }
+
+			// Reset lane control
 			_laneControl = null;
-			_multiplier = 1;
-			_tbAddress.ReadOnly = false;
-			_tbPort.ReadOnly = false;
-			_timeSpanSleep = new TimeSpan(100000000);
 
-			// Reset control values
+			// Reset private attributes
+			InitializeAttributes();
+
+			// Reset speed value
 			_lblSpeedValue.Text = _multiplier.ToString();
-			SwitchTextButtonStart();
-			
-			// Initialize background workers
-			InitializeBackgroundWorkerInput();
-			InitializeBackgroundWorkerRead();
-			InitializeBackgroundWorkerSpawn();
-			InitializeBackgroundWorkerWrite();
-
-			// Show a message box with instructions
-			MessageBox.Show(Strings.InstructionsText, Strings.InstructionsCaption,
-				MessageBoxButtons.OK, MessageBoxIcon.Information);
 		}
 
 		/// <summary>
@@ -1231,15 +1303,25 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// </summary>
 		private void SwitchTextButtonStart()
 		{
-			// If the button start text isn't 'Start simulatie'
+			// If the caller comes from a different thread
+			if (InvokeRequired)
+			{
+				// Execute the associated delegate asynchronously
+				BeginInvoke(new UpdateUI(SwitchTextButtonStart));
+
+				// Can't update the UI yet
+				return;
+			}
+
+			// If the button Start text isn't 'Start simulatie'
 			if (!_btnStart.Text.Equals(Strings.ViewStart))
 			{
-				// The button start text is 'Start simulatie'
+				// The button Start text is 'Start simulatie'
 				_btnStart.Text = Strings.ViewStart;
 			}
-			else /* Else if the button start text is 'Start simulatie' */
+			else /* Else if the button Start text is 'Start simulatie' */
 			{
-				// The button start text is 'Stop simulatie'
+				// The button Start text is 'Stop simulatie'
 				_btnStart.Text = Strings.ViewStop;
 			}
 		}
@@ -1260,11 +1342,15 @@ namespace KruispuntGroep4.Simulator.Communication
 					// Create a stream writer for the TCP client stream
 					StreamWriter writer = new StreamWriter(_client.GetStream());
 
-					// Write the message
-					writer.WriteLine(message);
+					try
+					{
+						// Write the message
+						writer.WriteLine(message);
 
-					// Ensure that the buffer is empty
-					writer.Flush();
+						// Ensure that the buffer is empty
+						writer.Flush();
+					}
+					catch (IOException) { } /* When there is no writing possible */
 				}
 			}
 		}

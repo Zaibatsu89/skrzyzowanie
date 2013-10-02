@@ -11,10 +11,6 @@ using Microsoft.Xna.Framework.Input;
 
 namespace KruispuntGroep4.Simulator.Main
 {
-    //TODO: 
-
-    //Bugs:
-
     /// <summary>
     /// This is the main type for your game
     /// </summary>
@@ -136,14 +132,7 @@ namespace KruispuntGroep4.Simulator.Main
 			communicationForm.SetLaneControl(laneControl);
         }
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
-        /// </summary>
-        protected override void UnloadContent()
-        {
-			Content.Unload();
-        }
+        
 
         /// <summary>
         /// Allows the game to run logic such as updating the world,
@@ -173,6 +162,31 @@ namespace KruispuntGroep4.Simulator.Main
 
             base.Draw(gameTime);
         }
+
+		/// <summary>
+		/// Called after the game loop has stopped running before exiting.
+		/// </summary>
+		protected override void EndRun()
+		{
+			// Unload the content
+			UnloadContent();
+
+			// Close the TCP client of CommunicationForm
+			communicationForm.CloseClient();
+
+			// Let my father execute the same function
+			base.EndRun();
+		}
+
+		/// <summary>
+		/// UnloadContent will be called once per game and is the place to unload
+		/// all content.
+		/// </summary>
+		protected override void UnloadContent()
+		{
+			// Unload the content
+			Content.Unload();
+		}
 
         private void LoadCrossroad(string path)
         {
