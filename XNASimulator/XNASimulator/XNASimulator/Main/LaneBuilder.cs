@@ -7,12 +7,19 @@ using Microsoft.Xna.Framework;
 
 namespace KruispuntGroep4.Main
 {
+    /// <summary>
+    /// Creates all Lane objects
+    /// </summary>
     class LaneBuilder
     {
         private Lists lists;
         private List<string> laneIDs;
         private List<PathsEnum> pathlaneIDs;
 
+        /// <summary>
+        /// Initialize
+        /// </summary>
+        /// <param name="lists">Lists of all Vehicles, Lanes and Tiles</param>
         public LaneBuilder(Lists lists)
         {
             this.lists = lists;
@@ -22,6 +29,9 @@ namespace KruispuntGroep4.Main
             InitLanes();
         }
 
+        /// <summary>
+        /// Creates all empty Lanes with unique IDs
+        /// </summary>
         private void InitLanes()
         {
             for (int i = 0; i < MainGame.NrOfLanes; i++)
@@ -49,6 +59,9 @@ namespace KruispuntGroep4.Main
             }
         }
 
+        /// <summary>
+        /// Fills the lanes with the required information
+        /// </summary>
         public void LoadLanes()
         {
             //First build all the regular lanes
@@ -70,6 +83,10 @@ namespace KruispuntGroep4.Main
             LoadPathLane(pathLane);
         }
 
+        /// <summary>
+        /// Fills a pathing lane with its tiles
+        /// </summary>
+        /// <param name="lane">Lane in question</param>
         private void LoadPathLane(Lane lane)
         {
             Tile startTile;
@@ -123,6 +140,13 @@ namespace KruispuntGroep4.Main
             }
         }
 
+        /// <summary>
+        /// Loads all tiles in a single direction into a pathing lane
+        /// </summary>
+        /// <param name="startTile">Starting tile of this direction</param>
+        /// <param name="endLane">The lane at which the path must stop</param>
+        /// <param name="direction">Direction the tiles are added in</param>
+        /// <param name="pathLane">The pathing lane in question</param>
         private void LoadPathLane(Tile startTile, Lane endLane, RotationEnum direction, Lane pathLane)
         {
             //Add the first tile
@@ -159,6 +183,10 @@ namespace KruispuntGroep4.Main
 
         }
 
+        /// <summary>
+        /// Loads an entry/exit lane depending on which one it is
+        /// </summary>
+        /// <param name="lane">Lane in question</param>
         private void LoadLane(Lane lane)
         {
             //Build all the lanes starting from the location of the stoplights and going outwards
@@ -234,6 +262,11 @@ namespace KruispuntGroep4.Main
             }
         }
 
+        /// <summary>
+        /// Fills an entry/exit lane with its data
+        /// </summary>
+        /// <param name="laneStartPosition">Starting point of the lane on the crossroad grid</param>
+        /// <param name="lane">Lane in question</param>
         private void LoadLane(Vector2 laneStartPosition, Lane lane)
         {
             RotationEnum laneDirection = RotationEnum.North;

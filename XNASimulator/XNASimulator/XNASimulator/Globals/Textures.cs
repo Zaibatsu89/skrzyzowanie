@@ -2,6 +2,9 @@
 
 namespace KruispuntGroep4.Simulator.Globals
 {
+    /// <summary>
+    /// All avaliable textures that can be used
+    /// </summary>
     struct Textures
     {
         public static Texture2D RedLight;

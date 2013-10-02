@@ -5,6 +5,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace KruispuntGroep4.Simulator.Objects
 {
+    /// <summary>
+    /// A Tile object of the tile-based crossroad
+    /// and the information it contains
+    /// </summary>
     class Tile
     {
         public Texture2D Texture { get; set; }
@@ -30,6 +34,12 @@ namespace KruispuntGroep4.Simulator.Objects
         public bool isWalkway = false;
         public bool isSpawn = false;
 
+        /// <summary>
+        /// A single Tile
+        /// </summary>
+        /// <param name="texture">The Texture of the tile</param>
+        /// <param name="rotation">The rotation of the texture</param>
+        /// <param name="gridposition">The position of the tile on the crossroad grid</param>
         public Tile(Texture2D texture, RotationEnum rotation, Vector2 gridposition)
         {
             this.Height = texture.Height;

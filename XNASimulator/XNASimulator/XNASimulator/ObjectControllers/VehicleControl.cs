@@ -10,6 +10,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace KruispuntGroep4.Simulator.ObjectControllers
 {
+    /// <summary>
+    /// Handles all moving objects/vehicles in the simulator
+    /// </summary>
     class VehicleControl
     {
 		private CommunicationForm communicationForm;
@@ -18,6 +21,12 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 		private Random random;
         private int nrOfTries;
 
+        /// <summary>
+        /// Initialization
+        /// </summary>
+        /// <param name="graphics">Graphics Device used for drawing</param>
+        /// <param name="lists">Lists of all Vehicles, Lanes and Tiles</param>
+        /// <param name="communicationForm">Access to communication for detection loops</param>
         public VehicleControl(GraphicsDevice graphics, Lists lists, CommunicationForm communicationForm)
         {
 			this.communicationForm = communicationForm;
@@ -27,6 +36,10 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 			random = new Random();
         }
 
+        /// <summary>
+        /// Update is called from MainGame.Update and handles the vehicle updates
+        /// </summary>
+        /// <param name="gameTime">The game update cycle</param>
         public void Update(GameTime gameTime)
         {
             for (int i = lists.Vehicles.Count - 1; i >= 0; i--)
@@ -70,6 +83,11 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             }
         }
 
+        /// <summary>
+        /// Draws vehicles on screen, called from MainGame.Draw
+        /// </summary>
+        /// <param name="gameTime">The game update cycle</param>
+        /// <param name="spriteBatch">A collection of sprites/textures</param>
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
 			for (int i = lists.Vehicles.Count - 1; i >= 0; i--)
@@ -91,6 +109,11 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             }
         }
 
+        /// <summary>
+        /// This will check if a vehicle is still on screen
+        /// and should be considered alive or not
+        /// </summary>
+        /// <param name="vehicle">Vehicle in question</param>
         private void CheckAlive(Vehicle vehicle)
         {
             if (vehicle.alive)
@@ -116,6 +139,12 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             }
         }
 
+        /// <summary>
+        /// This is the 'brain' of the vehicle
+        /// It will choose which tile to move on 
+        /// to next and when.
+        /// </summary>
+        /// <param name="vehicle">Vehicle in question</param>
         private void MakeNextMove(Vehicle vehicle)
         {
             Tile currentTile = lists.Tiles[(int)vehicle.occupyingtile.X,(int)vehicle.occupyingtile.Y];
@@ -168,17 +197,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
                                     nextTile = vehicle.turnVehicleTile(TurnEnum.Left, currentTile); //Turn left
                                 }
                             }
-                            /*
-                            //Find the correct tile
-
-                            //The 'index' for the adjacent tiles library
-                            IEnumerator<KeyValuePair<RotationEnum, Tile>> enumerator = currentTile.adjacentTiles.GetEnumerator();
-
-                            //Take the first adjacent tile
-                            nextTile = enumerator.Current.Value;
-
-                            //Pick the correct path
-                            nextTile = ChooseCorrectPath(vehicle, nextTile, enumerator);*/
                         }
                         else if (currentTile.laneID.Equals(PathsEnum.InnerPathLane.ToString()) &&
                                  nextTile.laneID.Equals(PathsEnum.OuterPathLane.ToString()))
@@ -208,69 +226,12 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             }
         }
 
-        private Tile ChooseCorrectPath(Vehicle vehicle, Tile nextTile, IEnumerator<KeyValuePair<RotationEnum, Tile>> enumerator)
-        {
-            if (!(nrOfTries > 4))
-            {
-                //First check if this tile exists
-                if (enumerator.Current.Value != null && enumerator.Current.Value.laneID.Length > 0)
-                {
-                    nextTile = enumerator.Current.Value;
-                    bool correctPath = false;
-
-                        Lane tileLane;
-                        lists.Lanes.TryGetValue(nextTile.laneID, out tileLane);
-
-                        //Check if this is the tile the vehicle should go on
-                        if ((nextTile.laneID.Equals(vehicle.destinationLaneID) || //His destination lane is a valid path
-                            nextTile.laneID.Equals(vehicle.spawntile.laneID)) //His starting lane is a valid path
-                            &&
-                            !isOppositeDirection(vehicle.rotation, enumerator.Current.Key)) //He is not allowed to go in the opposite direction
-                        {
-                            correctPath = true;
-                        }
-                        else
-                        {
-                            correctPath = false;
-                        }
-                    
-
-                    if (correctPath)
-                    {
-                        //Rotate the vehicle in the direction of the adjacent tile
-                        vehicle.rotation = enumerator.Current.Key;
-                        vehicle.drawposition = nextTile.DrawPosition;
-                        vehicle.collission = nextTile.CollisionRectangle;
-                        vehicle.position = nextTile.Position;
-
-                        //The given tile was the correct one to take, so return it
-                        nrOfTries = 0;
-                        return nextTile;
-                    }
-                    else //The vehicle should look to the next adjacent tile
-                    {
-                        enumerator.MoveNext();
-                        nextTile = enumerator.Current.Value;
-
-                        //Check again
-                        this.nrOfTries++;
-                        return ChooseCorrectPath(vehicle, nextTile, enumerator);
-                    }
-                }
-                else //The tile doesn't exist, so take the next adjacent one
-                {
-                    enumerator.MoveNext();
-                    this.nrOfTries++;
-                    return ChooseCorrectPath(vehicle, nextTile, enumerator);
-                }
-            }
-            else
-            {
-                nrOfTries = 0;
-                throw new Exception(Strings.ExceptionPath);
-            }
-        }
-
+        /// <summary>
+        /// Checks if two given directions are opposites
+        /// </summary>
+        /// <param name="currentDirection">Current direction</param>
+        /// <param name="newDirection">New direction</param>
+        /// <returns>True or false</returns>
         private bool isOppositeDirection(RotationEnum currentDirection, RotationEnum newDirection)
         {
             bool result = false;
@@ -298,6 +259,16 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             return result;
         }
 
+        /// <summary>
+        /// Handles the tile-based collision detection
+        /// by checking if the tile is occupied or otherwise
+        /// blocking the vehicle. 
+        /// 
+        /// Also contains detection loop code since vehicles 
+        /// enter and exit tiles here.
+        /// </summary>
+        /// <param name="vehicle">Vehicle in question</param>
+        /// <param name="tile">Tile in question</param>
         private void CheckTileOccupation(Vehicle vehicle, Tile tile)
         {
             //first check if it's a red light ahead

@@ -2,6 +2,9 @@
 
 namespace KruispuntGroep4.Simulator.Globals
 {
+    /// <summary>
+    /// All wind directions used in tile and vehicle rotations
+    /// </summary>
     enum RotationEnum
     { 
         North, 
@@ -10,6 +13,9 @@ namespace KruispuntGroep4.Simulator.Globals
         West 
     }
 
+    /// <summary>
+    /// Gets the Rad value of a wind direction
+    /// </summary>
     struct Rotation
     {
         public static float getRotation(RotationEnum rotation)

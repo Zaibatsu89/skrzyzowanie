@@ -4,6 +4,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace KruispuntGroep4.Simulator.Objects
 {
+    /// <summary>
+    /// This class represents a move-able object within the simulator
+    /// and the information it contains
+    /// </summary>
     class Vehicle
     {
 		public string ID {get; set;}
@@ -26,6 +30,14 @@ namespace KruispuntGroep4.Simulator.Objects
         public bool enterInnerLane { get; set; }
         public int innerLaneTurns { get; set; }
 		
+        /// <summary>
+        /// Default vehicle with the needed values 
+        /// assigned in order to be spawned
+        /// </summary>
+        /// <param name="texture">Sprite/Texture the vehicle uses</param>
+        /// <param name="ID">Unique ID</param>
+        /// <param name="type">Type such as bus or car</param>
+        /// <param name="speed">Speed at which the vehicle moves</param>
         public Vehicle(Texture2D texture, string ID, VehicleTypeEnum type, float speed)
         {
             this.ID = ID;
@@ -46,7 +58,10 @@ namespace KruispuntGroep4.Simulator.Objects
             innerLaneTurns = 0;
         }
 
-        //An 'empty' vehicle
+        /// <summary>
+        /// An 'empty' vehicle
+        /// </summary>
+        /// <param name="ID">Unique ID</param>
         public Vehicle(string ID)
         {
             this.ID = ID;
@@ -67,6 +82,12 @@ namespace KruispuntGroep4.Simulator.Objects
             innerLaneTurns = 0;
         }
 
+        /// <summary>
+        /// This method will make the vehicle do a left or right turn
+        /// </summary>
+        /// <param name="direction">Which direction the vehicle needs to turn</param>
+        /// <param name="currentTile">Current location of the vehicle</param>
+        /// <returns>The tile the vehicle will end up on</returns>
         public Tile turnVehicleTile(TurnEnum direction, Tile currentTile)
         {
             Tile tile = currentTile;

@@ -9,6 +9,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace KruispuntGroep4.Simulator.Main
 {
+    /// <summary>
+    /// Builds up the crossroad from the crossroad file
+    /// using tiles
+    /// </summary>
     class LevelBuilder
     {
         private Lists lists;
@@ -22,12 +26,19 @@ namespace KruispuntGroep4.Simulator.Main
             get { return lists.Tiles.GetLength(1); }
         } //vertical tiles
 
-
+        /// <summary>
+        /// Initialize
+        /// </summary>
+        /// <param name="lists">Lists of all Vehicles, Tiles and Lanes</param>
         public LevelBuilder(Lists lists)
         {
             this.lists = lists;
         }
 
+        /// <summary>
+        /// Builds up the whole level out of tiles
+        /// </summary>
+        /// <param name="path">Filepath of the crossroad file</param>
         public void LoadLevel(string path)
         {
             // Load the level and ensure all of the lines are the same length.
@@ -80,6 +91,9 @@ namespace KruispuntGroep4.Simulator.Main
             this.LoadAdjacentTiles();
         }
 
+        /// <summary>
+        /// Gives all tiles knowledge of their neighbours
+        /// </summary>
         private void LoadAdjacentTiles()
         {
             foreach (Tile tile in lists.Tiles)
@@ -107,6 +121,13 @@ namespace KruispuntGroep4.Simulator.Main
             }
         }
 
+        /// <summary>
+        /// Load a single tile
+        /// </summary>
+        /// <param name="tileType">Type as defined the crossroad file</param>
+        /// <param name="x">x-position in the crossroad</param>
+        /// <param name="y">y-position in the crossroad</param>
+        /// <returns></returns>
 		private Tile LoadTile(char tileType, int x, int y)
         {
             switch (tileType)
@@ -230,6 +251,13 @@ namespace KruispuntGroep4.Simulator.Main
             }
         }
 
+        /// <summary>
+        /// Load a single tile, called after type and position was defined
+        /// </summary>
+        /// <param name="texture">Texture of the tile</param>
+        /// <param name="rotation">Rotation of the texture</param>
+        /// <param name="gridposition">Position of the tile in the crossroad grid</param>
+        /// <returns>The complete Tile</returns>
 		private Tile LoadTile(Texture2D texture, RotationEnum rotation, Vector2 gridposition)
         {
 			return new Tile(texture, rotation, gridposition);

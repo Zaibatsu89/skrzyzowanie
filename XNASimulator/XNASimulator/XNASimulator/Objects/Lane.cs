@@ -3,6 +3,11 @@ using KruispuntGroep4.Simulator.Globals;
 
 namespace KruispuntGroep4.Simulator.Objects
 {
+    /// <summary>
+    /// A lane is a collection of tiles with a unique ID
+    /// They help vehicles with pathing and are called when
+    /// a traffic light tile needs its light switched
+    /// </summary>
     class Lane
     {
         public List<Tile> laneTiles { get; set; }
@@ -20,6 +25,10 @@ namespace KruispuntGroep4.Simulator.Objects
         public bool isPathLane { get; set; }
         public RotationEnum laneDirection { get; set; }
 
+        /// <summary>
+        /// A standard entry/exit lane
+        /// </summary>
+        /// <param name="ID">Unique ID</param>
         public Lane(string ID)
         {
             this.laneID = ID;
@@ -29,6 +38,10 @@ namespace KruispuntGroep4.Simulator.Objects
             this.vehicleQueue = new Queue<Vehicle>();
         }
 
+        /// <summary>
+        /// A central lane used purely for vehicle pathing
+        /// </summary>
+        /// <param name="ID">Unique ID</param>
         public Lane(PathsEnum ID)
         {
             this.laneID = ID.ToString();
@@ -39,6 +52,14 @@ namespace KruispuntGroep4.Simulator.Objects
             this.vehicleQueue = new Queue<Vehicle>();
         }
 
+        /// <summary>
+        /// Adds vehicle to this lane object and 
+        /// fills it with the lane's information
+        /// Vehicle is returned to continue spawn
+        /// process
+        /// </summary>
+        /// <param name="vehicle">Vehicle being added</param>
+        /// <returns>Added vehicle containing lane information</returns>
         public Vehicle AddVehicle(Vehicle vehicle)
         {
             vehicle.rotation = this.laneDirection;

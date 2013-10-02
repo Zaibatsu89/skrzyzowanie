@@ -7,17 +7,30 @@ using Microsoft.Xna.Framework;
 
 namespace KruispuntGroep4.Simulator.ObjectControllers
 {
+    /// <summary>
+    /// Handles lane creation, the vehicles spawning in them
+    /// and the traffic lights contained within them
+    /// </summary>
     class LaneControl
     {
         private Lists lists;
         private int totalSpawnedVehicles;
 
+        /// <summary>
+        /// Initializing
+        /// </summary>
+        /// <param name="lists">Lists of all Vehicles, Lanes and Tiles</param>
         public LaneControl(Lists lists)
         {
             this.lists = lists;
             this.totalSpawnedVehicles = 0;
         }
 
+        /// <summary>
+        /// Goes through all lanes checking for enqueued vehicles, 
+        /// called from MainGame.Update
+        /// </summary>
+        /// <param name="gametime">a game update cycle</param>
         public void Update(GameTime gametime)
         {
             foreach (KeyValuePair<string, Lane> lane in lists.Lanes)
@@ -26,6 +39,11 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             }
         }
 
+        /// <summary>
+        /// Changed the traffic light in a lane to a new value
+        /// </summary>
+        /// <param name="newValue">the new value</param>
+        /// <param name="laneID">the ID of the lane in question</param>
         public void ChangeTrafficLight(LightsEnum newValue, string laneID)
         {
             Lane lane;
@@ -93,6 +111,13 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             }
         }
 
+        /// <summary>
+        /// Spawns vehicle in the lane it arrives from,
+        /// called from the controller through the communication
+        /// </summary>
+        /// <param name="vehicleType">Type of the vehicle such as bus or car</param>
+        /// <param name="spawnLaneID">ID of the lane it's arriving in</param>
+        /// <param name="destinationLaneID">ID of the lane it's going to</param>
         public void SpawnVehicle(VehicleTypeEnum vehicleType, string spawnLaneID, string destinationLaneID)
         {         
             Lane spawnLane;
@@ -177,6 +202,10 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             }
         }
 
+        /// <summary>
+        /// Checks if there is space on the screen to spawn another vehicle
+        /// </summary>
+        /// <param name="lane">Lane in question</param>
         private void SpawnQueuedVehicles(Lane lane)
         {
             if (lane.vehicleQueue.Count > 0)

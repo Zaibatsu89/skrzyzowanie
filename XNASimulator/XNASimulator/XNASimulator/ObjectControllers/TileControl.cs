@@ -5,6 +5,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace KruispuntGroep4.Simulator.ObjectControllers
 {
+    /// <summary>
+    /// Handles changes in Tiles
+    /// </summary>
     class TileControl
     {
         private Lists lists;
@@ -19,11 +22,20 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             get { return lists.Tiles.GetLength(1); }
         } //vertical tiles
 
+        /// <summary>
+        /// Initialize
+        /// </summary>
+        /// <param name="lists">Lists of all Vehicles, Lanes and Tiles</param>
         public TileControl(Lists lists)
         {
             this.lists = lists;
         }
 
+        /// <summary>
+        /// Draws all tiles, called from MainGame.Draw
+        /// </summary>
+        /// <param name="gameTime">a game update cycle</param>
+        /// <param name="spriteBatch">a collection of sprites/textures</param>
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             // For each tile position
@@ -49,6 +61,10 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             }
         }
 
+        /// <summary>
+        /// Checks if a mouse click is clicking on a tile
+        /// </summary>
+        /// <param name="mouseposition">Position of mouse cursor</param>
         public void CheckMouseCollision(Vector2 mouseposition)
         {
             Rectangle mouseArea = new Rectangle((int)mouseposition.X, (int)mouseposition.Y, 1, 1);
@@ -57,11 +73,17 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             {
                 if (tile.CollisionRectangle.Contains(mouseArea))
                 {
-					this.ChangeLights(tile);
+                    this.ChangeLights(tile);
                 }
             }
         }
 
+        /// <summary>
+        /// Gives the ability to manually change traffic lights
+        /// from red to green and back for demonstration
+        /// purposes.
+        /// </summary>
+        /// <param name="tile"></param>
         public void ChangeLights(Tile tile)
         {
             if (tile.isGreen == false && tile.Texture.Equals(Textures.RedLight))
@@ -76,6 +98,11 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
             }
         }
 
+        /// <summary>
+        /// The changing of lights handled by the Controller
+        /// </summary>
+        /// <param name="laneID">ID of the lane containing the traffic light</param>
+        /// <param name="colour">New value of the traffic light</param>
         public void ChangeLights(string laneID, LightsEnum colour)
         {
             Lane lane;

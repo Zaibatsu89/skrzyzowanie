@@ -4,6 +4,12 @@ using KruispuntGroep4.Simulator.Objects;
 
 namespace KruispuntGroep4.Simulator.Globals
 {
+    /// <summary>
+    /// Global class containing 
+    /// the lists of all Vehicles, Lanes
+    /// and Tiles so other classes can
+    /// tell what's going on on the crossroad
+    /// </summary>
     class Lists
     {
         public List<Vehicle> Vehicles { get; set; }
