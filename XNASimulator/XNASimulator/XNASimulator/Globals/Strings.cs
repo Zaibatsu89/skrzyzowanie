@@ -1,6 +1,9 @@
 ﻿namespace KruispuntGroep4.Globals
 {
-	class Strings
+	/// <summary>
+	/// All available strings that can be used
+	/// </summary>
+	struct Strings
 	{
 		public const string Address = "127.0.0.1";
 		public const string BraceOpen = "{";

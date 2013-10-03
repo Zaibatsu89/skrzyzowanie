@@ -27,7 +27,7 @@ namespace KruispuntGroep4.Simulator.Communication
 	/// </copyright>
 	/// <author>Rinse Cramer</author>
 	/// <email>rinsecramer@gmail.com</email>
-	/// <date>02-10-2013</date>
+	/// <date>03-10-2013</date>
 	/// <summary>CommunicationForm is a form with
 	/// inputfields for address/port of host,
 	/// buttons for start/stop view & changing speed</summary>
@@ -1279,15 +1279,15 @@ namespace KruispuntGroep4.Simulator.Communication
 				return;
 			}
 
+			// Try to reset some controls
 			try
 			{
-				// Reset controls
 				_btnSpeedDown.Enabled = false;
 				_btnSpeedUp.Enabled = false;
 				_tbAddress.ReadOnly = false;
 				_tbPort.ReadOnly = false;
 			}
-			catch (ObjectDisposedException) { }
+			catch (ObjectDisposedException) { } /* Rare exception */
 
 			// Reset lane control
 			_laneControl = null;
@@ -1343,12 +1343,11 @@ namespace KruispuntGroep4.Simulator.Communication
 					// Create a stream writer for the TCP client stream
 					StreamWriter writer = new StreamWriter(_client.GetStream());
 
+					// Try to write the message and
+					// ensure that the buffer is empty
 					try
 					{
-						// Write the message
 						writer.WriteLine(message);
-
-						// Ensure that the buffer is empty
 						writer.Flush();
 					}
 					catch (IOException) { } /* When there is no writing possible */

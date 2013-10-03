@@ -12,10 +12,11 @@ using Microsoft.Xna.Framework.Input;
 namespace KruispuntGroep4.Simulator.Main
 {
     /// <summary>
-    /// This is the main type for your game
+    /// The heart of the simulator
     /// </summary>
     class MainGame : Game
     {
+		// Appoint private attributes
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
@@ -43,6 +44,10 @@ namespace KruispuntGroep4.Simulator.Main
         private MouseState mouseStatePrevious;
         private Vector2 mousePosition;
 
+		/// <summary>
+		/// The constructor
+		/// </summary>
+		/// <param name="communication">The CommunicationForm</param>
         public MainGame(CommunicationForm communication)
         {
 			this.communicationForm = communication;
@@ -132,8 +137,6 @@ namespace KruispuntGroep4.Simulator.Main
 			communicationForm.SetLaneControl(laneControl);
         }
 
-        
-
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -188,6 +191,10 @@ namespace KruispuntGroep4.Simulator.Main
 			Content.Unload();
 		}
 
+		/// <summary>
+		/// Load the crossroad
+		/// </summary>
+		/// <param name="path">The path of the crossroad text file</param>
         private void LoadCrossroad(string path)
         {
             if (File.Exists(path))
@@ -195,6 +202,9 @@ namespace KruispuntGroep4.Simulator.Main
             else throw new Exception(Strings.ExceptionCrossroad);
         }
 
+		/// <summary>
+		/// Gather mouse button input, like an event
+		/// </summary>
         private void MouseButtonPress()
         {
             mouseStateCurrent = Mouse.GetState();

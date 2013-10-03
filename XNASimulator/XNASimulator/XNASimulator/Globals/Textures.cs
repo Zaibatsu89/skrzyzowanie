@@ -3,7 +3,7 @@
 namespace KruispuntGroep4.Simulator.Globals
 {
     /// <summary>
-    /// All avaliable textures that can be used
+    /// All available textures that can be used
     /// </summary>
     struct Textures
     {
