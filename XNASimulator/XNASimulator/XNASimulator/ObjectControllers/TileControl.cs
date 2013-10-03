@@ -11,7 +11,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
     class TileControl
     {
         private Lists lists;
-        private int DEBUGvehicleID = 0;
 
         private int LevelWidth
         {

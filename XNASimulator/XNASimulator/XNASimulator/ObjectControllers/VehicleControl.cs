@@ -19,7 +19,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
         private Lists lists;
         private GraphicsDevice graphics;
 		private Random random;
-        private int nrOfTries;
 
         /// <summary>
         /// Initialization
@@ -32,7 +31,6 @@ namespace KruispuntGroep4.Simulator.ObjectControllers
 			this.communicationForm = communicationForm;
             this.lists = lists;
             this.graphics = graphics;
-            this.nrOfTries = 0;
 			random = new Random();
         }
 

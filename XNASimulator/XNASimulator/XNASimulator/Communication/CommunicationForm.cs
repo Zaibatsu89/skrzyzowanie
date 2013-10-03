@@ -417,6 +417,12 @@ namespace KruispuntGroep4.Simulator.Communication
 			// If the TCP client exists
 			if (_client != null)
 			{
+				// Spawning ended,
+				// so request cancellation of
+				// background worker spawn,
+				// so the UI stays responsive
+				_bwSpawn.CancelAsync();
+
 				// Close TCP client
 				_client.Close();
 			}
@@ -758,16 +764,6 @@ namespace KruispuntGroep4.Simulator.Communication
 			// For each JSON string in JSON array
 			for (int i = _jsonNr; i < _json.Length; i++)
 			{
-				// If the user requested cancellation,
-				// set Cancel property, break and
-				// previous number is number
-				if (_bwSpawn.CancellationPending)
-				{
-					e.Cancel = true;
-					_jsonNr = i;
-					break;
-				}
-
 				// Create JSON string from JSON array
 				string json = _json[i];
 
@@ -819,6 +815,16 @@ namespace KruispuntGroep4.Simulator.Communication
 					// Sleep for a maximum of 10 seconds,
 					// depending on multiplier value
 					Thread.Sleep(_timeSpanSleep);
+				}
+
+				// If the user requested cancellation,
+				// set Cancel property, break and
+				// previous number is number
+				if (_bwSpawn.CancellationPending)
+				{
+					e.Cancel = true;
+					_jsonNr = i;
+					break;
 				}
 
 				// The previous time is time
@@ -998,16 +1004,19 @@ namespace KruispuntGroep4.Simulator.Communication
 					}
 					catch (IOException) { } /* When there is no reading possible */
 				}
-				else
+				else /* Else if there was a disconnection */
 				{
-					// The TCP client isn't connected,
-					// so request cancellation of
-					// background worker read,
-					// so the UI stays responsive
-					_bwRead.CancelAsync();
-
-					// Reset client
+					// Reset the TCP client
 					_client = null;
+
+					if (!_bwSpawn.CancellationPending) /* If the host disconnected */
+					{
+						// The TCP client isn't connected,
+						// so request cancellation of
+						// background worker read,
+						// so the UI stays responsive
+						_bwRead.CancelAsync();
+					}
 
 					// Return the message
 					return message;
@@ -1048,8 +1057,15 @@ namespace KruispuntGroep4.Simulator.Communication
 			// If the user didn't interfere
 			if (!e.Cancelled)
 			{
-				// Create the received message from the result
-				string message = e.Result.ToString();
+				// Initialize the message
+				string message = string.Empty;
+
+				// If the result exists
+				if (e.Result != null)
+				{
+					// The message is received from the result
+					message = e.Result.ToString();
+				}
 
 				// If the message probably is valid JSON
 				if (message.StartsWith(Strings.BraceOpen) ||
@@ -1263,12 +1279,6 @@ namespace KruispuntGroep4.Simulator.Communication
 		/// </summary>
 		private void SpawnEnd()
 		{
-			// Spawning ended,
-			// so request cancellation of
-			// background worker spawn,
-			// so the UI stays responsive
-			_bwSpawn.CancelAsync();
-
 			// If the caller comes from a different thread
 			if (InvokeRequired)
 			{
@@ -1284,16 +1294,15 @@ namespace KruispuntGroep4.Simulator.Communication
 			{
 				_btnSpeedDown.Enabled = false;
 				_btnSpeedUp.Enabled = false;
-				_tbAddress.ReadOnly = false;
-				_tbPort.ReadOnly = false;
+				_btnStart.Enabled = false;
 			}
 			catch (ObjectDisposedException) { } /* Rare exception */
 
-			// Reset lane control
-			_laneControl = null;
-
 			// Reset private attributes
 			InitializeAttributes();
+
+			// Reset lane control
+			_laneControl = null;
 
 			// Reset speed value
 			_lblSpeedValue.Text = _multiplier.ToString();
